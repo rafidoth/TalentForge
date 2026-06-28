@@ -1,0 +1,541 @@
+{
+  "version": "2.0.0",
+  "darkMode": true,
+  "gridEnabling": false,
+  "currentViewName": null,
+  "defaultView": {
+    "detailLevel": "All",
+    "tablePositions": [
+      {
+        "name": "Users",
+        "schemaName": "public",
+        "x": 12,
+        "y": 154
+      },
+      {
+        "name": "AttributeCategories",
+        "schemaName": "public",
+        "x": 12,
+        "y": 12
+      },
+      {
+        "name": "Attributes",
+        "schemaName": "public",
+        "x": 466.891796875,
+        "y": 12
+      },
+      {
+        "name": "AttributeOptions",
+        "schemaName": "public",
+        "x": 914.6310546875,
+        "y": 12
+      },
+      {
+        "name": "ProfileAttributes",
+        "schemaName": "public",
+        "x": 914.6310546875,
+        "y": 186
+      },
+      {
+        "name": "Projects",
+        "schemaName": "public",
+        "x": 466.891796875,
+        "y": 283
+      },
+      {
+        "name": "TechnologyTags",
+        "schemaName": "public",
+        "x": 12,
+        "y": 392
+      },
+      {
+        "name": "ProjectTechnologyTags",
+        "schemaName": "public",
+        "x": 914.6310546875,
+        "y": 424
+      },
+      {
+        "name": "AttributeT",
+        "schemaName": "public",
+        "x": 12,
+        "y": 621
+      },
+      {
+        "name": "AttributeTy",
+        "schemaName": "public",
+        "x": 12,
+        "y": 621
+      },
+      {
+        "name": "AttributeTyp",
+        "schemaName": "public",
+        "x": 12,
+        "y": 621
+      },
+      {
+        "name": "AttributeType",
+        "schemaName": "public",
+        "x": 12,
+        "y": 621
+      },
+      {
+        "name": "Attribute",
+        "schemaName": "public",
+        "x": 12,
+        "y": 621
+      },
+      {
+        "name": "AttributeTypes",
+        "schemaName": "public",
+        "x": 12,
+        "y": 621
+      },
+      {
+        "name": "AttributeFOptions",
+        "schemaName": "public",
+        "x": 12,
+        "y": 621
+      },
+      {
+        "name": "AttributeFrOptions",
+        "schemaName": "public",
+        "x": 12,
+        "y": 621
+      },
+      {
+        "name": "AttributeFroOptions",
+        "schemaName": "public",
+        "x": 12,
+        "y": 621
+      },
+      {
+        "name": "AttributeDOptions",
+        "schemaName": "public",
+        "x": 12,
+        "y": 621
+      },
+      {
+        "name": "AttributeDrOptions",
+        "schemaName": "public",
+        "x": 12,
+        "y": 621
+      },
+      {
+        "name": "AttributeDroOptions",
+        "schemaName": "public",
+        "x": 12,
+        "y": 621
+      },
+      {
+        "name": "AttributeDropOptions",
+        "schemaName": "public",
+        "x": 12,
+        "y": 621
+      },
+      {
+        "name": "AttributeDropdOptions",
+        "schemaName": "public",
+        "x": 12,
+        "y": 621
+      },
+      {
+        "name": "AttributeDropdoOptions",
+        "schemaName": "public",
+        "x": 12,
+        "y": 621
+      },
+      {
+        "name": "AttributeDropdowOptions",
+        "schemaName": "public",
+        "x": 12,
+        "y": 621
+      },
+      {
+        "name": "AttributeDropdownOptions",
+        "schemaName": "public",
+        "x": 12,
+        "y": 621
+      }
+    ],
+    "tableGroupCollapseStates": [],
+    "stickyNoteLayouts": [],
+    "referencePaths": [
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "AttributeCategories",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "category_id"
+        ],
+        "secondTableName": "Attributes",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Attributes",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "attribute_id"
+        ],
+        "secondTableName": "AttributeOptions",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Users",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "user_id"
+        ],
+        "secondTableName": "ProfileAttributes",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Attributes",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "attribute_id"
+        ],
+        "secondTableName": "ProfileAttributes",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Users",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "user_id"
+        ],
+        "secondTableName": "Projects",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Projects",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "project_id"
+        ],
+        "secondTableName": "ProjectTechnologyTags",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "TechnologyTags",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "tag_id"
+        ],
+        "secondTableName": "ProjectTechnologyTags",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Attributes",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "attribute_id"
+        ],
+        "secondTableName": "AttributeT",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Attributes",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "attribute_id"
+        ],
+        "secondTableName": "AttributeTy",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Attributes",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "attribute_id"
+        ],
+        "secondTableName": "AttributeTyp",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Attributes",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "attribute_id"
+        ],
+        "secondTableName": "AttributeType",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Attributes",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "attribute_id"
+        ],
+        "secondTableName": "Attribute",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Attributes",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "attribute_id"
+        ],
+        "secondTableName": "AttributeTypes",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Attributes",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "attribute_id"
+        ],
+        "secondTableName": "AttributeFOptions",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Attributes",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "attribute_id"
+        ],
+        "secondTableName": "AttributeFrOptions",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Attributes",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "attribute_id"
+        ],
+        "secondTableName": "AttributeFroOptions",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Attributes",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "attribute_id"
+        ],
+        "secondTableName": "AttributeDOptions",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Attributes",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "attribute_id"
+        ],
+        "secondTableName": "AttributeDrOptions",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Attributes",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "attribute_id"
+        ],
+        "secondTableName": "AttributeDroOptions",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Attributes",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "attribute_id"
+        ],
+        "secondTableName": "AttributeDropOptions",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Attributes",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "attribute_id"
+        ],
+        "secondTableName": "AttributeDropdOptions",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Attributes",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "attribute_id"
+        ],
+        "secondTableName": "AttributeDropdoOptions",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Attributes",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "attribute_id"
+        ],
+        "secondTableName": "AttributeDropdowOptions",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "Attributes",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "attribute_id"
+        ],
+        "secondTableName": "AttributeDropdownOptions",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "id"
+        ],
+        "firstTableName": "AttributeDropdownOptions",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "dropdown_option_id"
+        ],
+        "secondTableName": "ProfileAttributes",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      }
+    ]
+  },
+  "views": {}
+}

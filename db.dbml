@@ -1,0 +1,76 @@
+Table Users {
+  id uuid [pk]
+  email varchar [unique, not null]
+  role varchar [not null, note: 'candidate | recruiter | admin']
+  created_at timestamp
+  updated_at timestamp
+}
+
+
+
+Table Attributes {
+  id uuid [pk]
+  category_id uuid [ref: > AttributeCategories.id]
+  name varchar [unique, not null]
+  type enum [not null, note: 'string | text | image | numeric | date | period | boolean | dropdown']
+  is_builtin boolean [default: false]
+  created_at timestamp
+}
+
+Table AttributeCategories {
+  id uuid [pk]
+  name varchar [unique, not null, note: 'Certification, Soft Skills, etc.']
+}
+
+Table AttributeDropdownOptions {
+  id uuid [pk]
+  attribute_id uuid [ref: > Attributes.id]
+  label varchar [not null]
+  note: 'Only for dropdown type attributes'
+}
+
+Table ProfileAttributes {
+  id uuid [pk]
+  user_id uuid [ref: > Users.id]
+  attribute_id uuid [ref: > Attributes.id]
+  numeric_value numeric
+  string_value varchar
+  text_value text
+  image_value varchar [note: 'URL to the image']
+  date_value date
+  period_start date
+  period_end date
+  boolean_value boolean
+  dropdown_option_id uuid [ref: > AttributeDropdownOptions.id]
+  created_at timestamp
+  updated_at timestamp
+
+  indexes {
+    (user_id, attribute_id) [unique]
+  }
+}
+
+Table Projects {
+  id uuid [pk]
+  user_id uuid [ref: > Users.id]
+  name varchar [not null]
+  start_date date
+  end_date date
+  description text [note: 'Markdown formatted']
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table TechnologyTags {
+  id uuid [pk]
+  name varchar [unique, not null]
+}
+
+Table ProjectTechnologyTags {
+  project_id uuid [ref: > Projects.id]
+  tag_id uuid [ref: > TechnologyTags.id]
+
+  indexes {
+    (project_id, tag_id) [pk]
+  }
+}
