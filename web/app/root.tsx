@@ -7,8 +7,15 @@ import {
   ScrollRestoration,
 } from "react-router";
 
+import "@mantine/core/styles.css";
 import type { Route } from "./+types/root";
-import "./app.css";
+import {
+  MantineProvider,
+  createTheme,
+  type MantineColorsTuple,
+  mantineHtmlProps
+} from "@mantine/core";
+import { cwd } from "process";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -23,9 +30,30 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+
+const myColor: MantineColorsTuple = [
+  '#f3edff',
+  '#e0d7fa',
+  '#beabf0',
+  '#9a7de6',
+  '#7c55de',
+  '#693cd9',
+  '#5f30d8',
+  '#4f23c0',
+  '#461eac',
+  '#3b1898'
+];
+
+const theme = createTheme({
+  colors: {
+    myColor,
+  },
+  primaryColor: "myColor",
+});
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" {...mantineHtmlProps}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -33,7 +61,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <MantineProvider
+          defaultColorScheme="dark"
+          theme={theme}
+        >
+          {children}
+        </MantineProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

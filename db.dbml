@@ -2,6 +2,8 @@ Table Users {
   id uuid [pk]
   email varchar [unique, not null]
   role varchar [not null, note: 'candidate | recruiter | admin']
+  theme varchar [default: 'light', note: 'light | dark | system']
+  language varchar [default: 'en', note: 'en | es']
   created_at timestamp
   updated_at timestamp
 }
