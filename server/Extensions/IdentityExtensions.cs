@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
@@ -17,8 +18,13 @@ namespace server.Extensions
 
         public static IServiceCollection AddIdentityAuth(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddAuthentication()
-                .AddGoogle(options =>
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                }
+            ).AddGoogle(options =>
                 {
                     options.ClientId = configuration["Authentication:Google:ClientId"] ?? throw new ArgumentException(
                         "Google ClientId is not configured."

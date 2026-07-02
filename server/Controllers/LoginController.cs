@@ -4,92 +4,32 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using server.Dto;
 using server.services.AuthService;
 
 namespace server.Controllers;
 
-
-
-
 [ApiController]
-[Route("api")]
+[Route("api/users")]
 public class LoginController(IAuthService authService) : ControllerBase
 {
-    /*     [HttpGet("login/google")]
-        public async Task<IActionResult> GoogleLogin([FromQuery] string returnUrl = "/")
+    [AllowAnonymous]
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginDto loginDto)
+    {
+        var result = await authService.LoginAsync(loginDto);
+        if (result.IsSuccess)
         {
-            var redirectUrl = $"/api/login/google/callback?returnUrl={Uri.EscapeDataString(returnUrl)}";
-            var properties = signInManager.ConfigureExternalAuthenticationProperties(
-                "Google",
-                redirectUrl
-            );
-            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+            return Ok(result.Data);
         }
 
-        [HttpGet("login/google/callback")]
-        public async Task<IActionResult> GoogleLoginCallback([FromQuery] string? returnUrl = "/")
+        if (result.ErrorCode == "InvalidCredentials")
         {
-            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
-            if (!result.Succeeded)
-            {
-                return Redirect($"{returnUrl ?? "/"}?error=Google authentication failed.");
-            }
-
-            var claimsPrincipal = result.Principal;
-            if (claimsPrincipal == null)
-            {
-                return Redirect($"{returnUrl ?? "/"}?error=Google authentication failed. No principal found.");
-            }
-
-            var email = claimsPrincipal.FindFirstValue(ClaimTypes.Email);
-            if (email == null)
-            {
-                return Redirect($"{returnUrl ?? "/"}?error=Google authentication failed. Email claim not found.");
-            }
-
-            var providerKey = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (providerKey == null)
-            {
-                return Redirect($"{returnUrl ?? "/"}?error=Google authentication failed. NameIdentifier claim not found.");
-            }
-
-            // 1. Find user by Google login
-            var user = await signInManager.UserManager.FindByLoginAsync("Google", providerKey);
-            if (user == null)
-            {
-                // 2. Find or create user by email
-                user = await signInManager.UserManager.FindByEmailAsync(email);
-                if (user == null)
-                {
-                    user = new IdentityUser
-                    {
-                        UserName = email,
-                        Email = email,
-                        EmailConfirmed = true
-                    };
-
-                    var createUserResult = await signInManager.UserManager.CreateAsync(user);
-                    if (!createUserResult.Succeeded)
-                    {
-                        return Redirect($"{returnUrl ?? "/"}?error=Failed to create user.");
-                    }
-                }
-
-                // 3. Link Google account to user
-                var info = new UserLoginInfo("Google", providerKey, "Google");
-                var linkResult = await signInManager.UserManager.AddLoginAsync(user, info);
-                if (!linkResult.Succeeded)
-                {
-                    return Redirect($"{returnUrl ?? "/"}?error=Failed to link Google account.");
-                }
-            }
-
-            // 4. Sign the user in
-            await signInManager.SignInAsync(user, isPersistent: true);
-
-            return Redirect(returnUrl ?? "/");
+            return Unauthorized(result.Message);
         }
-     */
+        return Unauthorized();
+    }
+
     [AllowAnonymous]
     [HttpGet("login/google")]
     public IActionResult ExternalLogin([FromQuery] string provider, [FromQuery] string? returnUrl = "/")
@@ -103,7 +43,6 @@ public class LoginController(IAuthService authService) : ControllerBase
         var properties = authService.ConfigureExternalLogin(provider, redirectUrl);
         return new ChallengeResult(provider, properties);
     }
-
 
     [HttpGet("login/google/callback")]
     [AllowAnonymous]
@@ -121,17 +60,17 @@ public class LoginController(IAuthService authService) : ControllerBase
         }
 
         var result = await authService.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false);
-        if (result.Succeeded)
+        if (result.IsSuccess)
         {
-            return Redirect($"{returnUrl}");
+            return Redirect($"{returnUrl}/login/success?userId={result.Data?.UserId}");
         }
 
         var createResult = await authService.CreateExternalUserAsync(info);
-        if (createResult.Succeeded)
+        if (createResult.IsSuccess)
         {
-            return Redirect($"{returnUrl}");
+            return Redirect($"{returnUrl}/login/success?userId={createResult.Data?.UserId}");
         }
 
-        return Redirect($"{returnUrl}/unauthorized");
+        return Redirect($"{returnUrl}/login?error=GoogleAuthFailed");
     }
 }

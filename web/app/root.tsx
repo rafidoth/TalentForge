@@ -15,6 +15,8 @@ import {
   type MantineColorsTuple,
   mantineHtmlProps
 } from "@mantine/core";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useState } from "react";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -51,6 +53,17 @@ const theme = createTheme({
 });
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60 * 1000,
+          },
+        },
+      })
+  );
+
   return (
     <html lang="en" {...mantineHtmlProps}>
       <head>
@@ -60,12 +73,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <MantineProvider
-          defaultColorScheme="dark"
-          theme={theme}
-        >
-          {children}
-        </MantineProvider>
+        <QueryClientProvider client={queryClient}>
+          <MantineProvider theme={theme}>
+            {children}
+          </MantineProvider>
+        </QueryClientProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

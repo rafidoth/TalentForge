@@ -28,6 +28,5 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.ConfigureCorsPolicy().ConfigureIdentityAuth();
 
-app.MapIdentityApi<IdentityUser>();
 app.MapControllers();
 app.Run();

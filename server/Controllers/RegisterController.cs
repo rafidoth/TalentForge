@@ -6,11 +6,11 @@ using server.Dto;
 namespace server.Controllers;
 
 [ApiController]
-[Route("register")]
+[Route("api/users")]
 public class RegisterController(UserManager<IdentityUser> userManager) : ControllerBase
 {
 
-    [HttpPost("", Order = -1)]
+    [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto request)
     {
         if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
