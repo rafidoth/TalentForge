@@ -15,7 +15,6 @@ import {
   type MantineColorsTuple,
   mantineHtmlProps
 } from "@mantine/core";
-import { cwd } from "process";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },

@@ -1,4 +1,5 @@
 import type { Route } from "./+types/home";
+import { loginWithGoogle } from "../api/auth";
 import { Button } from "@mantine/core";
 
 export function meta({ }: Route.MetaArgs) {
@@ -9,9 +10,12 @@ export function meta({ }: Route.MetaArgs) {
 }
 
 export default function Home() {
+
   return (
     <div>
-      <Button variant="filled">Hello world</Button>
+      <Button variant="filled" onClick={() =>
+        loginWithGoogle()
+      } >Sign in with Google</Button>
     </div>
   );
 }

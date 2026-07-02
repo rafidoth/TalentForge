@@ -3,6 +3,7 @@ using Scalar.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using server.Data;
+using server.services.AuthService;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddUserSecrets<Program>();
@@ -13,12 +14,44 @@ builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseNpgsql(dataSource)
     );
 
-builder.Services.AddAuthorization();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddIdentityApiEndpoints<IdentityUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddAuthentication()
+    .AddGoogle(options =>
+    {
+        var clientId = builder.Configuration["Authentication:Google:ClientId"];
+        if (clientId == null)
+        {
+            throw new ArgumentException("Google ClientId is not configured.");
+        }
+
+        var clientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+        if (clientSecret == null)
+        {
+            throw new ArgumentException("Google ClientSecret is not configured.");
+        }
+
+        options.ClientId = clientId;
+        options.ClientSecret = clientSecret;
+        options.SignInScheme = IdentityConstants.ExternalScheme;
+    });
+builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 
 var app = builder.Build();
 
@@ -73,9 +106,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors("AllowFrontend");
+app.UseAuthentication();
 app.UseAuthorization();
-
+app.MapIdentityApi<IdentityUser>();
 app.MapControllers();
 
 app.Run();
