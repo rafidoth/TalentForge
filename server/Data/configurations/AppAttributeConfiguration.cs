@@ -10,6 +10,7 @@ namespace server.Data.Configurations
         {
             builder.HasIndex(a => a.Name).IsUnique();
             builder.Property(a => a.CreatedAt).HasDefaultValueSql("now()").ValueGeneratedOnAdd();
+            builder.Property<uint>("Version").IsRowVersion();
         }
     }
 }

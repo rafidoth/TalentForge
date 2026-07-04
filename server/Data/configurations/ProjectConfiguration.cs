@@ -2,13 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using server.Entities;
 
-namespace server.Data.Configurations
+namespace server.Data.configurations
 {
-    public class ProfileAttributeConfiguration : IEntityTypeConfiguration<ProfileAttribute>
+    public class ProjectConfiguration : IEntityTypeConfiguration<Project>
     {
-        public void Configure(EntityTypeBuilder<ProfileAttribute> builder)
+        public void Configure(EntityTypeBuilder<Project> builder)
         {
-            builder.HasIndex(p => new { p.UserId, p.AttributeId }).IsUnique();
             builder.Property(a => a.CreatedAt).HasDefaultValueSql("now()").ValueGeneratedOnAdd();
             builder.Property<uint>("Version").IsRowVersion();
         }
