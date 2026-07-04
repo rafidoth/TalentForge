@@ -13,6 +13,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Project> Projects { get; set; }
     public DbSet<TechnologyTag> TechnologyTags { get; set; }
     public DbSet<ProjectTechnologyTag> ProjectTechnologyTags { get; set; }
+    public DbSet<UserPreference> UserPreferences { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

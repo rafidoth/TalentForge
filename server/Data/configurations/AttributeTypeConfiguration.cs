@@ -9,6 +9,16 @@ namespace server.Data.Configurations
         public void Configure(EntityTypeBuilder<AttributeType> builder)
         {
             builder.HasIndex(a => a.Name).IsUnique();
+
+            var attributeTypeNames = new[] { "String", "Text", "Image", "Numeric", "Date", "Period", "Boolean", "One of Many" };
+
+            var attributeTypes = attributeTypeNames.Select((name, index) => new AttributeType
+            {
+                Id = index + 1,
+                Name = name
+            });
+
+            builder.HasData(attributeTypes);
         }
     }
 }

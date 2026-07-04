@@ -9,6 +9,7 @@ namespace server.Data.Configurations
         public void Configure(EntityTypeBuilder<ProfileAttribute> builder)
         {
             builder.HasIndex(p => new { p.UserId, p.AttributeId }).IsUnique();
+            builder.Property(a => a.CreatedAt).HasDefaultValueSql("now()").ValueGeneratedOnAdd();
         }
     }
 }

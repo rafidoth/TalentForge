@@ -15,12 +15,12 @@ namespace server.Entities
         [Required]
         public string Value { get; set; } = string.Empty;
 
-        public Guid? TypeId { get; set; }
+        public int? TypeId { get; set; }
 
         [ForeignKey("TypeId")]
         public AttributeType? Type { get; set; }
 
-        public Guid? CategoryId { get; set; }
+        public int? CategoryId { get; set; }
 
         [ForeignKey("CategoryId")]
         public AttributeCategory? Category { get; set; }

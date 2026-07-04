@@ -2,13 +2,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using server.Entities;
 
-namespace server.Data.Configurations
+namespace server.Data.configurations
 {
-    public class AttributeConfiguration : IEntityTypeConfiguration<AppAttribute>
+    public class UserPreferenceConfiguration : IEntityTypeConfiguration<AppAttribute>
     {
         public void Configure(EntityTypeBuilder<AppAttribute> builder)
         {
-            builder.HasIndex(a => a.Name).IsUnique();
+
             builder.Property(a => a.CreatedAt).HasDefaultValueSql("now()").ValueGeneratedOnAdd();
         }
     }

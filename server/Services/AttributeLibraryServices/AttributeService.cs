@@ -1,6 +1,6 @@
 namespace server.Services.AttributeLibraryService
 {
-    public class AttributeService
+    public class AttributeService : IAttributeService
     {
 
     }

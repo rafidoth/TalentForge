@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260703085721_AddAtrributeLibraryTables")]
-    partial class AddAtrributeLibraryTables
+    [Migration("20260704051833_AddAttributeLibraryTables")]
+    partial class AddAttributeLibraryTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -226,8 +226,8 @@ namespace server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("CategoryId")
-                        .HasColumnType("uuid");
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -239,8 +239,8 @@ namespace server.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("TypeId")
-                        .HasColumnType("uuid");
+                    b.Property<int?>("TypeId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Value")
                         .IsRequired()
@@ -260,9 +260,11 @@ namespace server.Migrations
 
             modelBuilder.Entity("server.Entities.AttributeCategory", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -274,6 +276,28 @@ namespace server.Migrations
                         .IsUnique();
 
                     b.ToTable("AttributeCategories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Personal Information"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Certifications"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Domain Knowledge"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Soft Skills"
+                        });
                 });
 
             modelBuilder.Entity("server.Entities.AttributeDropdownOption", b =>
@@ -298,9 +322,11 @@ namespace server.Migrations
 
             modelBuilder.Entity("server.Entities.AttributeType", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -312,6 +338,48 @@ namespace server.Migrations
                         .IsUnique();
 
                     b.ToTable("AttributeTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "String"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Text"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Image"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Numeric"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Date"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Period"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Boolean"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "One of Many"
+                        });
                 });
 
             modelBuilder.Entity("server.Entities.ProfileAttribute", b =>

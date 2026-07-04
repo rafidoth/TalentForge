@@ -1,12 +1,15 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
+
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
 namespace server.Migrations
 {
     /// <inheritdoc />
-    public partial class AddAtrributeLibraryTables : Migration
+    public partial class AddAttributeLibraryTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,7 +18,8 @@ namespace server.Migrations
                 name: "AttributeCategories",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -27,7 +31,8 @@ namespace server.Migrations
                 name: "AttributeTypes",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -78,8 +83,8 @@ namespace server.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Value = table.Column<string>(type: "jsonb", nullable: false),
-                    TypeId = table.Column<Guid>(type: "uuid", nullable: true),
-                    CategoryId = table.Column<Guid>(type: "uuid", nullable: true),
+                    TypeId = table.Column<int>(type: "integer", nullable: true),
+                    CategoryId = table.Column<int>(type: "integer", nullable: true),
                     IsBuiltin = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -167,6 +172,32 @@ namespace server.Migrations
                         principalTable: "Attributes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "AttributeCategories",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Personal Information" },
+                    { 2, "Certifications" },
+                    { 3, "Domain Knowledge" },
+                    { 4, "Soft Skills" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AttributeTypes",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "String" },
+                    { 2, "Text" },
+                    { 3, "Image" },
+                    { 4, "Numeric" },
+                    { 5, "Date" },
+                    { 6, "Period" },
+                    { 7, "Boolean" },
+                    { 8, "One of Many" }
                 });
 
             migrationBuilder.CreateIndex(
