@@ -1,4 +1,5 @@
 
+using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Entities;
 using server.ServiceResults;
@@ -40,6 +41,14 @@ namespace server.Services.AttributeLibraryServices
                 return ServiceResult<AttributeType>.Failure("Attribute type not found.", "NOT_FOUND");
             }
             return ServiceResult<AttributeType>.Success(type, "Attribute type retrieved successfully.");
+        }
+
+        public async Task<ServiceResult<AppAttribute?>> GetByIdAsync(Guid id)
+        {
+            var attribute = await db.Attributes.FindAsync(id);
+            return attribute != null
+                ? ServiceResult<AppAttribute?>.Success(attribute, "Attribute retrieved successfully.")
+                : ServiceResult<AppAttribute?>.Failure("Attribute not found.", "NOT_FOUND");
         }
     }
 }
