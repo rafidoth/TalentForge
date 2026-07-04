@@ -16,7 +16,8 @@ import {
   mantineHtmlProps
 } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuthStore, useCheckAuth } from "./auth/store";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -53,6 +54,7 @@ const theme = createTheme({
 });
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const checkAuth = useCheckAuth();
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -63,6 +65,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         },
       })
   );
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   return (
     <html lang="en" {...mantineHtmlProps}>

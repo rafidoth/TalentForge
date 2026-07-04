@@ -1,21 +1,21 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { Navigate, useNavigate } from 'react-router';
 import { useMutation } from '@tanstack/react-query';
 import { Container, Paper, Title, TextInput, PasswordInput, Button, Divider, Stack, Text } from '@mantine/core';
 import { login, loginWithGoogle } from '../api/auth';
-import { useAuthStore, useLogin } from '../auth/store';
-import type { LoginRequest, LoginResponse } from '../api/types';
+import { useCheckAuth, useIsAuthenticated } from '../auth/store';
+import type { LoginRequest } from '../api/types';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const authLogin = useLogin();
+  const checkAuth = useCheckAuth();
+  const isAuthenticated = useIsAuthenticated();
   const navigate = useNavigate();
-
   const mutation = useMutation({
     mutationFn: (data: LoginRequest) => login(data),
-    onSuccess: (data: LoginResponse) => {
-      authLogin(data.userId, data.role);
+    onSuccess: async () => {
+      await checkAuth();
       navigate('/app');
     },
   });
@@ -24,6 +24,11 @@ export default function Login() {
     e.preventDefault();
     mutation.mutate({ email, password });
   };
+
+
+  if (isAuthenticated) {
+    return <Navigate to="/app" replace />;
+  }
 
   return (
     <Container size={420} my={40}>

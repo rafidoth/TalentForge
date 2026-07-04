@@ -1,33 +1,58 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
 import type { UserRole } from '~/types';
+import { fetchMe, logout as apiLogout } from '~/api/auth';
 
 interface AuthState {
   isAuthenticated: boolean;
   userId: string | null;
+  email: string | null;
   role: UserRole | null;
-  login: (userId: string, role: UserRole) => void;
-  logout: () => void;
+  isLoading: boolean;
+  checkAuth: () => Promise<void>;
+  logout: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
+export const useAuthStore = create<AuthState>()((set) => ({
+  isAuthenticated: false,
+  userId: null,
+  email: null,
+  role: null,
+  isLoading: true,
+  checkAuth: async () => {
+    try {
+      const data = await fetchMe();
+      set({
+        isAuthenticated: true,
+        userId: data.userId,
+        email: data.email,
+        role: data.role as UserRole,
+        isLoading: false,
+      });
+    } catch {
+      set({
+        isAuthenticated: false,
+        userId: null,
+        email: null,
+        role: null,
+        isLoading: false,
+      });
+    }
+  },
+  logout: async () => {
+    await apiLogout();
+    set({
       isAuthenticated: false,
       userId: null,
+      email: null,
       role: null,
-      login: (userId, role) => set({ isAuthenticated: true, userId, role }),
-      logout: () => set({ isAuthenticated: false, userId: null, role: null }),
-    }),
-    {
-      name: 'auth-storage',
-      storage: createJSONStorage(() => localStorage),
-    }
-  )
-);
+      isLoading: false,
+    });
+  },
+}));
 
 export const useIsAuthenticated = () => useAuthStore((state) => state.isAuthenticated);
 export const useUserId = () => useAuthStore((state) => state.userId);
 export const useUserRole = () => useAuthStore((state) => state.role);
-export const useLogin = () => useAuthStore((state) => state.login);
+export const useAuthLoading = () => useAuthStore((state) => state.isLoading);
+export const useCheckAuth = () => useAuthStore((state) => state.checkAuth);
 export const useLogout = () => useAuthStore((state) => state.logout);

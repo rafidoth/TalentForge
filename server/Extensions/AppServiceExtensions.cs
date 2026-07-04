@@ -1,4 +1,4 @@
-using server.services.AuthService;
+using server.Services.UserServices;
 
 namespace server.Extensions
 {

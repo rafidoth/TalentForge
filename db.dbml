@@ -1,22 +1,32 @@
 Table Users {
   id uuid [pk]
   email varchar [unique, not null]
-  role varchar [not null, note: 'candidate | recruiter | admin']
-  theme varchar [default: 'light', note: 'light | dark | system']
-  language varchar [default: 'en', note: 'en | es']
+  password_hash varchar [not null]
   created_at timestamp
   updated_at timestamp
 }
 
-
+Table UserPreferences {
+  id uuid [pk]
+  user_id uuid [ref: > Users.id]
+  theme varchar [default: 'light', note: 'light | dark | system']
+  language varchar [default: 'en', note: 'en | es']
+  created_at timestamp
+}
 
 Table Attributes {
   id uuid [pk]
   category_id uuid [ref: > AttributeCategories.id]
   name varchar [unique, not null]
-  type enum [not null, note: 'string | text | image | numeric | date | period | boolean | dropdown']
+  value jsonb [not null, note: 'The value of the attribute, stored as JSON. The structure of the JSON depends on the type of the attribute.']
+  type_id uuid [ref: > AttributeTypes.id]
   is_builtin boolean [default: false]
   created_at timestamp
+}
+
+Table AttributeTypes{
+  id uuid [pk]
+  name varchar [unique, not null, note: 'string | text | image | numeric | date | period | boolean | dropdown']
 }
 
 Table AttributeCategories {
@@ -35,15 +45,7 @@ Table ProfileAttributes {
   id uuid [pk]
   user_id uuid [ref: > Users.id]
   attribute_id uuid [ref: > Attributes.id]
-  numeric_value numeric
-  string_value varchar
-  text_value text
-  image_value varchar [note: 'URL to the image']
-  date_value date
-  period_start date
-  period_end date
-  boolean_value boolean
-  dropdown_option_id uuid [ref: > AttributeDropdownOptions.id]
+  value jsonb [not null, note: 'The value of the attribute, stored as JSON. The structure of the JSON depends on the type of the attribute.']
   created_at timestamp
   updated_at timestamp
 
