@@ -4,7 +4,7 @@ public record CreateAttributeDto(
     string Name,
     int TypeId,
     int CategoryId,
-    bool IsBuiltin = false,
+    string Value,
     List<string>? DropdownOptions = null
     );
 
@@ -16,7 +16,6 @@ public record UpdateAttributeDto(
     uint Version
 );
 
-// For searching/filtering attributes
 public record AttributeSearchQuery(string? Prefix = null, int? CategoryId = null, string? UserId = null, int Page = 1, int PageSize = 20);
 
 // Response DTO for a single attribute
