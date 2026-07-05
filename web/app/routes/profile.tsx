@@ -30,7 +30,6 @@ export default function Profile() {
         refetch,
     } = useMeSection();
 
-    // Wait for the async auth check to finish before redirecting
     if (authLoading) {
         return (
             <Container size="md" py="xl">
@@ -64,18 +63,15 @@ export default function Profile() {
 
     const { meAttributes } = meSection;
 
-    // Attributes shown in the hero card — excluded from the details card
     const heroAttributeNames = ['First Name', 'Last Name', 'Location', 'Profile Image'];
 
-    // Remaining attributes go into the details card
     const detailAttributes = meAttributes.filter(
         (a) => !heroAttributeNames.includes(a.attributeName)
     );
 
     return (
-        <Container size="md" py="xl">
+        <Container py="xl">
             <Stack gap="lg">
-                {/* Back navigation */}
                 <Group>
                     <Button
                         variant="subtle"
@@ -86,31 +82,16 @@ export default function Profile() {
                         Back to Dashboard
                     </Button>
                 </Group>
-
-                {/* Hero card with avatar, name, role, location */}
                 <ProfileHero
                     attributes={meAttributes}
                     email={email}
                     role={role}
                 />
+                <ProfileDetailsCard
+                    title="Info"
+                    icon={<IdentificationCardIcon size={20} />}
+                />
 
-                {/* Attribute detail cards */}
-                <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
-                    <ProfileDetailsCard
-                        title="Personal Information"
-                        icon={<UserIcon size={20} weight="duotone" />}
-                        attributes={meAttributes}
-                        include={['First Name', 'Last Name']}
-                    />
-
-                    {detailAttributes.length > 0 && (
-                        <ProfileDetailsCard
-                            title="Additional Details"
-                            icon={<IdentificationCardIcon size={20} weight="duotone" />}
-                            attributes={detailAttributes}
-                        />
-                    )}
-                </SimpleGrid>
             </Stack>
         </Container>
     );

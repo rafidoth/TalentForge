@@ -26,25 +26,20 @@ const roleBadgeColor: Record<string, string> = {
 export function ProfileHero({ attributes, email, role }: ProfileHeroProps) {
     const displayName = getDisplayName(attributes);
     const imageUrl = getProfileImageUrl(attributes);
-    const location = getAttributeValue(attributes, 'Location');
+    const location = getAttributeValue(attributes, 'Address');
 
     return (
         <Paper
-            shadow="sm"
-            radius="lg"
+            shadow="none"
             p="xl"
-            withBorder
-            style={{
-                background:
-                    'linear-gradient(135deg, var(--mantine-color-myColor-light) 0%, var(--mantine-color-body) 40%)',
-            }}
+            withBorder={false}
         >
             <Group align="flex-start" gap="xl" wrap="wrap">
                 <Avatar
                     src={imageUrl}
                     alt={displayName}
                     size={120}
-                    radius="xl"
+                    radius="sm"
                     style={{
                         border: '4px solid var(--mantine-color-myColor-6)',
                         boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
@@ -79,9 +74,8 @@ export function ProfileHero({ attributes, email, role }: ProfileHeroProps) {
                                 <MapPinIcon
                                     size={16}
                                     weight="fill"
-                                    color="var(--mantine-color-dimmed)"
                                 />
-                                <Text size="sm" c="dimmed">
+                                <Text  >
                                     {location}
                                 </Text>
                             </Group>

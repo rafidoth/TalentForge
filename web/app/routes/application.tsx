@@ -9,11 +9,6 @@ export default function Application() {
     return (
         <AppShell
             header={{ height: 60 }}
-            navbar={{
-                width: 250,
-                breakpoint: 'sm',
-                collapsed: { mobile: !opened },
-            }}
             padding="md"
         >
             <AppHeader opened={opened} toggle={toggle} />
