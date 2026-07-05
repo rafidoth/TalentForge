@@ -22,6 +22,8 @@ if (app.Environment.IsDevelopment())
 
     await app.SeedRoles();
     await app.SeedAdminUser(builder.Configuration);
+    await app.SeedBuiltInAttributes();
+
 }
 
 app.UseHttpsRedirection();

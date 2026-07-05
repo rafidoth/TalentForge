@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using server.Services.AttributeLibraryServices;
 
 namespace server.Extensions
 {
@@ -16,30 +17,23 @@ namespace server.Extensions
             return services;
         }
 
-        // public static async Task<WebApplication> SeedBuiltInAttributes(this WebApplication app)
-        // {
-        //     using var scope = app.Services.CreateScope();
-        //     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+        public static async Task<WebApplication> SeedBuiltInAttributes(this WebApplication app)
+        {
+            using var scope = app.Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var attrService = scope.ServiceProvider.GetRequiredService<IAttributeService>();
 
-        //     var adminEmail = configuration["RootAdmin:Email"] ?? throw new ArgumentException(
-        //         "Admin user email is not configured."
-        //     );
-        //     var adminPassword = configuration["RootAdmin:Password"] ?? throw new ArgumentException(
-        //         "Admin user password is not configured."
-        //     );
+            if (!await db.Attributes.AnyAsync(a => a.IsBuiltin))
+            {
+                var builtInAttributes = new server.Data.BuiltInAttributes(attrService);
+                var attributes = await builtInAttributes.GetAsync();
 
-        //     var adminUser = await userManager.FindByEmailAsync(adminEmail);
-        //     if (adminUser == null)
-        //     {
-        //         adminUser = new IdentityUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
-        //         var result = await userManager.CreateAsync(adminUser, adminPassword);
-        //         if (result.Succeeded)
-        //         {
-        //             await userManager.AddToRoleAsync(adminUser, Roles.Admin);
-        //         }
-        //     }
-        //     return app;
-        // }
+                db.Attributes.AddRange(attributes);
+                await db.SaveChangesAsync();
+            }
+
+            return app;
+        }
     }
 
 }
