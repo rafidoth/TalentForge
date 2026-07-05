@@ -78,6 +78,10 @@ public class AttributeService(
         return await atLib.GetAttributeTypeByNameAsync(name);
     }
 
+    public async Task<ServiceResult<AttributeCategory>> GetCategoryAsync(string name)
+    {
+        return await atLib.GetCategoryByNameAsync(name);
+    }
 
     private AttributeDto MapToDto(AppAttribute attr)
     {

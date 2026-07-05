@@ -159,6 +159,14 @@ namespace server.Services.AttributeLibraryServices
             return ServiceResult<List<AttributeCategory>>.Success(categories, null);
         }
 
+        public async Task<ServiceResult<AttributeCategory>> GetCategoryByNameAsync(string name)
+        {
+            var category = await db.AttributeCategories.FirstOrDefaultAsync(c => c.Name == name);
+            return category != null
+                ? ServiceResult<AttributeCategory>.Success(category, "Attribute category retrieved successfully.")
+                : ServiceResult<AttributeCategory>.Failure("Attribute category not found.", "NOT_FOUND");
+        }
+
 
         private async Task<AppAttribute?> FindWithNavigationsAsync(Guid id)
         {
