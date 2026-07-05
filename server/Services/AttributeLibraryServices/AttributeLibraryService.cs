@@ -7,29 +7,44 @@ namespace server.Services.AttributeLibraryServices
     public class AttributeLibraryService(ApplicationDbContext db)
     {
 
-        public async Task<ServiceResult<AppAttribute>> CreateAsync(int typeId, string name, int categoryId)
+        public async Task<AppAttribute?> CreateAsync(
+            int typeId, string name,
+            int categoryId, string? description,
+            List<string>? dropdownOptions
+        )
         {
             var typeResult = await db.AttributeTypes.FindAsync(typeId);
             var categoryResult = await db.AttributeCategories.FindAsync(categoryId);
-            return typeResult != null && categoryResult != null
-                ? await SaveNewAttributeAsync(BuildAttribute(typeResult, name, categoryResult))
-                : ServiceResult<AppAttribute>.Failure("Attribute type or category not found.", "NOT_FOUND");
+            if (typeResult != null && categoryResult != null)
+            {
+                var newAttribute = BuildAttribute(typeResult, name, categoryResult, description);
+                await SaveNewAttributeAsync(newAttribute);
+
+                if (dropdownOptions != null && dropdownOptions.Count > 0)
+                {
+                    await CreateDropdownOptionsAsync(newAttribute, dropdownOptions);
+                    await ReloadNavigationsAsync(newAttribute);
+                }
+                return newAttribute;
+            }
+
+            return null;
         }
 
-        private async Task<ServiceResult<AppAttribute>> SaveNewAttributeAsync(AppAttribute attribute)
+        private async Task SaveNewAttributeAsync(AppAttribute attribute)
         {
             db.Attributes.Add(attribute);
             await db.SaveChangesAsync();
-            return ServiceResult<AppAttribute>.Success(attribute, "Attribute created successfully.");
         }
 
-        private AppAttribute BuildAttribute(AttributeType type, string name, AttributeCategory category)
+        private AppAttribute BuildAttribute(AttributeType type, string name, AttributeCategory category, string? description)
         {
             return new AppAttribute
             {
                 Id = Guid.NewGuid(),
                 Name = name,
                 TypeId = type.Id,
+                Description = description,
                 Type = type,
                 CategoryId = category.Id,
                 Category = category,
@@ -37,15 +52,34 @@ namespace server.Services.AttributeLibraryServices
             };
         }
 
-
-        public async Task<ServiceResult<AppAttribute>> UpdateAttributeAsync(
-            Guid id, string? name, int? typeId, int? categoryId, uint version, List<string>? dropdownOptions)
+        private async Task CreateDropdownOptionsAsync(AppAttribute attribute, List<string> labels)
         {
-            var attribute = await FindWithNavigationsAsync(id);
-            if (attribute == null)
-                return ServiceResult<AppAttribute>.Failure("Attribute not found.", "NOT_FOUND");
+            foreach (var label in labels)
+            {
+                var option = BuildDropdownOption(attribute.Id, label);
+                db.AttributeDropdownOptions.Add(option);
+            }
+            await db.SaveChangesAsync();
+        }
 
-            ApplyFieldUpdates(attribute, name, typeId, categoryId);
+        private AttributeDropdownOption BuildDropdownOption(Guid attributeId, string label)
+        {
+            return new AttributeDropdownOption
+            {
+                Id = Guid.NewGuid(),
+                AttributeId = attributeId,
+                Label = label
+            };
+        }
+
+        public async Task<AppAttribute?> UpdateAttributeAsync(
+            Guid id, string? name, uint version, List<string>? dropdownOptions)
+        {
+            var attribute = await FindAttributeByIdAsync(id);
+            if (attribute == null)
+                return null;
+
+            if (!String.IsNullOrEmpty(name)) attribute.Name = name;
             SetVersion(attribute, version);
 
             if (dropdownOptions != null)
@@ -53,14 +87,7 @@ namespace server.Services.AttributeLibraryServices
 
             await db.SaveChangesAsync();
             await ReloadNavigationsAsync(attribute);
-            return ServiceResult<AppAttribute>.Success(attribute, "Attribute updated successfully.");
-        }
-
-        private static void ApplyFieldUpdates(AppAttribute attribute, string? name, int? typeId, int? categoryId)
-        {
-            if (name is not null) attribute.Name = name;
-            if (typeId is not null) attribute.TypeId = typeId;
-            if (categoryId is not null) attribute.CategoryId = categoryId;
+            return attribute;
         }
 
         private void SetVersion(AppAttribute attribute, uint version)
@@ -82,30 +109,15 @@ namespace server.Services.AttributeLibraryServices
             }
         }
 
-
-        public async Task<ServiceResult<bool>> DeleteAttributeAsync(Guid id)
+        public async Task<bool> DeleteAttributeAsync(Guid id)
         {
             var attribute = await db.Attributes.FindAsync(id);
-            if (attribute == null)
-                return ServiceResult<bool>.Failure("Attribute not found.", "NOT_FOUND");
-
-            if (attribute.IsBuiltin)
-                return ServiceResult<bool>.Failure("Built-in attributes cannot be deleted.", "FORBIDDEN");
-
+            if (attribute is null || attribute.IsBuiltin)
+                return false;
             db.Attributes.Remove(attribute);
             await db.SaveChangesAsync();
-            return ServiceResult<bool>.Success(true, "Attribute deleted successfully.");
+            return true;
         }
-
-
-        public async Task<ServiceResult<AppAttribute>> GetByIdWithNavigationsAsync(Guid id)
-        {
-            var attribute = await FindWithNavigationsAsync(id);
-            return attribute != null
-                ? ServiceResult<AppAttribute>.Success(attribute, "Attribute retrieved successfully.")
-                : ServiceResult<AppAttribute>.Failure("Attribute not found.", "NOT_FOUND");
-        }
-
 
         public async Task<ServiceResult<List<AppAttribute>>> SearchAttributesAsync(
             string? prefix, int? categoryId, string? recentlyUsedByUserId, int page, int pageSize)
@@ -152,7 +164,6 @@ namespace server.Services.AttributeLibraryServices
                 : ServiceResult<AttributeType>.Failure("Attribute type not found.", "NOT_FOUND");
         }
 
-
         public async Task<ServiceResult<List<AttributeCategory>>> GetAllCategoriesAsync()
         {
             var categories = await db.AttributeCategories.ToListAsync();
@@ -167,8 +178,7 @@ namespace server.Services.AttributeLibraryServices
                 : ServiceResult<AttributeCategory>.Failure("Attribute category not found.", "NOT_FOUND");
         }
 
-
-        private async Task<AppAttribute?> FindWithNavigationsAsync(Guid id)
+        public async Task<AppAttribute?> FindAttributeByIdAsync(Guid id)
         {
             return await db.Attributes
                 .Include(a => a.Type)
@@ -204,6 +214,16 @@ namespace server.Services.AttributeLibraryServices
 
         }
 
+        public async Task<List<AttributeType>> GetAllAttributeTypesAsync()
+        {
+            var types = await db.AttributeTypes.ToListAsync();
+            return types;
+        }
 
+        public async Task<List<AttributeCategory>> GetAllAttributeCategoriesAsync()
+        {
+            var categories = await db.AttributeCategories.ToListAsync();
+            return categories;
+        }
     }
 }

@@ -20,6 +20,7 @@ namespace server.Entities
 
         [ForeignKey("CategoryId")]
         public AttributeCategory? Category { get; set; }
+        public string? Description { get; set; }
 
         public bool IsBuiltin { get; set; }
 

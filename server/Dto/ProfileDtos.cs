@@ -11,7 +11,6 @@ public record ProfileAttributeDto(
     uint Version
 );
 
-// For adding an attribute from the library to the profile (just picks it)
 public record AddProfileAttributeDto(Guid AttributeId);
 
 // For updating the value of a profile attribute (auto-save uses this)

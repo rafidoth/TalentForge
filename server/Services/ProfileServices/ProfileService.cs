@@ -166,7 +166,7 @@ namespace server.Services.ProfileServices
                 {
                     throw new Exception("DiceBear profile image URL is not configured.");
                 }
-                var profileAttributes = await CreateProfileAttributesAsync(
+                var profileAttributes = await CreateMeProfileAttributesAsync(
                     userId, FName, LName, Location, dicebear_url
                 );
 
@@ -180,7 +180,7 @@ namespace server.Services.ProfileServices
             }
         }
 
-        private async Task<List<ProfileAttribute>> CreateProfileAttributesAsync(
+        private async Task<List<ProfileAttribute>> CreateMeProfileAttributesAsync(
             string userId,
             string FName,
             string LName,
@@ -220,9 +220,6 @@ namespace server.Services.ProfileServices
             };
 
         }
-
-
-
 
         public Task<ServiceResult<ProfileAttributeDto>> UpdateProfileAttributeValueAsync(string userId, UpdateProfileAttributeValueDto dto)
         {

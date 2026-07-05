@@ -8,19 +8,24 @@ namespace server.Services.AttributeLibraryServices;
 public class AttributeService(ApplicationDbContext db) : IAttributeService
 {
     private readonly AttributeLibraryService atLib = new AttributeLibraryService(db);
-    public async Task<ServiceResult<AttributeDto>> CreateAsync(CreateAttributeDto dto)
+    public async Task<ServiceResult<AttributeDto>> CreateAsync(
+        string name, int typeId, int categoryId,
+        string? description, List<string>? dropdownOptions = null
+    )
     {
-        ServiceResult<AppAttribute> serviceResult;
+        AppAttribute? newAttribute;
         try
         {
-            serviceResult = await atLib.CreateAsync(dto.TypeId, dto.Name, dto.CategoryId);
+            newAttribute = await atLib.CreateAsync(typeId, name, categoryId, description, dropdownOptions);
+            if (newAttribute is null)
+                return ServiceResult<AttributeDto>.Failure("Failed to create attribute.", "CREATION_FAILED");
+            return ServiceResult<AttributeDto>.Success(MapToDto(newAttribute), "Attribute created successfully.");
         }
         catch (DbUpdateException)
         {
             return ServiceResult<AttributeDto>.Failure(
-                $"An attribute with the name '{dto.Name}' already exists.", "DUPLICATE_NAME");
+                $"An attribute with the name '{name}' already exists.", "DUPLICATE_NAME");
         }
-        return ServiceResult<AttributeDto>.Success(MapToDto(serviceResult.Data!), "Attribute created successfully.");
     }
 
     public async Task<ServiceResult<List<AppAttribute>>> GetBuiltInAttributesAsync()
@@ -44,10 +49,10 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
     {
         try
         {
-            var result = await atLib.UpdateAttributeAsync(id, dto.Name, dto.TypeId, dto.CategoryId, dto.Version, dto.DropdownOptions);
-            return result.IsSuccess
-                ? ServiceResult<AttributeDto>.Success(MapToDto(result.Data!), result.Message)
-                : ServiceResult<AttributeDto>.Failure(result.Message, result.ErrorCode);
+            AppAttribute? updatedAttr = await atLib.UpdateAttributeAsync(id, dto.Name, dto.Version, dto.DropdownOptions);
+            return updatedAttr != null
+                ? ServiceResult<AttributeDto>.Success(MapToDto(updatedAttr), "Attribute updated successfully.")
+                : ServiceResult<AttributeDto>.Failure("Failed to update attribute.", "UPDATE_FAILED");
         }
         catch (DbUpdateConcurrencyException)
         {
@@ -63,15 +68,18 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
 
     public async Task<ServiceResult<bool>> DeleteAsync(Guid id)
     {
-        return await atLib.DeleteAttributeAsync(id);
+        bool result = await atLib.DeleteAttributeAsync(id);
+        return result
+            ? ServiceResult<bool>.Success(true, "Attribute deleted successfully.")
+            : ServiceResult<bool>.Failure("Failed to delete attribute.", "DELETE_FAILED");
     }
 
     public async Task<ServiceResult<AttributeDto>> GetByIdAsync(Guid id)
     {
-        var result = await atLib.GetByIdWithNavigationsAsync(id);
-        return result.IsSuccess
-            ? ServiceResult<AttributeDto>.Success(MapToDto(result.Data!), null)
-            : ServiceResult<AttributeDto>.Failure(result.Message, result.ErrorCode);
+        var attrbute = await atLib.FindAttributeByIdAsync(id);
+        return attrbute != null
+            ? ServiceResult<AttributeDto>.Success(MapToDto(attrbute), null)
+            : ServiceResult<AttributeDto>.Failure("Attribute not found.", "NOT_FOUND");
     }
 
     public async Task<ServiceResult<List<AttributeDto>>> SearchAsync(AttributeSearchQuery query)
@@ -86,6 +94,16 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
         var result = await atLib.GetAllCategoriesAsync();
         var dtos = result.Data!.Select(c => new AttributeCategoryDto(c.Id, c.Name)).ToList();
         return ServiceResult<List<AttributeCategoryDto>>.Success(dtos, null);
+    }
+
+    public async Task<ServiceResult<List<AttributeType>>> GetAttributeTypesAsync()
+    {
+        var types = await atLib.GetAllAttributeTypesAsync();
+        if (types == null || types.Count == 0)
+        {
+            return ServiceResult<List<AttributeType>>.Failure("No attribute types found.", "NOT_FOUND");
+        }
+        return ServiceResult<List<AttributeType>>.Success(types, null);
     }
 
     public async Task<ServiceResult<AttributeType>> GetAttributeTypeAsync(string name)
@@ -116,4 +134,5 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
             Version: version
         );
     }
+
 }

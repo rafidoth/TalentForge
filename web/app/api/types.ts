@@ -45,3 +45,13 @@ export interface ServiceResult<T> {
     data: T | null;
     errorCode: string | null;
 }
+
+export interface AttributeCategoryDto {
+    id: number;
+    name: string;
+}
+
+export interface AttributeType {
+    id: number;
+    name: string;
+}

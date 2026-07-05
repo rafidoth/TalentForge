@@ -5,8 +5,10 @@ public record CreateAttributeDto(
     int TypeId,
     int CategoryId,
     string Value,
+    string Description,
     List<string>? DropdownOptions = null
-    );
+);
+
 
 public record UpdateAttributeDto(
     string? Name,
