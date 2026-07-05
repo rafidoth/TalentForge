@@ -24,4 +24,5 @@ public interface IAuthService
     Task<IdentityResult> AssignRoleAsync(IdentityUser user, string role);
     Task<SignInResult> SignInUserAsync(IdentityUser user, string password, bool isPersistent);
     Task LogoutAsync();
+    Task<ServiceResult<RegisterResponse>> RegisterAsync(RegisterDto request);
 }

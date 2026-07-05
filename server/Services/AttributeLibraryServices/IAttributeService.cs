@@ -13,4 +13,7 @@ public interface IAttributeService
     Task<ServiceResult<List<AttributeDto>>> SearchAsync(AttributeSearchQuery query);
     Task<ServiceResult<List<AttributeCategoryDto>>> GetCategoriesAsync();
     Task<ServiceResult<AttributeType>> GetAttributeTypeAsync(string name);
+    Task<ServiceResult<AttributeCategory>> GetCategoryAsync(string name);
+    Task<ServiceResult<List<AppAttribute>>> GetBuiltInAttributesAsync();
+    Task<ServiceResult<AppAttribute>> GetAttributeByNameAsync(string name);
 }

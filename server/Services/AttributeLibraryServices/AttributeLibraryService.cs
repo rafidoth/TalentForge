@@ -184,5 +184,26 @@ namespace server.Services.AttributeLibraryServices
             await db.Entry(attribute).Collection(a => a.DropdownOptions).LoadAsync();
         }
 
+        public async Task<List<AppAttribute>> GetBuiltInAttributesAsync()
+        {
+            var attributes = await db.Attributes
+                .Where(a => a.IsBuiltin)
+                .ToListAsync();
+            return attributes;
+
+        }
+
+        public async Task<AppAttribute?> GetAttributeByNameAsync(string name)
+        {
+            var attribute = await db.Attributes
+                .Include(a => a.Type)
+                .Include(a => a.Category)
+                .Include(a => a.DropdownOptions)
+                .FirstOrDefaultAsync(a => a.Name == name);
+            return attribute;
+
+        }
+
+
     }
 }

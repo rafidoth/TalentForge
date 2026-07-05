@@ -11,10 +11,6 @@ namespace server.Entities
         [Required]
         public string Name { get; set; } = string.Empty;
 
-        [Column(TypeName = "jsonb")]
-        [Required]
-        public string Value { get; set; } = string.Empty;
-
         public int? TypeId { get; set; }
 
         [ForeignKey("TypeId")]

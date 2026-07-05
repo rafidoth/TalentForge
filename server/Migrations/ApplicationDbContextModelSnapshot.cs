@@ -241,9 +241,11 @@ namespace server.Migrations
                     b.Property<int?>("TypeId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("jsonb");
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 
@@ -402,18 +404,19 @@ namespace server.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("UserPreferenceId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Value")
                         .IsRequired()
                         .HasColumnType("jsonb");
 
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AttributeId");
-
-                    b.HasIndex("UserPreferenceId");
 
                     b.HasIndex("UserId", "AttributeId")
                         .IsUnique();
@@ -428,7 +431,9 @@ namespace server.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -450,14 +455,15 @@ namespace server.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("UserPreferenceId")
-                        .HasColumnType("uuid");
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
-
-                    b.HasIndex("UserPreferenceId");
 
                     b.ToTable("Projects");
                 });
@@ -617,10 +623,6 @@ namespace server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("server.Entities.UserPreference", null)
-                        .WithMany("ProfileAttributes")
-                        .HasForeignKey("UserPreferenceId");
-
                     b.Navigation("Attribute");
 
                     b.Navigation("User");
@@ -633,10 +635,6 @@ namespace server.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("server.Entities.UserPreference", null)
-                        .WithMany("Projects")
-                        .HasForeignKey("UserPreferenceId");
 
                     b.Navigation("User");
                 });
@@ -696,13 +694,6 @@ namespace server.Migrations
             modelBuilder.Entity("server.Entities.TechnologyTag", b =>
                 {
                     b.Navigation("ProjectTechnologyTags");
-                });
-
-            modelBuilder.Entity("server.Entities.UserPreference", b =>
-                {
-                    b.Navigation("ProfileAttributes");
-
-                    b.Navigation("Projects");
                 });
 #pragma warning restore 612, 618
         }

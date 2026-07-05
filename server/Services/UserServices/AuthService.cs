@@ -1,14 +1,16 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Dto;
 using server.ServiceResults;
+using server.Services.ProfileServices;
 
 namespace server.Services.UserServices;
 
 
-public class AuthService(SignInManager<IdentityUser> signInManager) : IAuthService
+public class AuthService(SignInManager<IdentityUser> signInManager, IProfileService profileService, ApplicationDbContext db) : IAuthService
 {
     public AuthenticationProperties ConfigureExternalLogin(string provider, string? redirectUrl)
     {
@@ -192,6 +194,75 @@ public class AuthService(SignInManager<IdentityUser> signInManager) : IAuthServi
         else
         {
             return await signInManager.PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure: true);
+        }
+    }
+
+    public async Task<ServiceResult<RegisterResponse>> RegisterAsync(RegisterDto request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+        {
+            return ServiceResult<RegisterResponse>.Failure("Email and Password are required.", "ValidationError");
+        }
+
+        var existingUser = await GetUserByEmailAsync(request.Email);
+        if (existingUser != null)
+        {
+            return ServiceResult<RegisterResponse>.Failure("Email is already registered. Try to login.", "DuplicateEmail");
+        }
+
+        await using var transaction = await db.Database.BeginTransactionAsync();
+        try
+        {
+            var user = new IdentityUser
+            {
+                UserName = request.Email,
+                Email = request.Email
+            };
+
+            var createResult = await CreateNewUserAsync(user, request.Password);
+            if (!createResult.Succeeded)
+            {
+                await transaction.RollbackAsync();
+                return ServiceResult<RegisterResponse>.Failure(
+                    string.Join("; ", createResult.Errors.Select(e => e.Description)),
+                    "UserCreationFailed"
+                );
+            }
+
+            var assignRoleResult = await AssignRoleAsync(user, Roles.Candidate);
+            if (!assignRoleResult.Succeeded)
+            {
+                await transaction.RollbackAsync();
+                return ServiceResult<RegisterResponse>.Failure(
+                    string.Join("; ", assignRoleResult.Errors.Select(e => e.Description)),
+                    "RoleAssignmentFailed"
+                );
+            }
+
+            var profileResult = await profileService.CreateMeSectionAsync(
+                request.FirstName, request.LastName, request.Location, user.Id
+            );
+            if (!profileResult.IsSuccess)
+            {
+                await transaction.RollbackAsync();
+                return ServiceResult<RegisterResponse>.Failure(
+                    "Failed to create profile.", "ProfileCreationFailed"
+                );
+            }
+
+            await transaction.CommitAsync();
+
+            await SignInUserAsync(user, request.Password, isPersistent: false);
+
+            return ServiceResult<RegisterResponse>.Success(
+                new RegisterResponse(true, user.Id, Roles.Candidate),
+                "Registration successful."
+            );
+        }
+        catch (Exception)
+        {
+            await transaction.RollbackAsync();
+            throw;
         }
     }
 

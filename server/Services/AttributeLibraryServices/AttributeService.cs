@@ -5,11 +5,9 @@ using server.ServiceResults;
 
 namespace server.Services.AttributeLibraryServices;
 
-public class AttributeService(
-    ApplicationDbContext db,
-    AttributeLibraryService atLib
-    ) : IAttributeService
+public class AttributeService(ApplicationDbContext db) : IAttributeService
 {
+    private readonly AttributeLibraryService atLib = new AttributeLibraryService(db);
     public async Task<ServiceResult<AttributeDto>> CreateAsync(CreateAttributeDto dto)
     {
         ServiceResult<AppAttribute> serviceResult;
@@ -23,6 +21,23 @@ public class AttributeService(
                 $"An attribute with the name '{dto.Name}' already exists.", "DUPLICATE_NAME");
         }
         return ServiceResult<AttributeDto>.Success(MapToDto(serviceResult.Data!), "Attribute created successfully.");
+    }
+
+    public async Task<ServiceResult<List<AppAttribute>>> GetBuiltInAttributesAsync()
+    {
+        var result = await atLib.GetBuiltInAttributesAsync();
+        return result != null && result.Count > 0
+            ? ServiceResult<List<AppAttribute>>.Success(result, "Built-in attributes retrieved successfully.")
+            : ServiceResult<List<AppAttribute>>.Failure("No built-in attributes found.", "NOT_FOUND");
+
+    }
+
+    public async Task<ServiceResult<AppAttribute>> GetAttributeByNameAsync(string name)
+    {
+        var result = await atLib.GetAttributeByNameAsync(name);
+        return result != null
+            ? ServiceResult<AppAttribute>.Success(result, "Attribute retrieved successfully.")
+            : ServiceResult<AppAttribute>.Failure("Attribute not found.", "NOT_FOUND");
     }
 
     public async Task<ServiceResult<AttributeDto>> UpdateAsync(Guid id, UpdateAttributeDto dto)

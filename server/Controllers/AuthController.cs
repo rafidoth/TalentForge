@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using server.Data;
 using server.Dto;
 using server.Services.UserServices;
 
@@ -103,42 +102,12 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto request)
     {
-        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+        var result = await authService.RegisterAsync(request);
+        if (result.IsSuccess)
         {
-            return BadRequest(new { message = "Email and Password are required." });
+            return Ok(new { success = true });
         }
 
-        var user = await authService.GetUserByEmailAsync(request.Email);
-        if (user != null)
-        {
-            return BadRequest(new { message = "Email is already registered. Try to login." });
-        }
-
-        user = new IdentityUser
-        {
-            UserName = request.Email,
-            Email = request.Email
-        };
-
-        var createResult = await authService.CreateNewUserAsync(user, request.Password);
-        if (!createResult.Succeeded)
-        {
-            return BadRequest(createResult.Errors);
-        }
-
-        var assignRoleResult = await authService.AssignRoleAsync(user, Roles.Candidate);
-        if (!assignRoleResult.Succeeded)
-        {
-            return BadRequest(assignRoleResult.Errors);
-        }
-
-        var signInResult = await authService.SignInUserAsync(user, request.Password, isPersistent: false);
-        if (!signInResult.Succeeded)
-        {
-            return BadRequest(new { message = "Failed to sign in user." });
-        }
-
-        return Ok(new { success = true });
+        return BadRequest(new { message = result.Message });
     }
 }
-

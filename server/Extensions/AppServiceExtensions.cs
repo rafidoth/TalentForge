@@ -1,4 +1,5 @@
-using server.Services.AttributeLibraryService;
+using server.Services.AttributeLibraryServices;
+using server.Services.ProfileServices;
 using server.Services.UserServices;
 
 namespace server.Extensions
@@ -10,6 +11,7 @@ namespace server.Extensions
         {
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IAttributeService, AttributeService>();
+            services.AddScoped<IProfileService, ProfileService>();
             return services;
         }
     }

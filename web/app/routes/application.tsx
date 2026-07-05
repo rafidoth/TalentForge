@@ -1,9 +1,9 @@
 import { AppShell, Burger, Group, Title, Badge, Text, ActionIcon, useMantineColorScheme, Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { MoonStarsIcon, SunDimIcon } from '@phosphor-icons/react';
+import { useEffect } from 'react';
 import { Navigate, Outlet, useNavigate } from 'react-router';
 import { useIsAuthenticated, useUserId, useUserRole, useLogout } from "~/auth/store";
-import type { UserRole } from "~/types";
 
 interface AppHeaderProps {
     opened: boolean;
@@ -68,9 +68,7 @@ export default function Application() {
     const [opened, { toggle }] = useDisclosure();
     const isAuthenticated = useIsAuthenticated();
 
-    if (!isAuthenticated) {
-        return <Navigate to="/login" replace />;
-    }
+
 
     return (
         <AppShell

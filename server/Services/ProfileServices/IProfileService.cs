@@ -21,5 +21,7 @@ namespace server.Services.ProfileServices
         Task<ServiceResult<FullProfileDto>> GetFullProfileAsync(string userId);
 
         Task<ServiceResult<AutoSaveResultDto>> AutoSaveAsync(string userId, AutoSaveDto dto);
+
+        Task<ServiceResult<bool>> CreateMeSectionAsync(string FName, string LName, string Location, string userId);
     }
 }
