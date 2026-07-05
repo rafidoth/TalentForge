@@ -19,9 +19,5 @@ namespace server.Entities
         public DateTime? CreatedAt { get; set; }
 
         public DateTime? UpdatedAt { get; set; }
-
-        public ICollection<ProfileAttribute> ProfileAttributes { get; set; } = new List<ProfileAttribute>();
-
-        public ICollection<Project> Projects { get; set; } = new List<Project>();
     }
 }
