@@ -18,7 +18,7 @@ import {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { useAuthStore, useCheckAuth } from "./auth/store";
-
+import { mantineTheme } from "./theme";
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
@@ -31,27 +31,6 @@ export const links: Route.LinksFunction = () => [
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
 ];
-
-
-const myColor: MantineColorsTuple = [
-  '#f3edff',
-  '#e0d7fa',
-  '#beabf0',
-  '#9a7de6',
-  '#7c55de',
-  '#693cd9',
-  '#5f30d8',
-  '#4f23c0',
-  '#461eac',
-  '#3b1898'
-];
-
-const theme = createTheme({
-  colors: {
-    myColor,
-  },
-  primaryColor: "myColor",
-});
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const checkAuth = useCheckAuth();
@@ -80,7 +59,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <QueryClientProvider client={queryClient}>
-          <MantineProvider theme={theme}>
+          <MantineProvider theme={mantineTheme}>
             {children}
           </MantineProvider>
         </QueryClientProvider>
