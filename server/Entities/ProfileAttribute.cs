@@ -12,7 +12,7 @@ namespace server.Entities
         public string UserId { get; set; } = string.Empty;
 
         [ForeignKey("UserId")]
-        public IdentityUser User { get; set; } = null!;
+        public ApplicationUser User { get; set; } = null!;
 
         public Guid AttributeId { get; set; }
 

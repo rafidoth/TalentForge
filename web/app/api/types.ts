@@ -55,3 +55,23 @@ export interface AttributeType {
     id: number;
     name: string;
 }
+
+export interface UserListDto {
+    id: string;
+    email: string;
+    method: string;
+    status: string;
+    role: string;
+    joinedAt: string;
+    lastLoginAt: string;
+}
+
+export interface PaginatedResponse<T> {
+    data: T[];
+    pageNumber: number;
+    pageSize: number;
+    totalPages: number;
+    totalRecords: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+}

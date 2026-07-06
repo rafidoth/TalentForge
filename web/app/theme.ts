@@ -1,4 +1,4 @@
-import { Card, Container, createTheme, Paper, rem, Select } from "@mantine/core";
+import { Card, Container, createTheme, Paper, rem, Select, Table } from "@mantine/core";
 import type { MantineThemeOverride } from "@mantine/core";
 
 const CONTAINER_SIZES: Record<string, string> = {
@@ -37,7 +37,6 @@ export const mantineTheme: MantineThemeOverride = createTheme({
     },
     primaryColor: "blue",
     components: {
-        /** Put your mantine component override here */
         Container: Container.extend({
             vars: (_, { size, fluid }) => ({
                 root: {

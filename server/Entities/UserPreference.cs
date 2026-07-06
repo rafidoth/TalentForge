@@ -10,7 +10,7 @@ namespace server.Entities
 
         public string UserId { get; set; } = string.Empty;
         [Required]
-        public IdentityUser User { get; set; } = null!;
+        public ApplicationUser User { get; set; } = null!;
 
         public string Theme { get; set; } = "light";
 

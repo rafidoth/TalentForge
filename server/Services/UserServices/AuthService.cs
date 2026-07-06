@@ -1,16 +1,18 @@
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Dto;
+using server.Entities;
 using server.ServiceResults;
 using server.Services.ProfileServices;
 
 namespace server.Services.UserServices;
 
 
-public class AuthService(SignInManager<IdentityUser> signInManager, IProfileService profileService, ApplicationDbContext db) : IAuthService
+public class AuthService(SignInManager<ApplicationUser> signInManager, IProfileService profileService, ApplicationDbContext db) : IAuthService
 {
     public AuthenticationProperties ConfigureExternalLogin(string provider, string? redirectUrl)
     {
@@ -70,7 +72,7 @@ public class AuthService(SignInManager<IdentityUser> signInManager, IProfileServ
         return await CreateAndSignInNewExternalUserAsync(email, info);
     }
 
-    private async Task<ServiceResult<ExternalLoginResponse>> LinkExistingExternalUserAsync(IdentityUser user, ExternalLoginInfo info)
+    private async Task<ServiceResult<ExternalLoginResponse>> LinkExistingExternalUserAsync(ApplicationUser user, ExternalLoginInfo info)
     {
         var loginResult = await signInManager.UserManager.AddLoginAsync(user, info);
         if (loginResult.Succeeded)
@@ -83,7 +85,7 @@ public class AuthService(SignInManager<IdentityUser> signInManager, IProfileServ
 
     private async Task<ServiceResult<ExternalLoginResponse>> CreateAndSignInNewExternalUserAsync(string email, ExternalLoginInfo info)
     {
-        var user = new IdentityUser { UserName = email, Email = email, EmailConfirmed = true };
+        var user = new ApplicationUser { UserName = email, Email = email, EmailConfirmed = true };
         var result = await CreateNewUserAsync(user, string.Empty);
         if (result.Succeeded)
         {
@@ -92,7 +94,7 @@ public class AuthService(SignInManager<IdentityUser> signInManager, IProfileServ
         return GetFailureResult("Failed to create user.", "UserCreationFailed");
     }
 
-    private async Task<ServiceResult<ExternalLoginResponse>> AssignRoleAndSignInAsync(IdentityUser user, ExternalLoginInfo info)
+    private async Task<ServiceResult<ExternalLoginResponse>> AssignRoleAndSignInAsync(ApplicationUser user, ExternalLoginInfo info)
     {
         var result = await AssignRoleAsync(user, Roles.Candidate);
         if (result.Succeeded)
@@ -102,7 +104,7 @@ public class AuthService(SignInManager<IdentityUser> signInManager, IProfileServ
         return GetFailureResult("Failed to assign role to user.", "RoleAssignmentFailed");
     }
 
-    private async Task<ServiceResult<ExternalLoginResponse>> AddLoginAndSignInAsync(IdentityUser user, ExternalLoginInfo info)
+    private async Task<ServiceResult<ExternalLoginResponse>> AddLoginAndSignInAsync(ApplicationUser user, ExternalLoginInfo info)
     {
         var result = await signInManager.UserManager.AddLoginAsync(user, info);
 
@@ -124,6 +126,9 @@ public class AuthService(SignInManager<IdentityUser> signInManager, IProfileServ
         var signInResult = await SignInUserAsync(user, loginDto.Password, isPersistent: false);
         if (signInResult.Succeeded)
         {
+            user.LastLoginAt = DateTime.UtcNow;
+            await signInManager.UserManager.UpdateAsync(user);
+
             var role = await GetUserRoleAsync(user);
             return ServiceResult<LoginResponse>.Success(
                 new LoginResponse(true, user.Id, role),
@@ -133,13 +138,13 @@ public class AuthService(SignInManager<IdentityUser> signInManager, IProfileServ
         return ServiceResult<LoginResponse>.Failure("Invalid login attempt.", "InvalidCredentials");
     }
 
-    public async Task<string> GetUserRoleAsync(IdentityUser user)
+    public async Task<string> GetUserRoleAsync(ApplicationUser user)
     {
         var roles = await signInManager.UserManager.GetRolesAsync(user);
         return roles.FirstOrDefault() ?? Roles.Candidate;
     }
 
-    public async Task<bool> SignInUserWithPasswordAsync(LoginDto loginDto, IdentityUser user)
+    public async Task<bool> SignInUserWithPasswordAsync(LoginDto loginDto, ApplicationUser user)
     {
         var result = await signInManager.PasswordSignInAsync(
             user,
@@ -150,13 +155,13 @@ public class AuthService(SignInManager<IdentityUser> signInManager, IProfileServ
         return result.Succeeded;
     }
 
-    public async Task<IdentityUser?> GetUserByEmailAsync(string email)
+    public async Task<ApplicationUser?> GetUserByEmailAsync(string email)
     {
         var user = await signInManager.UserManager.FindByEmailAsync(email);
         return user;
     }
 
-    public async Task<IdentityUser?> GetUserByClaimsPrincipalAsync(ClaimsPrincipal User)
+    public async Task<ApplicationUser?> GetUserByClaimsPrincipalAsync(ClaimsPrincipal User)
     {
         var user = await signInManager.UserManager.GetUserAsync(User);
         return user;
@@ -167,7 +172,7 @@ public class AuthService(SignInManager<IdentityUser> signInManager, IProfileServ
         await signInManager.SignOutAsync();
     }
 
-    public async Task<IdentityResult> CreateNewUserAsync(IdentityUser user, string password)
+    public async Task<IdentityResult> CreateNewUserAsync(ApplicationUser user, string password)
     {
         if (password == string.Empty || password == null)
         {
@@ -178,13 +183,13 @@ public class AuthService(SignInManager<IdentityUser> signInManager, IProfileServ
         return resultWithPassword;
     }
 
-    public async Task<IdentityResult> AssignRoleAsync(IdentityUser user, string role)
+    public async Task<IdentityResult> AssignRoleAsync(ApplicationUser user, string role)
     {
         var result = await signInManager.UserManager.AddToRoleAsync(user, role);
         return result;
     }
 
-    public async Task<SignInResult> SignInUserAsync(IdentityUser user, string password, bool isPersistent)
+    public async Task<SignInResult> SignInUserAsync(ApplicationUser user, string password, bool isPersistent)
     {
         if (password == string.Empty || password == null)
         {
@@ -213,10 +218,12 @@ public class AuthService(SignInManager<IdentityUser> signInManager, IProfileServ
         await using var transaction = await db.Database.BeginTransactionAsync();
         try
         {
-            var user = new IdentityUser
+            var user = new ApplicationUser
             {
                 UserName = request.Email,
-                Email = request.Email
+                Email = request.Email,
+                JoinedAt = DateTime.UtcNow,
+                Status = UserStatus.Active,
             };
 
             var createResult = await CreateNewUserAsync(user, request.Password);

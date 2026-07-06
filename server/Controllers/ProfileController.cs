@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using server.Entities;
 using server.Services.ProfileServices;
 
 namespace server.Controllers
@@ -9,7 +10,7 @@ namespace server.Controllers
     [Authorize]
     [ApiController]
     [Route("api/profile")]
-    public class ProfileController(IProfileService profileService, UserManager<IdentityUser> userManager) : ControllerBase
+    public class ProfileController(IProfileService profileService, UserManager<ApplicationUser> userManager) : ControllerBase
     {
 
         [HttpGet("me")]

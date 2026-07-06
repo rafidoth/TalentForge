@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddUserSecrets<Program>();
 
 builder.Services.AddDatabase(builder.Configuration)
-                .AddApplicationServices(builder.Configuration)
+                .AddApplicationServices()
                 .AddIdentityHandlersAndStores()
                 .AddIdentityAuth(builder.Configuration)
                 .AddCorsPolicy()

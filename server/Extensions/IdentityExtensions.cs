@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
+using server.Entities;
 
 namespace server.Extensions
 {
@@ -9,7 +10,7 @@ namespace server.Extensions
         public static IServiceCollection AddIdentityHandlersAndStores(this IServiceCollection services)
         {
 
-            services.AddIdentityApiEndpoints<IdentityUser>()
+            services.AddIdentityApiEndpoints<ApplicationUser>()
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             return services;
@@ -89,7 +90,7 @@ namespace server.Extensions
         public static async Task<WebApplication> SeedAdminUser(this WebApplication app, IConfiguration configuration)
         {
             using var scope = app.Services.CreateScope();
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
             var adminEmail = configuration["RootAdmin:Email"] ?? throw new ArgumentException(
                 "Admin user email is not configured."
@@ -101,7 +102,7 @@ namespace server.Extensions
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
             if (adminUser == null)
             {
-                adminUser = new IdentityUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
+                adminUser = new ApplicationUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
                 var result = await userManager.CreateAsync(adminUser, adminPassword);
                 if (result.Succeeded)
                 {
