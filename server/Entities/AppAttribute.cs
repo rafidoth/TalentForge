@@ -7,27 +7,18 @@ namespace server.Entities
     {
         [Key]
         public Guid Id { get; set; }
-
         [Required]
         public string Name { get; set; } = string.Empty;
-
         public int? TypeId { get; set; }
-
         [ForeignKey("TypeId")]
         public AttributeType? Type { get; set; }
-
         public int? CategoryId { get; set; }
-
         [ForeignKey("CategoryId")]
         public AttributeCategory? Category { get; set; }
         public string? Description { get; set; }
-
         public bool IsBuiltin { get; set; }
-
         public DateTime? CreatedAt { get; set; }
-
         public ICollection<AttributeDropdownOption> DropdownOptions { get; set; } = new List<AttributeDropdownOption>();
-
         public ICollection<ProfileAttribute> ProfileAttributes { get; set; } = new List<ProfileAttribute>();
     }
 }

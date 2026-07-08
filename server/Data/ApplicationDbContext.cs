@@ -14,6 +14,13 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<TechnologyTag> TechnologyTags { get; set; }
     public DbSet<ProjectTechnologyTag> ProjectTechnologyTags { get; set; }
     public DbSet<UserPreference> UserPreferences { get; set; }
+    public DbSet<Position> Positions { get; set; }
+    public DbSet<PositionAttribute> PositionAttributes { get; set; }
+    public DbSet<PositionAccessRule> PositionAccessRules { get; set; }
+    public DbSet<PositionTechnologyTag> PositionTechnologyTags { get; set; }
+    public DbSet<Cv> Cvs { get; set; }
+    public DbSet<CvLike> CvLikes { get; set; }
+    public DbSet<PositionDiscussionPost> PositionDiscussionPosts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
