@@ -18,7 +18,7 @@ import {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { useAuthStore, useCheckAuth } from "./auth/store";
-import { mantineTheme } from "./theme";
+import theme from "./theme";
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
@@ -59,7 +59,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <QueryClientProvider client={queryClient}>
-          <MantineProvider theme={mantineTheme}>
+          <MantineProvider theme={theme}>
             {children}
           </MantineProvider>
         </QueryClientProvider>
@@ -70,8 +70,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+import { RouteGuard } from "./auth/RouteGuard";
+
 export default function App() {
-  return <Outlet />;
+  return (
+    <RouteGuard>
+      <Outlet />
+    </RouteGuard>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

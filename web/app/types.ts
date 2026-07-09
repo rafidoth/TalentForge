@@ -1,1 +1,0 @@
-export type UserRole = "Candidate" | "Recruiter" | "Administrator";

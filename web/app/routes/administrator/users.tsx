@@ -1,5 +1,9 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useState, useEffect } from 'react';
+import type { RouteHandle } from '~/auth/types';
+
+export const handle: RouteHandle = {
+    allowedRoles: ['Administrator']
+};
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
     Container,
@@ -22,19 +26,13 @@ import { PageSizes, Roles } from '~/Constants';
 
 export default function UsersAdministratorPage() {
     const role = useUserRole();
-    const authLoading = useAuthLoading();
-    const navigate = useNavigate();
     const queryClient = useQueryClient();
 
     const [activePage, setActivePage] = useState(1);
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const pageSize = PageSizes.UsersManagement;
 
-    useEffect(() => {
-        if (!authLoading && role !== 'Administrator') {
-            navigate('/app', { replace: true });
-        }
-    }, [role, authLoading, navigate]);
+
 
     useEffect(() => {
         setSelectedIds([]);
@@ -43,7 +41,7 @@ export default function UsersAdministratorPage() {
     const { data, isLoading, isError, error } = useQuery({
         queryKey: ['users', activePage, pageSize],
         queryFn: () => getUsers(activePage, pageSize),
-        enabled: role === 'Administrator' && !authLoading
+        enabled: role === 'Administrator'
     });
 
     const invalidateAndClear = () => {
@@ -71,13 +69,7 @@ export default function UsersAdministratorPage() {
         onSuccess: invalidateAndClear
     });
 
-    if (authLoading || role !== Roles.Administrator) {
-        return (
-            <Center style={{ height: '100vh' }}>
-                <Loader type="dots" />
-            </Center>
-        );
-    }
+
 
     const handleSelectAll = () => {
         if (!data?.data) return;

@@ -13,6 +13,8 @@ builder.Services.AddDatabase(builder.Configuration)
 
 builder.Services.AddControllers();
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
@@ -25,6 +27,8 @@ if (app.Environment.IsDevelopment())
     await app.SeedBuiltInAttributes();
 
 }
+
+app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 app.ConfigureCorsPolicy().ConfigureIdentityAuth();

@@ -2,6 +2,11 @@ import { AppShell } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Outlet } from 'react-router';
 import { AppHeader } from '~/components/layout';
+import type { RouteHandle } from '~/auth/types';
+
+export const handle: RouteHandle = {
+    requireAuth: true
+};
 
 export default function Application() {
     const [opened, { toggle }] = useDisclosure();

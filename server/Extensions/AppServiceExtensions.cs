@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using server.Entities;
 using server.Services.AttributeLibraryServices;
+using server.Services.PositionServices;
 using server.Services.ProfileServices;
 using server.Services.UserServices;
 using server.Utils;
@@ -16,6 +17,7 @@ namespace server.Extensions
             services.AddScoped<IProfileService, ProfileService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserConfirmation<ApplicationUser>, UserConfirmation>();
+            services.AddScoped<IPositionService, PositionService>();
             return services;
         }
     }

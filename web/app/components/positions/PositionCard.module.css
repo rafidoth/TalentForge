@@ -1,0 +1,56 @@
+.card {
+  position: relative;
+  overflow: hidden;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+  cursor: pointer;
+  background-color: var(--mantine-color-body);
+  border: 1px solid var(--mantine-color-default-border);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--mantine-shadow-xl);
+  border-color: var(--mantine-color-blue-filled);
+}
+
+.cardBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(145deg, var(--mantine-color-blue-light) 0%, transparent 100%);
+  opacity: 0.4;
+  z-index: 1;
+  transition: opacity 250ms ease;
+}
+
+.card:hover .cardBackground {
+  opacity: 0.8;
+}
+
+.title {
+  transition: color 250ms ease;
+}
+
+.card:hover .title {
+  color: var(--mantine-color-blue-filled);
+}
+
+.footer {
+  padding-top: var(--mantine-spacing-md);
+  border-top: 1px solid var(--mantine-color-default-border);
+}
+
+.viewDetails {
+  transition: transform 250ms ease;
+}
+
+.arrowIcon {
+  color: var(--mantine-color-blue-filled);
+  transition: transform 250ms ease;
+}
+
+.card:hover .arrowIcon {
+  transform: translateX(4px);
+}

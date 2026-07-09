@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { UserRole } from '~/types';
+import type { UserRole } from '~/auth/types';
 import { fetchMe, logout as apiLogout } from '~/api/auth';
 
 interface AuthState {
