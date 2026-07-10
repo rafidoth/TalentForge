@@ -1,5 +1,5 @@
 import api from "./index";
-import type { PaginatedResponse } from "./types";
+import type { PaginatedResponse, PositionAttributeDto, CreatePositionAttributeDto } from "./types";
 
 export interface PositionDto {
   id: string;
@@ -8,9 +8,6 @@ export interface PositionDto {
   isPublic: boolean;
   maxProjects: number;
   createdAt: string;
-  attributes: any[];
-  accessRules: any[];
-  technologyTags: any[];
 }
 
 
@@ -19,14 +16,19 @@ export interface CreatePositionDto {
 }
 
 export interface UpdatePositionDto {
-  title: string;
+  title?: string;
   shortDescription?: string;
-  isPublic: boolean;
-  maxProjects: number;
-  attributes: any[];
-  accessRules: any[];
-  technologyTags: any[];
+  isPublic?: boolean;
+  maxProjects?: number;
+  attributes?: any[];
+  accessRules?: any[];
+  technologyTags?: any[];
 }
+
+export const updatePosition = async (id: string, dto: UpdatePositionDto) => {
+  const { data } = await api.put<PositionDto>(`/positions/${id}`, dto);
+  return data;
+};
 
 
 
@@ -40,7 +42,7 @@ export const fetchPositions = async (
 };
 
 export const createPosition = async (dto: CreatePositionDto) => {
-  const { data } = await api.post<PositionDto>("/api/positions", dto);
+  const { data } = await api.post<PositionDto>("/positions", dto);
   return data;
 };
 
@@ -53,4 +55,35 @@ export const duplicatePosition = async (id: string) => {
     `/positions/${id}/duplicate`,
   );
   return data;
+};
+
+export const getPositionById = async (id: string) => {
+  const { data } = await api.get<PositionDto>(`/positions/${id}`);
+  return data;
+};
+
+export const fetchPositionAttributes = async (
+  id: string,
+  pageNumber: number = 1,
+  pageSize: number = 10,
+): Promise<PaginatedResponse<PositionAttributeDto>> => {
+  const { data } = await api.get<PaginatedResponse<PositionAttributeDto>>(
+    `/positions/${id}/attributes?pageNumber=${pageNumber}&pageSize=${pageSize}`
+  );
+  return data;
+};
+
+export const addPositionAttribute = async (
+  id: string,
+  dto: CreatePositionAttributeDto
+) => {
+  const { data } = await api.post(`/positions/${id}/attributes`, dto);
+  return data;
+};
+
+export const removePositionAttribute = async (
+  positionId: string,
+  attributeId: string
+) => {
+  await api.delete(`/positions/${positionId}/attributes/${attributeId}`);
 };

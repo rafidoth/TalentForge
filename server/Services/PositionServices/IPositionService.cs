@@ -12,5 +12,6 @@ namespace server.Services.PositionServices
         Task<PositionDto> UpdatePositionAsync(Guid id, UpdatePositionDto dto);
         Task<bool> DeletePositionAsync(Guid id);
         Task<PositionDto> GetPositionByIdAsync(Guid id);
+        Task ExistsAsync(Guid positionId);
     }
 }

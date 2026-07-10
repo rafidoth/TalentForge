@@ -1,23 +1,21 @@
 using server.Dto;
 using server.Entities;
-using server.ServiceResults;
+using server.Utils;
 
 namespace server.Services.AttributeLibraryServices;
 
 public interface IAttributeService
 {
-    Task<ServiceResult<AttributeDto>> CreateAsync(
-        string name, int typeId, int categoryId,
-        string? description, List<string>? dropdownOptions = null
-    );
-    Task<ServiceResult<AttributeDto>> UpdateAsync(Guid id, UpdateAttributeDto dto);
-    Task<ServiceResult<bool>> DeleteAsync(Guid id);
-    Task<ServiceResult<AttributeDto>> GetByIdAsync(Guid id);
-    Task<ServiceResult<List<AttributeDto>>> SearchAsync(AttributeSearchQuery query);
-    Task<ServiceResult<List<AttributeCategoryDto>>> GetCategoriesAsync();
-    Task<ServiceResult<List<AttributeType>>> GetAttributeTypesAsync();
-    Task<ServiceResult<AttributeType>> GetAttributeTypeAsync(string name);
-    Task<ServiceResult<AttributeCategory>> GetCategoryAsync(string name);
-    Task<ServiceResult<List<AppAttribute>>> GetBuiltInAttributesAsync();
-    Task<ServiceResult<AppAttribute>> GetAttributeByNameAsync(string name);
+    Task<AttributeDto> CreateAsync(CreateAttributeDto dto);
+    Task<AttributeDto> UpdateAsync(Guid id, UpdateAttributeDto dto);
+    Task<bool> DeleteAsync(Guid id);
+    Task<AttributeDto> GetByIdAsync(Guid id);
+    Task<PagedResponse<AttributeDto>> SearchAsync(AttributeSearchQueryDto dto);
+    Task<List<AttributeCategoryDto>> GetCategoriesAsync();
+    Task<List<AttributeType>> GetAttributeTypesAsync();
+    Task<AttributeType> GetAttributeTypeAsync(string name);
+    Task<AttributeCategory> GetCategoryAsync(string name);
+    Task<List<AppAttribute>> GetBuiltInAttributesAsync();
+    Task<AppAttribute> GetAttributeByNameAsync(string name);
+    Task AttributExists(Guid attributeId);
 }

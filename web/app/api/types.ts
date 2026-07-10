@@ -75,3 +75,42 @@ export interface PaginatedResponse<T> {
     hasNextPage: boolean;
     hasPreviousPage: boolean;
 }
+
+export interface AttributeDto {
+    id: string;
+    name: string;
+    typeId: number;
+    typeName: string;
+    categoryId: number;
+    categoryName: string;
+    isBuiltin: boolean;
+    dropdownOptions: DropdownOptionDto[] | null;
+    version: number;
+}
+
+export interface CreateAttributeDto {
+    name: string;
+    typeId: number;
+    categoryId: number;
+    value?: string;
+    description?: string;
+    dropdownOptions?: string[] | null;
+}
+
+export interface UpdateAttributeDto {
+    name?: string;
+    typeId?: number;
+    categoryId?: number;
+    dropdownOptions?: string[] | null;
+    version: number;
+}
+
+export interface PositionAttributeDto {
+    id: string;
+    attribute: AttributeDto;
+    order: number;
+}
+
+export interface CreatePositionAttributeDto {
+    attributeId: string;
+}

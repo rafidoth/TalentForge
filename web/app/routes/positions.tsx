@@ -19,7 +19,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
-import { Navigate } from "react-router";
+import { useNavigate } from "react-router";
 import { useAuthStore } from "~/auth/store";
 import {
   usePositions,
@@ -39,6 +39,7 @@ export default function PositionsPage() {
   const createMutation = useCreatePosition();
   const deleteMutation = useDeletePosition();
   const duplicateMutation = useDuplicatePosition();
+  const navigate = useNavigate();
 
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -65,15 +66,18 @@ export default function PositionsPage() {
   };
 
   const handleCardClick = (id: string) => {
-    // Navigate or open drawer to edit/view details
-    console.log("Navigate to details of position: ", id);
+    navigate(`/app/position/${id}`);
   };
 
-  const handleCreate = (values: { title: string }) => {
+  const handleClose = () => {
+    close();
+    form.reset();
+  };
+
+  const handleSubmit = (values: { title: string }) => {
     createMutation.mutate(values, {
       onSuccess: () => {
-        close();
-        form.reset();
+        handleClose();
       },
     });
   };
@@ -118,13 +122,12 @@ export default function PositionsPage() {
 
       <Modal
         opened={opened}
-        onClose={close}
-        title="Create Position"
+        onClose={handleClose}
+        title={<Text size="xl">Create a Position</Text>}
         centered
-        radius="md"
         overlayProps={{ blur: 3, opacity: 0.55 }}
       >
-        <form onSubmit={form.onSubmit(handleCreate)}>
+        <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap="md">
             <TextInput
               label="Position Title"
@@ -134,13 +137,12 @@ export default function PositionsPage() {
               {...form.getInputProps("title")}
             />
             <Group justify="flex-end" mt="md">
-              <Button variant="subtle" color="gray" onClick={close}>
+              <Button variant="subtle" color="gray" onClick={handleClose}>
                 Cancel
               </Button>
               <Button
                 type="submit"
                 loading={createMutation.isPending}
-                radius="md"
               >
                 Create
               </Button>

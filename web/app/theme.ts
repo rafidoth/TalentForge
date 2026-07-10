@@ -194,45 +194,9 @@ const theme: MantineThemeOverride = {
     luminanceThreshold: 0.3,
     fontFamily: 'Rubik',
     fontFamilyMonospace: 'Roboto Mono',
-    headings: {
-        fontFamily: 'Open Sans',
-        fontWeight: '500',
-        sizes: {
-            h1: {
-                fontSize: '3.125rem',
-                lineHeight: '1.3',
-                fontWeight: '700'
-            },
-            h2: {
-                fontSize: '1.625rem',
-                lineHeight: '1.35',
-                fontWeight: '0'
-            },
-            h3: {
-                fontSize: '1.375rem',
-                lineHeight: '1.4',
-                fontWeight: '0'
-            },
-            h4: {
-                fontSize: '1.125rem',
-                lineHeight: '1.45',
-                fontWeight: '0'
-            },
-            h5: {
-                fontSize: '1rem',
-                lineHeight: '1.5',
-                fontWeight: '0'
-            },
-            h6: {
-                fontSize: '0.875rem',
-                lineHeight: '1.5',
-                fontWeight: '0'
-            }
-        }
-    },
     scale: 1,
     radius: {
-        xs: '0.05rem',
+        xs: '0.2rem',
         sm: '0.75rem',
         md: '0.7rem',
         lg: '1.2rem',

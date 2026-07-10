@@ -5,65 +5,42 @@ using server.Data;
 using server.Dto;
 using server.Entities;
 using server.ServiceResults;
+using server.Utils;
 
 namespace server.Services.UserServices
 {
-    public class UserService(UserManager<ApplicationUser> userManager, ApplicationDbContext db) : IUserService
+    public class UserService(
+        UserManager<ApplicationUser> userManager,
+        ApplicationDbContext db
+    ) : IUserService
     {
         public async Task<PagedResponse<UserDto>> GetUsersAsync(UserQueryFilter filter)
         {
-            var pageNumber = Math.Max(1, filter.PageNumber);
-            var pageSize = Math.Clamp(filter.PageSize, 1, 20);
-
             var query = userManager.Users.AsNoTracking();
             query = ApplySearchFilter(query, filter.Search!);
             query = ApplySortEmailFilter(query, filter.SortBy!);
 
-            var totalRecords = await query.CountAsync();
-            var totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
-
-            if (totalPages > 0)
-                pageNumber = Math.Min(pageNumber, totalPages);
-
-            var users = await GetUsersList(query, pageNumber, pageSize);
-            return new PagedResponse<UserDto>
+            var mappedQuery = query.Select(u => new UserDto
             {
-                Data = users!,
-                PageNumber = pageNumber,
-                PageSize = pageSize,
-                TotalPages = totalPages,
-                TotalRecords = totalRecords
-            };
-        }
-
-        private async Task<List<UserDto>?> GetUsersList(
-            IQueryable<ApplicationUser> query,
-            int pageNumber,
-            int pageSize
-        )
-        {
-            var users = await query
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .Select(u => new UserDto
-                {
-                    Id = u.Id,
-                    Email = u.Email ?? string.Empty,
-                    JoinedAt = u.JoinedAt,
-                    Status = u.Status,
-                    LastLoginAt = u.LastLoginAt,
-                    Role = db.UserRoles
-                        .Where(ur => ur.UserId == u.Id)
-                        .Join(db.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => r.Name)
-                        .FirstOrDefault() ?? "Unknown",
-                    Method = db.UserLogins
+                Id = u.Id,
+                Email = u.Email ?? string.Empty,
+                JoinedAt = u.JoinedAt,
+                Status = u.Status,
+                LastLoginAt = u.LastLoginAt,
+                Role = db.UserRoles
+                    .Where(ur => ur.UserId == u.Id)
+                    .Join(db.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => r.Name)
+                    .FirstOrDefault() ?? "Unknown",
+                Method = db.UserLogins
                     .Where(ul => ul.UserId == u.Id)
                     .Select(ul => ul.LoginProvider)
                     .FirstOrDefault() ?? "Email"
-                })
-                .ToListAsync();
-            return users;
+            });
+
+            return await PagedResponse.CreateAsync(mappedQuery, filter.PageNumber, filter.PageSize, maxPageSize: 20);
         }
+
+
 
         private IQueryable<ApplicationUser> ApplySearchFilter(IQueryable<ApplicationUser> query, string search)
         {

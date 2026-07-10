@@ -1,64 +1,42 @@
 using Microsoft.EntityFrameworkCore;
-using server.Data;
 using server.Dto;
 using server.Entities;
 using server.Exceptions;
-using server.Services.UserServices;
 using server.Utils;
 
 namespace server.Services.PositionServices
 {
     public class PositionService(ApplicationDbContext db) : IPositionService
     {
+        public async Task ExistsAsync(Guid positionId)
+        {
+            var result = await db.Positions.AnyAsync(p => p.Id == positionId);
+            if (!result)
+            {
+                throw new NotFoundException("Position", positionId);
+            }
+        }
         public async Task<PagedResponse<PositionDto>> GetAllPositionsAsync(int pageNumber = 1, int pageSize = 10)
         {
-            var (totalPages, totalRecords) = await GetTotalPages(pageNumber, pageSize);
-            var positions = await GetPaginatedPositionList(pageSize, pageNumber);
-            return BuildPagedResponseAsync(positions, pageNumber, pageSize, totalRecords, totalPages);
-        }
-
-        private async Task<(int, int)> GetTotalPages(int pageNumber, int pageSize)
-        {
-            (pageNumber, pageSize) = SafeParsePageNumberAndPageSize(pageNumber, pageSize);
-            var totalRecords = await db.Positions.AsNoTracking().CountAsync();
-            var totalpages = (int)Math.Ceiling((double)totalRecords / pageSize);
-            if (totalpages > 0) pageNumber = Math.Min(pageNumber, totalpages);
-            return (totalpages, totalRecords);
-        }
-
-        private (int, int) SafeParsePageNumberAndPageSize(int pageNumber, int pageSize)
-        {
-            pageNumber = Math.Max(1, pageNumber);
-            pageSize = Math.Clamp(pageSize, 1, 50);
-            return (pageNumber, pageSize);
-        }
-
-        private async Task<List<Position>> GetPaginatedPositionList(int pageSize, int pageNumber)
-        {
-            return await db.Positions
-                .Include(p => p.PositionAttributes)
-                .Include(p => p.AccessRules)
-                .Include(p => p.TechnologyTags)
-                .OrderByDescending(p => p.CreatedAt)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-        }
-        private PagedResponse<PositionDto> BuildPagedResponseAsync(
-            List<Position> positions,
-            int pageNumber, int pageSize,
-            int totalRecords, int totalPages
-        )
-        {
-            return new PagedResponse<PositionDto>
+            var query = db.Positions.AsNoTracking().Select(p => new PositionDto
             {
-                Data = positions.Select(MapToDto).ToList(),
-                PageNumber = pageNumber,
-                PageSize = pageSize,
-                TotalPages = totalPages,
-                TotalRecords = totalRecords
-            };
+                Id = p.Id,
+                Title = p.Title,
+                ShortDescription = p.ShortDescription,
+                IsPublic = p.IsPublic,
+                MaxProjects = p.MaxProjects,
+                CreatedAt = p.CreatedAt,
+            });
+
+            return await PagedResponse.CreateAsync(
+                query,
+                pageNumber,
+                pageSize,
+                maxPageSize: 10
+            );
         }
+
+
 
         public async Task<PositionDto> CreatePositionAsync(CreatePositionDto dto)
         {
@@ -114,7 +92,6 @@ namespace server.Services.PositionServices
         {
             target.PositionAttributes = source.PositionAttributes.Select(pa => new PositionAttribute
             {
-                Id = Guid.NewGuid(),
                 PositionId = target.Id,
                 AttributeId = pa.AttributeId,
                 Order = pa.Order
@@ -145,7 +122,6 @@ namespace server.Services.PositionServices
 
         public async Task<PositionDto> UpdatePositionAsync(Guid id, UpdatePositionDto dto)
         {
-
             using var transaction = await db.Database.BeginTransactionAsync();
             var position = await GetPositionById(id);
             position = await UpdatePosition(position, dto);
@@ -162,10 +138,25 @@ namespace server.Services.PositionServices
         }
         private Position BuildUpdatedPosition(Position position, UpdatePositionDto dto)
         {
-            position.Title = dto.Title;
-            position.ShortDescription = dto.ShortDescription;
-            position.MaxProjects = dto.MaxProjects;
+            UpdateTitleAndDescription(position, dto);
+            UpdateIsPublicAndMaxProjects(position, dto);
             return position;
+        }
+
+        private void UpdateTitleAndDescription(Position position, UpdatePositionDto dto)
+        {
+            if (!string.IsNullOrWhiteSpace(dto.Title))
+                position.Title = dto.Title;
+            if (dto.ShortDescription != null)
+                position.ShortDescription = dto.ShortDescription;
+        }
+
+        private void UpdateIsPublicAndMaxProjects(Position position, UpdatePositionDto dto)
+        {
+            if (dto.IsPublic.HasValue)
+                position.IsPublic = dto.IsPublic.Value;
+            if (dto.MaxProjects.HasValue)
+                position.MaxProjects = dto.MaxProjects.Value;
         }
 
         private async Task UpdateExternalPositionData(Position position, UpdatePositionDto dto)
@@ -177,6 +168,7 @@ namespace server.Services.PositionServices
 
         private async Task UpdatePositionTechnologyTags(Position position, UpdatePositionDto dto)
         {
+            if (dto.TechnologyTags == null) return;
             db.PositionTechnologyTags.RemoveRange(position.TechnologyTags);
             position.TechnologyTags = dto.TechnologyTags.Select(tt => new PositionTechnologyTag
             {
@@ -187,6 +179,8 @@ namespace server.Services.PositionServices
 
         private async Task UpdatePositionAccessRules(Position position, UpdatePositionDto dto)
         {
+
+            if (dto.AccessRules == null) return;
             db.PositionAccessRules.RemoveRange(position.AccessRules);
             position.AccessRules = dto.AccessRules.Select(ar => new PositionAccessRule
             {
@@ -200,12 +194,13 @@ namespace server.Services.PositionServices
 
         private async Task UpdatePositionAttributes(Position position, UpdatePositionDto dto)
         {
+            if (dto.Attributes == null) return;
             db.PositionAttributes.RemoveRange(position.PositionAttributes);
             position.PositionAttributes = dto.Attributes.Select(a => new PositionAttribute
             {
                 Id = Guid.NewGuid(),
                 PositionId = position.Id,
-                AttributeId = a.AttributeId,
+                AttributeId = a.Id,
                 Order = a.Order
             }).ToList();
         }
@@ -242,38 +237,6 @@ namespace server.Services.PositionServices
             IsPublic = position.IsPublic,
             MaxProjects = position.MaxProjects,
             CreatedAt = position.CreatedAt,
-            Attributes = MapToAttributeDto(position),
-            AccessRules = MapToAccessRuleDto(position),
-            TechnologyTags = MapToTechnologyTagDto(position)
         };
-
-        private static List<PositionAttributeDto> MapToAttributeDto(Position position)
-        {
-            return position.PositionAttributes?.Select(pa => new PositionAttributeDto
-            {
-                AttributeId = pa.AttributeId,
-                Order = pa.Order
-            }).ToList() ?? new();
-        }
-
-        private static List<PositionAccessRuleDto> MapToAccessRuleDto(Position position)
-        {
-            return position.AccessRules?.Select(ar => new PositionAccessRuleDto
-            {
-                AttributeId = ar.AttributeId,
-                Operator = ar.Operator,
-                ExpectedValue = ar.ExpectedValue
-            }).ToList() ?? new();
-        }
-
-        private static List<PositionTechnologyTagDto> MapToTechnologyTagDto(Position position)
-        {
-            return position.TechnologyTags?.Select(tt => new PositionTechnologyTagDto
-            {
-                TagId = tt.TagId
-            }).ToList() ?? new();
-        }
-
-
     }
 }

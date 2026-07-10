@@ -188,10 +188,10 @@ namespace server.Services.ProfileServices
             string dicebear_url
         )
         {
-            var fna = (await attrs.GetAttributeByNameAsync(BuiltInAttributes.FirstName)).Data;
-            var lna = (await attrs.GetAttributeByNameAsync(BuiltInAttributes.LastName)).Data;
-            var loc = (await attrs.GetAttributeByNameAsync(BuiltInAttributes.Address)).Data;
-            var pia = (await attrs.GetAttributeByNameAsync(BuiltInAttributes.ProfilePhoto)).Data;
+            var fna = await attrs.GetAttributeByNameAsync(BuiltInAttributes.FirstName);
+            var lna = await attrs.GetAttributeByNameAsync(BuiltInAttributes.LastName);
+            var loc = await attrs.GetAttributeByNameAsync(BuiltInAttributes.Address);
+            var pia = await attrs.GetAttributeByNameAsync(BuiltInAttributes.ProfilePhoto);
 
             if (fna == null || lna == null || loc == null || pia == null)
             {

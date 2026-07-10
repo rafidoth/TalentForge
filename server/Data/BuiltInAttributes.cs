@@ -15,9 +15,9 @@ public class BuiltInAttributes(IAttributeService attrs)
     public static readonly string ProfilePhoto = "Profile Photo";
     public async Task<List<AppAttribute>> GetAsync()
     {
-        int piCategoryId = (await attrs.GetCategoryAsync("Personal Information")).Data!.Id;
-        int stringTypeId = (await attrs.GetAttributeTypeAsync(AttributeTypes.String)).Data!.Id;
-        int imageTypeId = (await attrs.GetAttributeTypeAsync(AttributeTypes.Image)).Data!.Id;
+        int piCategoryId = (await attrs.GetCategoryAsync("Personal Information")).Id;
+        int stringTypeId = (await attrs.GetAttributeTypeAsync(AttributeTypes.String)).Id;
+        int imageTypeId = (await attrs.GetAttributeTypeAsync(AttributeTypes.Image)).Id;
 
         if (piCategoryId == 0 || stringTypeId == 0 || imageTypeId == 0)
         {

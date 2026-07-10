@@ -12,17 +12,25 @@ public record PositionDto
     public bool IsPublic { get; init; }
     public int MaxProjects { get; init; }
     public DateTime CreatedAt { get; init; }
-    public List<PositionAttributeDto> Attributes { get; init; } = new();
-    public List<PositionAccessRuleDto> AccessRules { get; init; } = new();
-    public List<PositionTechnologyTagDto> TechnologyTags { get; init; } = new();
 }
 
 public record PositionAttributeDto
 {
+    public Guid Id { get; init; }
+    public AttributeDto Attribute { get; init; } = null!;
+    public int Order { get; init; }
+    public uint Version { get; init; }
+}
+
+public record CreatePositionAttributeDto
+{
     [Required(ErrorMessage = PositionConstraints.AttributeIdRequiredErrorMessage)]
     public Guid AttributeId { get; init; }
-    [Required(ErrorMessage = PositionConstraints.OrderRequiredErrorMessage)]
-    public int Order { get; init; }
+}
+
+public record CreatePositionAttributeResponseDto : CreatePositionAttributeDto
+{
+    public Guid Id { get; init; }
 }
 
 public record PositionAccessRuleDto
@@ -48,20 +56,20 @@ public record CreatePositionDto
     public required string Title { get; init; }
 }
 
+
 public record UpdatePositionDto
 {
-    [Required(ErrorMessage = PositionConstraints.TitleRequiredErrorMessage)]
     [StringLength(PositionConstraints.TitleMaxLength, ErrorMessage = PositionConstraints.TitleMaxLengthErrorMessage)]
-    public required string Title { get; init; }
+    public required string? Title { get; init; }
 
     [StringLength(PositionConstraints.ShortDescriptionMaxLength, ErrorMessage = PositionConstraints.ShortDescriptionMaxLengthErrorMessage)]
     public string? ShortDescription { get; init; }
+    public bool? IsPublic { get; init; }
 
-    [Required]
     [Range(PositionConstraints.MaxProjectsMin, PositionConstraints.MaxProjectsMax, ErrorMessage = PositionConstraints.MaxProjectsRangeErrorMessage)]
-    public int MaxProjects { get; init; }
+    public int? MaxProjects { get; init; }
 
-    public List<PositionAttributeDto> Attributes { get; init; } = new();
-    public List<PositionAccessRuleDto> AccessRules { get; init; } = new();
-    public List<PositionTechnologyTagDto> TechnologyTags { get; init; } = new();
+    public List<PositionAttributeDto>? Attributes { get; init; } = new();
+    public List<PositionAccessRuleDto>? AccessRules { get; init; } = new();
+    public List<PositionTechnologyTagDto>? TechnologyTags { get; init; } = new();
 }

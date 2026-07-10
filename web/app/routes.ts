@@ -8,7 +8,8 @@ export default [
     route("app", "routes/application.tsx", [
         route("profile", "routes/profile.tsx"),
         route("users", "routes/administrator/users.tsx"),
-        route("positions", "routes/positions.tsx")
+        route("positions", "routes/positions.tsx"),
+        route("position/:id", "routes/position-details.tsx")
     ])
 ] satisfies RouteConfig;
 

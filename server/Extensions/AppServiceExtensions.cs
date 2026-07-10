@@ -18,6 +18,7 @@ namespace server.Extensions
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserConfirmation<ApplicationUser>, UserConfirmation>();
             services.AddScoped<IPositionService, PositionService>();
+            services.AddScoped<IPositionAttributeService, PositionAttributeService>();
             return services;
         }
     }

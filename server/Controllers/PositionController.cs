@@ -9,7 +9,10 @@ namespace server.Controllers
     [Authorize(Roles = Roles.AdminOrRecruiter)]
     [ApiController]
     [Route("api/positions")]
-    public class PositionController(IPositionService positionService) : ControllerBase
+    public class PositionController(
+        IPositionService positionService,
+        IPositionAttributeService positionAttributeService
+    ) : ControllerBase
     {
         [HttpGet]
         public async Task<IActionResult> GetAllPositions([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
@@ -52,5 +55,28 @@ namespace server.Controllers
             var result = await positionService.GetPositionByIdAsync(id);
             return Ok(result);
         }
+
+        [HttpGet("{id:guid}/attributes")]
+        public async Task<IActionResult> GetPositionAttributes(Guid id, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await positionAttributeService.GetAllAsync(id, pageNumber, pageSize);
+            return Ok(result);
+        }
+
+        [HttpPost("{id:guid}/attributes")]
+        public async Task<IActionResult> AddAttribute(Guid id, [FromBody] CreatePositionAttributeDto dto)
+        {
+            var result = await positionAttributeService.CreateAsync(id, dto);
+            return Ok(result);
+        }
+
+        [HttpDelete("{id:guid}/attributes/{attributeId:guid}")]
+        public async Task<IActionResult> RemoveAttribute(Guid id, Guid attributeId)
+        {
+            await positionAttributeService.DeleteAsync(id, attributeId);
+            return NoContent();
+        }
+
+
     }
 }

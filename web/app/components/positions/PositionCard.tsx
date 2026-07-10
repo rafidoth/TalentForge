@@ -42,6 +42,7 @@ export function PositionCard({ position, onDelete, onDuplicate, onClick }: Posit
               Delete
             </Menu.Item>
           </Menu.Dropdown>
+
         </Menu>
       </Group>
 
