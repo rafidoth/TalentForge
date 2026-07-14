@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 
 namespace server.Entities
@@ -21,7 +22,7 @@ namespace server.Entities
 
         [Column(TypeName = "jsonb")]
         [Required]
-        public string Value { get; set; } = string.Empty;
+        public JsonElement Value { get; set; }
 
         public DateTime? CreatedAt { get; set; }
 

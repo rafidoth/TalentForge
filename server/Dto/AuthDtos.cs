@@ -1,3 +1,4 @@
+using System.Text.Json;
 using server.Data;
 
 namespace server.Dto;
@@ -6,9 +7,9 @@ namespace server.Dto;
 public record RegisterDto(
       string Email,
       string Password,
-      string FirstName,
-      string LastName,
-      string Location
+      JsonElement FirstName,
+      JsonElement LastName,
+      JsonElement Location
    );
 public record RegisterResponse(bool Success, string UserId, string Role = Roles.Candidate);
 public record LoginDto(string Email, string Password);

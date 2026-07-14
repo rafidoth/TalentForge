@@ -1,27 +1,28 @@
+using System.Text.Json;
 using server.Dto;
-using server.ServiceResults;
+using server.Entities;
 
 namespace server.Services.ProfileServices
 {
     public interface IProfileService
     {
-        Task<ServiceResult<MeSectionDto>> GetMeSectionAsync(string userId);
-        Task<ServiceResult<MeSectionDto>> UpdateMeSectionAsync(string userId, UpdateMeSectionDto dto);
+        Task<MeSectionDto> GetMeSectionAsync(string userId);
+        Task<MeSectionDto> UpdateMeSectionAsync(ApplicationUser user, UpdateMeSectionDto dto);
 
-        Task<ServiceResult<List<ProfileAttributeDto>>> GetInfoSectionAsync(string userId);
-        Task<ServiceResult<ProfileAttributeDto>> AddAttributeToProfileAsync(string userId, AddProfileAttributeDto dto);
-        Task<ServiceResult<bool>> RemoveAttributeFromProfileAsync(string userId, Guid profileAttributeId);
-        Task<ServiceResult<ProfileAttributeDto>> UpdateProfileAttributeValueAsync(string userId, UpdateProfileAttributeValueDto dto);
+        Task<List<ProfileAttributeDto>> GetInfoSectionAsync(string userId);
+        Task AddAttributeToProfileAsync(string userId, AddProfileAttributeDto dto);
+        Task<bool> RemoveAttributeFromProfileAsync(string userId, Guid profileAttributeId);
+        Task<ProfileAttributeDto> UpdateProfileAttributeValueAsync(string userId, UpdateProfileAttributeValueDto dto);
 
-        Task<ServiceResult<List<ProjectDto>>> GetProjectsAsync(string userId);
-        Task<ServiceResult<ProjectDto>> CreateProjectAsync(string userId, CreateProjectDto dto);
-        Task<ServiceResult<ProjectDto>> UpdateProjectAsync(string userId, Guid projectId, UpdateProjectDto dto);
-        Task<ServiceResult<bool>> DeleteProjectAsync(string userId, Guid projectId);
+        Task<List<ProjectDto>> GetProjectsAsync(string userId);
+        Task<ProjectDto> CreateProjectAsync(string userId, CreateProjectDto dto);
+        Task<ProjectDto> UpdateProjectAsync(string userId, Guid projectId, UpdateProjectDto dto);
+        Task<bool> DeleteProjectAsync(string userId, Guid projectId);
 
-        Task<ServiceResult<FullProfileDto>> GetFullProfileAsync(string userId);
+        Task<FullProfileDto> GetFullProfileAsync(string userId);
 
-        Task<ServiceResult<AutoSaveResultDto>> AutoSaveAsync(string userId, AutoSaveDto dto);
+        Task<AutoSaveResultDto> AutoSaveAsync(string userId, AutoSaveDto dto);
 
-        Task<ServiceResult<bool>> CreateMeSectionAsync(string FName, string LName, string Location, string userId);
+        Task<bool> CreateMeSectionAsync(JsonElement FName, JsonElement LName, JsonElement Location, string userId);
     }
 }

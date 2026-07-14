@@ -14,6 +14,7 @@ import {
     ProfileDetailsCard,
     ProfileSkeleton,
     ProfileError,
+    MeSectionEditor,
 } from '~/components/profile';
 
 export default function Profile() {
@@ -87,6 +88,9 @@ export default function Profile() {
                     email={email}
                     role={role}
                 />
+                
+                <MeSectionEditor attributes={meAttributes} />
+
                 <ProfileDetailsCard
                     title="Info"
                     icon={<IdentificationCardIcon size={20} />}

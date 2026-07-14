@@ -1,45 +1,128 @@
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
+
 namespace server.Dto;
 
-public record ProfileAttributeDto(
-    Guid Id,
-    Guid AttributeId,
-    string AttributeName,
-    string TypeName,
-    string CategoryName,
-    string Value,
-    List<DropdownOptionDto>? DropdownOptions,
-    uint Version
-);
+public record ProfileAttributeDto
+{
+    public Guid Id { get; set; }
+    public Guid AttributeId { get; set; }
+    public string AttributeName { get; set; } = string.Empty;
+    public string TypeName { get; set; } = string.Empty;
+    public string CategoryName { get; set; } = string.Empty;
+    public JsonElement Value { get; set; }
+    public List<DropdownOptionDto>? DropdownOptions { get; set; }
+    public uint Version { get; set; }
+}
 
-public record AddProfileAttributeDto(Guid AttributeId);
+public record AddProfileAttributeDto
+{
+    [Required]
+    public Guid AttributeId { get; set; }
+    [Required]
+    public JsonElement Value { get; set; }
+}
 
-// For updating the value of a profile attribute (auto-save uses this)
-public record UpdateProfileAttributeValueDto(Guid ProfileAttributeId, string Value, uint Version);
+public record UpdateProfileAttributeValueDto
+{
+    [Required]
+    public Guid ProfileAttributeId { get; set; }
 
-public record MeSectionDto(
-    List<ProfileAttributeDto> MeAttributes
-);
+    [Required]
+    public JsonElement Value { get; set; }
 
-// Update me section
-public record UpdateMeSectionDto(List<UpdateProfileAttributeValueDto> Attributes);
+    [Required]
+    public uint Version { get; set; }
+}
 
-// Create project
-public record CreateProjectDto(string Name, DateOnly? StartDate, DateOnly? EndDate, string? Description, List<string>? Tags);
+public record MeSectionDto
+{
+    public List<ProfileAttributeDto> MeAttributes { get; set; } = [];
+}
 
-// Update project
-public record UpdateProjectDto(string? Name, DateOnly? StartDate, DateOnly? EndDate, string? Description, List<string>? Tags, uint Version);
+public record UpdateMeSectionDto
+{
+    [Required]
+    [MinLength(1, ErrorMessage = "No attributes provided for update.")]
+    public List<UpdateProfileAttributeValueDto> Attributes { get; set; } = [];
+}
 
-// Project response
-public record ProjectDto(Guid Id, string Name, DateOnly? StartDate, DateOnly? EndDate, string? Description, List<string> Tags, uint Version, DateTime? CreatedAt, DateTime? UpdatedAt);
+public record CreateProjectDto
+{
+    [Required]
+    [MaxLength(255)]
+    public string Name { get; set; } = string.Empty;
 
-// Auto-save request - batches multiple changes
-public record AutoSaveDto(List<UpdateProfileAttributeValueDto>? AttributeUpdates, List<AutoSaveProjectDto>? ProjectUpdates);
+    public DateOnly? StartDate { get; set; }
+    public DateOnly? EndDate { get; set; }
+    public string? Description { get; set; }
+    public List<string>? Tags { get; set; }
+}
 
-public record AutoSaveProjectDto(Guid ProjectId, string? Name, DateOnly? StartDate, DateOnly? EndDate, string? Description, List<string>? Tags, uint Version);
+public record UpdateProjectDto
+{
+    public string? Name { get; set; }
+    public DateOnly? StartDate { get; set; }
+    public DateOnly? EndDate { get; set; }
+    public string? Description { get; set; }
+    public List<string>? Tags { get; set; }
+
+    [Required]
+    public uint Version { get; set; }
+}
+
+public record ProjectDto
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public DateOnly? StartDate { get; set; }
+    public DateOnly? EndDate { get; set; }
+    public string? Description { get; set; }
+    public List<string> Tags { get; set; } = [];
+    public uint Version { get; set; }
+    public DateTime? CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+}
+
+public record AutoSaveDto
+{
+    public List<UpdateProfileAttributeValueDto>? AttributeUpdates { get; set; }
+    public List<AutoSaveProjectDto>? ProjectUpdates { get; set; }
+}
+
+public record AutoSaveProjectDto
+{
+    [Required]
+    public Guid ProjectId { get; set; }
+
+    public string? Name { get; set; }
+    public DateOnly? StartDate { get; set; }
+    public DateOnly? EndDate { get; set; }
+    public string? Description { get; set; }
+    public List<string>? Tags { get; set; }
+
+    [Required]
+    public uint Version { get; set; }
+}
 
 // Auto-save result per item
-public record AutoSaveItemResult(Guid Id, bool Success, uint? NewVersion, string? Error);
-public record AutoSaveResultDto(List<AutoSaveItemResult> Results);
+public record AutoSaveItemResult
+{
+    public Guid Id { get; set; }
+    public bool Success { get; set; }
+    public uint? NewVersion { get; set; }
+    public string? Error { get; set; }
+}
+
+public record AutoSaveResultDto
+{
+    public List<AutoSaveItemResult> Results { get; set; } = [];
+}
 
 // Full profile response
-public record FullProfileDto(MeSectionDto Me, List<ProfileAttributeDto> Info, List<ProjectDto> Projects);
+public record FullProfileDto
+{
+    public MeSectionDto Me { get; set; } = null!;
+    public List<ProfileAttributeDto> Info { get; set; } = [];
+    public List<ProjectDto> Projects { get; set; } = [];
+}

@@ -8,7 +8,7 @@ namespace server.Services.AttributeLibraryServices;
 
 public class AttributeService(ApplicationDbContext db) : IAttributeService
 {
-    public async Task AttributExists(Guid attributeId)
+    public async Task AttributeExists(Guid attributeId)
     {
         var result = await db.Attributes.AnyAsync(a => a.Id == attributeId);
         if (!result)
@@ -102,7 +102,7 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
     public async Task<AttributeDto> UpdateAsync(Guid id, UpdateAttributeDto dto)
     {
         using var transaction = await db.Database.BeginTransactionAsync();
-        var attribute = await FindAttributeByIdAsync(id);
+        var attribute = await GetAttributeEntityByIdAsync(id);
 
         if (attribute.IsBuiltin)
             throw new ValidationException("Attribute", "Built-in attributes cannot be modified.");
@@ -156,7 +156,7 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
 
     public async Task<bool> DeleteAsync(Guid id)
     {
-        var attribute = await FindAttributeByIdAsync(id);
+        var attribute = await GetAttributeEntityByIdAsync(id);
 
         if (attribute.IsBuiltin)
             throw new ValidationException("Attribute", "Built-in attributes cannot be deleted.");
@@ -166,11 +166,23 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
         return true;
     }
 
-    public async Task<AttributeDto> GetByIdAsync(Guid id)
+    public async Task<AttributeDto> GetAttributeDtoByIdAsync(Guid id)
     {
-        var attribute = await FindAttributeByIdAsync(id);
+        var attribute = await GetAttributeEntityByIdAsync(id);
         return MapToDto(attribute, db);
     }
+
+    public async Task<AppAttribute> GetAttributeEntityByIdAsync(Guid id)
+    {
+        var attribute = await db.Attributes
+            .Include(a => a.Type)
+            .Include(a => a.Category)
+            .Include(a => a.DropdownOptions)
+            .FirstOrDefaultAsync(a => a.Id == id);
+
+        return attribute ?? throw new NotFoundException(nameof(AppAttribute), id);
+    }
+
 
     public async Task<PagedResponse<AttributeDto>> SearchAsync(AttributeSearchQueryDto dto)
     {
@@ -272,16 +284,6 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
         return attribute ?? throw new NotFoundException(nameof(AppAttribute), name);
     }
 
-    private async Task<AppAttribute> FindAttributeByIdAsync(Guid id)
-    {
-        var attribute = await db.Attributes
-            .Include(a => a.Type)
-            .Include(a => a.Category)
-            .Include(a => a.DropdownOptions)
-            .FirstOrDefaultAsync(a => a.Id == id);
-
-        return attribute ?? throw new NotFoundException(nameof(AppAttribute), id);
-    }
 
     private async Task ReloadNavigationsAsync(AppAttribute attribute)
     {

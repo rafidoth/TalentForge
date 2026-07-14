@@ -11,10 +11,10 @@ interface UsersTableProps {
   pageSize: number;
 }
 
-export function UsersTable({ 
-  data, 
-  selectedIds, 
-  onSelect, 
+export function UsersTable({
+  data,
+  selectedIds,
+  onSelect,
   onSelectAll,
   pageNumber,
   pageSize
@@ -36,7 +36,7 @@ export function UsersTable({
         <Table.Thead>
           <Table.Tr>
             <Table.Th w={40}>
-              <Checkbox 
+              <Checkbox
                 checked={isAllSelected}
                 indeterminate={isIndeterminate}
                 onChange={onSelectAll}
@@ -47,16 +47,16 @@ export function UsersTable({
             <Table.Th>Email</Table.Th>
             <Table.Th>Method</Table.Th>
             <Table.Th>Role</Table.Th>
-            <Table.Th>Status</Table.Th>
+            <Table.Th w={100}>Status</Table.Th>
             <Table.Th>Joined At</Table.Th>
             <Table.Th>Last Login</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
           {data.map((user, idx) => (
-            <UserTableRow 
-              key={user.id} 
-              user={user} 
+            <UserTableRow
+              key={user.id}
+              user={user}
               selected={selectedIds.includes(user.id)}
               onSelect={() => onSelect(user.id)}
               index={(pageNumber - 1) * pageSize + idx + 1}

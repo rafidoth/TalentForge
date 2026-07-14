@@ -12,7 +12,7 @@ export interface AttributeListProps {
   onEdit: (attribute: AttributeDto) => void;
 }
 
-export function AttributeList({ positionId, onCreate, onEdit }: AttributeListProps) {
+export function PositionAttributeList({ positionId, onCreate, onEdit }: AttributeListProps) {
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState<string | null>("all");
 
@@ -39,20 +39,64 @@ export function AttributeList({ positionId, onCreate, onEdit }: AttributeListPro
   const filteredAttributes = useMemo(() => {
     if (!activeTab || activeTab === "all") return attributes;
     if (activeTab === "recent") {
-      return attributes.slice(0, 5); // Fallback for recently used
+      return attributes.slice(0, 5);
     }
     return attributes.filter(attr => attr.categoryName === activeTab);
   }, [attributes, activeTab]);
 
   const addedAttributeIds = useMemo(() => {
-    const ids = new Set<string>();
-    if (positionAttributesData) {
-      positionAttributesData.pages.forEach(page => {
-        page.data.forEach(pa => ids.add(pa.attribute.id));
-      });
-    }
-    return ids;
+    return new Set<string>(
+      positionAttributesData?.pages.flatMap((page) =>
+        page.data.map((pa) => pa.attribute.id)
+      ) ?? []
+    );
   }, [positionAttributesData]);
+
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <Center h={300}>
+          <Loader />
+        </Center>
+      );
+    }
+
+    if (filteredAttributes.length === 0) {
+      return (
+        <Center h={300}>
+          <Text c="dimmed">No attributes found in this category.</Text>
+        </Center>
+      );
+    }
+
+    return (
+      <Stack gap="xl">
+        <SimpleGrid cols={{ base: 1, xs: 2, sm: 2, md: 3 }} spacing="md">
+          {filteredAttributes.map((attr) => (
+            <AttributeItem
+              key={attr.id}
+              attribute={attr}
+              positionId={positionId}
+              isAddedToPosition={addedAttributeIds.has(attr.id)}
+              onEdit={() => onEdit(attr)}
+            />
+          ))}
+        </SimpleGrid>
+
+        {hasNextPage && activeTab === "all" && (
+          <Center>
+            <Button
+              variant="light"
+              onClick={() => fetchNextPage()}
+              loading={isFetchingNextPage}
+            >
+              Load More
+            </Button>
+          </Center>
+        )}
+      </Stack>
+    );
+  };
 
   return (
     <Stack gap="md">
@@ -87,41 +131,7 @@ export function AttributeList({ positionId, onCreate, onEdit }: AttributeListPro
       )}
 
       <Box style={{ minHeight: 300, position: 'relative' }}>
-        {isLoading ? (
-          <Center h={300}>
-            <Loader />
-          </Center>
-        ) : filteredAttributes.length === 0 ? (
-          <Center h={300}>
-            <Text c="dimmed">No attributes found in this category.</Text>
-          </Center>
-        ) : (
-          <Stack gap="xl">
-            <SimpleGrid cols={{ base: 1, xs: 2, sm: 2, md: 3 }} spacing="md">
-              {filteredAttributes.map((attr) => (
-                <AttributeItem
-                  key={attr.id}
-                  attribute={attr}
-                  positionId={positionId}
-                  isAddedToPosition={addedAttributeIds.has(attr.id)}
-                  onEdit={() => onEdit(attr)}
-                />
-              ))}
-            </SimpleGrid>
-
-            {hasNextPage && activeTab === "all" && (
-              <Center>
-                <Button
-                  variant="light"
-                  onClick={() => fetchNextPage()}
-                  loading={isFetchingNextPage}
-                >
-                  Load More
-                </Button>
-              </Center>
-            )}
-          </Stack>
-        )}
+        {renderContent()}
       </Box>
     </Stack>
   );

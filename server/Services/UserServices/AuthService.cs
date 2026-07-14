@@ -246,10 +246,19 @@ public class AuthService(SignInManager<ApplicationUser> signInManager, IProfileS
                 );
             }
 
-            var profileResult = await profileService.CreateMeSectionAsync(
-                request.FirstName, request.LastName, request.Location, user.Id
-            );
-            if (!profileResult.IsSuccess)
+            bool profileCreated = false;
+            try
+            {
+                profileCreated = await profileService.CreateMeSectionAsync(
+                    request.FirstName, request.LastName, request.Location, user.Id
+                );
+            }
+            catch (Exception)
+            {
+                // Ignored, will be handled below
+            }
+
+            if (!profileCreated)
             {
                 await transaction.RollbackAsync();
                 return ServiceResult<RegisterResponse>.Failure(

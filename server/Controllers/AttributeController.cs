@@ -6,7 +6,8 @@ using server.Services.AttributeLibraryServices;
 
 namespace server.Controllers;
 
-[Authorize(Roles = Roles.AdminOrRecruiter)]
+
+[Authorize]
 [ApiController]
 [Route("api/attributes")]
 public class AttributeController(IAttributeService attributeService) : ControllerBase
@@ -25,6 +26,7 @@ public class AttributeController(IAttributeService attributeService) : Controlle
         });
     }
 
+    [Authorize(Roles = Roles.AdminOrRecruiter)]
     [HttpPost]
     public async Task<IActionResult> CreateAttribute([FromBody] CreateAttributeDto dto)
     {
@@ -33,6 +35,7 @@ public class AttributeController(IAttributeService attributeService) : Controlle
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = Roles.AdminOrRecruiter)]
     public async Task<IActionResult> UpdateAttribute(Guid id, [FromBody] UpdateAttributeDto dto)
     {
         var result = await attributeService.UpdateAsync(id, dto);
@@ -40,11 +43,13 @@ public class AttributeController(IAttributeService attributeService) : Controlle
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = Roles.AdminOrRecruiter)]
     public async Task<IActionResult> DeleteAttribute(Guid id)
     {
         await attributeService.DeleteAsync(id);
         return NoContent();
     }
+
 
     [HttpGet]
     public async Task<IActionResult> GetAttributes([FromQuery] AttributeSearchQueryDto dto)

@@ -16,7 +16,7 @@ namespace server.Services.PositionServices
         public async Task<PositionAttributeDto> CreateAsync(Guid positionId, CreatePositionAttributeDto dto)
         {
             await positionService.ExistsAsync(positionId);
-            await attributeService.AttributExists(dto.AttributeId);
+            await attributeService.AttributeExists(dto.AttributeId);
 
             var maxOrder = await db.PositionAttributes
                 .Where(pa => pa.PositionId == positionId)
@@ -75,7 +75,7 @@ namespace server.Services.PositionServices
         private async Task CheckExistanceOfAttributeInPosition(Guid positionId, Guid attributeId)
         {
             await positionService.ExistsAsync(positionId);
-            await attributeService.AttributExists(attributeId);
+            await attributeService.AttributeExists(attributeId);
             await PositionAttributeExistsAsync(positionId, attributeId);
         }
 

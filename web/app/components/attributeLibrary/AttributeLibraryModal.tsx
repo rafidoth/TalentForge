@@ -1,6 +1,6 @@
 import { Modal, Text, Title } from "@mantine/core";
 import { useState } from "react";
-import { AttributeList } from "./AttributeList";
+import { PositionAttributeList } from "./AttributeList";
 import { AttributeForm } from "./AttributeForm";
 import type { AttributeDto } from "../../api/types";
 
@@ -10,7 +10,9 @@ export interface AttributeLibraryModalProps {
   positionId?: string;
 }
 
-export function AttributeLibraryModal({ opened, onClose, positionId }: AttributeLibraryModalProps) {
+export function AttributeLibraryModal(
+  { opened, onClose, positionId }: AttributeLibraryModalProps
+) {
   const [view, setView] = useState<"list" | "create" | "edit">("list");
   const [editingAttribute, setEditingAttribute] = useState<AttributeDto | null>(null);
 
@@ -35,6 +37,22 @@ export function AttributeLibraryModal({ opened, onClose, positionId }: Attribute
     setEditingAttribute(null);
   };
 
+
+  const PositionAttributeListComponent = (view: string) => (view === "list" ? (
+    <PositionAttributeList
+      positionId={positionId}
+      onCreate={handleCreate}
+      onEdit={handleEdit}
+    />
+  ) : (
+    <AttributeForm
+      key={editingAttribute?.id ?? "new"}
+      attribute={editingAttribute}
+      onCancel={handleBackToList}
+      onSuccess={handleBackToList}
+    />
+  ));
+
   return (
     <Modal
       opened={opened}
@@ -43,18 +61,10 @@ export function AttributeLibraryModal({ opened, onClose, positionId }: Attribute
       size="70%"
       padding="lg"
     >
-      {view === "list" ? (
-        <AttributeList
-          positionId={positionId}
-          onCreate={handleCreate}
-          onEdit={handleEdit}
-        />
-      ) : (
-        <AttributeForm
-          attribute={editingAttribute}
-          onCancel={handleBackToList}
-          onSuccess={handleBackToList}
-        />
+      {positionId ? PositionAttributeListComponent(view) : (
+        <Text>
+          Attribute list for candidate profile
+        </Text>
       )}
     </Modal>
   );

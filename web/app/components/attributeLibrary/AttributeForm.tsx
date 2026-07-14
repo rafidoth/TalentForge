@@ -1,6 +1,5 @@
 import { TextInput, Select, Button, Group, Stack, Textarea, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useEffect } from "react";
 import type { AttributeDto, CreateAttributeDto, UpdateAttributeDto } from "../../api/types";
 import { useCreateAttribute, useUpdateAttribute, useAttributeTypesAndCategories } from "./useAttributes";
 
@@ -32,20 +31,7 @@ export function AttributeForm({ attribute, onCancel, onSuccess }: AttributeFormP
     },
   });
 
-  useEffect(() => {
-    if (attribute) {
-      form.setValues({
-        name: attribute.name,
-        categoryId: attribute.categoryId.toString(),
-        typeId: attribute.typeId.toString(),
-        value: "",
-        description: "",
-      });
-    } else {
-      form.reset();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attribute]);
+
 
   const handleSubmit = (values: typeof form.values) => {
     if (isEditing) {

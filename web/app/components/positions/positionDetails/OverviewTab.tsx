@@ -41,7 +41,6 @@ export function OverviewTab({ positionId, position }: OverviewTabProps) {
           <TextInput label="Title" {...form.getInputProps("title")} required />
           <TextInput label="Short Description" {...form.getInputProps("shortDescription")} />
           <NumberInput label="Max Projects" {...form.getInputProps("maxProjects")} />
-          <Checkbox label="Is Public" {...form.getInputProps("isPublic", { type: 'checkbox' })} />
           <Group justify="flex-end">
             <Button type="submit" loading={updateMutation.isPending}>Save Overview</Button>
           </Group>

@@ -1,10 +1,12 @@
 import api from "./index";
-import type { MeSectionDto, ServiceResult } from "./types";
+import type { MeSectionDto, UpdateMeSectionDto } from "./types";
 
 export async function fetchMeSection(): Promise<MeSectionDto> {
-    const res = await api.get<ServiceResult<MeSectionDto>>("/profile/me");
-    if (!res.data.isSuccess || !res.data.data) {
-        throw new Error(res.data.message ?? "Failed to fetch profile");
-    }
-    return res.data.data;
+    const res = await api.get<MeSectionDto>("/profile/me");
+    return res.data;
+}
+
+export async function updateMeSection(dto: UpdateMeSectionDto): Promise<MeSectionDto> {
+    const res = await api.put<MeSectionDto>("/profile/me", dto);
+    return res.data;
 }

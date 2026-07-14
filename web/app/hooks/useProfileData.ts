@@ -1,9 +1,20 @@
-import { useQuery } from '@tanstack/react-query';
-import { fetchMeSection } from '~/api/profile';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { fetchMeSection, updateMeSection } from '~/api/profile';
+import type { UpdateMeSectionDto } from '~/api/types';
 
 export function useMeSection() {
     return useQuery({
         queryKey: ['profile', 'me'],
         queryFn: fetchMeSection,
+    });
+}
+
+export function useUpdateMeSection() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data: UpdateMeSectionDto) => updateMeSection(data),
+        onSuccess: (data) => {
+            queryClient.setQueryData(['profile', 'me'], data);
+        },
     });
 }

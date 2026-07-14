@@ -39,6 +39,16 @@ export interface MeSectionDto {
     meAttributes: ProfileAttributeDto[];
 }
 
+export interface UpdateProfileAttributeValueDto {
+    profileAttributeId: string;
+    value: string;
+    version: number;
+}
+
+export interface UpdateMeSectionDto {
+    attributes: UpdateProfileAttributeValueDto[];
+}
+
 export interface ServiceResult<T> {
     isSuccess: boolean;
     message: string | null;
