@@ -30,9 +30,7 @@ namespace server.Services.ProfileServices
         {
             var profileAttributeIds = updates.Select(a => a.ProfileAttributeId).ToList();
             var profileAttributes = await GetProfileAttributesByIdsAsync(user.Id, profileAttributeIds);
-
             ApplyUpdatesToProfileAttributes(profileAttributes, updates);
-
             await db.SaveChangesAsync();
         }
 

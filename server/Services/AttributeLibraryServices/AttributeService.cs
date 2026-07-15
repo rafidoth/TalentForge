@@ -213,6 +213,7 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
         {
             Id = a.Id,
             Name = a.Name,
+            Description = a.Description ?? string.Empty,
             TypeId = a.TypeId ?? 0,
             TypeName = a.Type != null ? a.Type.Name : string.Empty,
             CategoryId = a.CategoryId ?? 0,

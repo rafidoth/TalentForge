@@ -1,24 +1,43 @@
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { 
-  fetchAttributes, 
-  createAttribute, 
-  updateAttribute, 
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
+  fetchAttributes,
+  createAttribute,
+  updateAttribute,
   deleteAttribute,
-  fetchAttributeTypesAndCategories
+  fetchAttributeTypesAndCategories,
 } from "../../api/attributes";
-import { 
-  fetchPositionAttributes, 
-  addPositionAttribute, 
-  removePositionAttribute 
+import {
+  fetchPositionAttributes,
+  addPositionAttribute,
+  removePositionAttribute,
 } from "../../api/positions";
-import type { CreateAttributeDto, UpdateAttributeDto, CreatePositionAttributeDto } from "../../api/types";
+import {
+  fetchProfileAttributes,
+  addProfileAttribute,
+  updateProfileAttribute,
+  deleteProfileAttribute,
+} from "../../api/profile";
+import type {
+  CreateAttributeDto,
+  UpdateAttributeDto,
+  CreatePositionAttributeDto,
+  AddProfileAttributeDto,
+  UpdateProfileAttributeValueDto,
+} from "../../api/types";
 
 export const useAttributes = (search: string = "") => {
   return useInfiniteQuery({
     queryKey: ["attributes", search],
-    queryFn: ({ pageParam }) => fetchAttributes(search, pageParam as number, 10),
+    queryFn: ({ pageParam }) =>
+      fetchAttributes(search, pageParam as number, 10),
     initialPageParam: 1,
-    getNextPageParam: (lastPage) => lastPage.hasNextPage ? lastPage.pageNumber + 1 : undefined,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNextPage ? lastPage.pageNumber + 1 : undefined,
   });
 };
 
@@ -42,7 +61,8 @@ export const useCreateAttribute = () => {
 export const useUpdateAttribute = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, dto }: { id: string; dto: UpdateAttributeDto }) => updateAttribute(id, dto),
+    mutationFn: ({ id, dto }: { id: string; dto: UpdateAttributeDto }) =>
+      updateAttribute(id, dto),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["attributes"] });
     },
@@ -62,9 +82,11 @@ export const useDeleteAttribute = () => {
 export const usePositionAttributes = (positionId: string | undefined) => {
   return useInfiniteQuery({
     queryKey: ["positionAttributes", positionId],
-    queryFn: ({ pageParam }) => fetchPositionAttributes(positionId!, pageParam as number, 10),
+    queryFn: ({ pageParam }) =>
+      fetchPositionAttributes(positionId!, pageParam as number, 10),
     initialPageParam: 1,
-    getNextPageParam: (lastPage) => lastPage.hasNextPage ? lastPage.pageNumber + 1 : undefined,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNextPage ? lastPage.pageNumber + 1 : undefined,
     enabled: !!positionId,
   });
 };
@@ -72,10 +94,17 @@ export const usePositionAttributes = (positionId: string | undefined) => {
 export const useAddPositionAttribute = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ positionId, dto }: { positionId: string; dto: CreatePositionAttributeDto }) => 
-      addPositionAttribute(positionId, dto),
+    mutationFn: ({
+      positionId,
+      dto,
+    }: {
+      positionId: string;
+      dto: CreatePositionAttributeDto;
+    }) => addPositionAttribute(positionId, dto),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["positionAttributes", variables.positionId] });
+      queryClient.invalidateQueries({
+        queryKey: ["positionAttributes", variables.positionId],
+      });
     },
   });
 };
@@ -83,10 +112,55 @@ export const useAddPositionAttribute = () => {
 export const useRemovePositionAttribute = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ positionId, attributeId }: { positionId: string; attributeId: string }) => 
-      removePositionAttribute(positionId, attributeId),
+    mutationFn: ({
+      positionId,
+      attributeId,
+    }: {
+      positionId: string;
+      attributeId: string;
+    }) => removePositionAttribute(positionId, attributeId),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["positionAttributes", variables.positionId] });
+      queryClient.invalidateQueries({
+        queryKey: ["positionAttributes", variables.positionId],
+      });
+    },
+  });
+};
+
+export const useProfileAttributes = () => {
+  return useQuery({
+    queryKey: ["profileAttributes"],
+    queryFn: () => fetchProfileAttributes(),
+  });
+};
+
+export const useAddProfileAttribute = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (dto: AddProfileAttributeDto) => addProfileAttribute(dto),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profileAttributes"] });
+    },
+  });
+};
+
+export const useUpdateProfileAttribute = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (dto: UpdateProfileAttributeValueDto) => updateProfileAttribute(dto),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profileAttributes"] });
+    },
+  });
+};
+
+export const useDeleteProfileAttribute = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (profileAttributeId: string) =>
+      deleteProfileAttribute(profileAttributeId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profileAttributes"] });
     },
   });
 };

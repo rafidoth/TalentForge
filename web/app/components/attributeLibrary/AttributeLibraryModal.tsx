@@ -1,6 +1,7 @@
-import { Modal, Text, Title } from "@mantine/core";
+import { Modal, Text } from "@mantine/core";
 import { useState } from "react";
 import { PositionAttributeList } from "./AttributeList";
+import { ProfileAttributeList } from "./ProfileAttributeList";
 import { AttributeForm } from "./AttributeForm";
 import type { AttributeDto } from "../../api/types";
 
@@ -10,11 +11,15 @@ export interface AttributeLibraryModalProps {
   positionId?: string;
 }
 
-export function AttributeLibraryModal(
-  { opened, onClose, positionId }: AttributeLibraryModalProps
-) {
+export function AttributeLibraryModal({
+  opened,
+  onClose,
+  positionId,
+}: AttributeLibraryModalProps) {
   const [view, setView] = useState<"list" | "create" | "edit">("list");
-  const [editingAttribute, setEditingAttribute] = useState<AttributeDto | null>(null);
+  const [editingAttribute, setEditingAttribute] = useState<AttributeDto | null>(
+    null,
+  );
 
   const handleClose = () => {
     setView("list");
@@ -37,21 +42,32 @@ export function AttributeLibraryModal(
     setEditingAttribute(null);
   };
 
+  const renderFormView = () => {
+    if (!positionId) {
+      return <Text>No Attributes found</Text>;
+    }
+    return (
+      <AttributeForm
+        key={editingAttribute?.id ?? "new"}
+        attribute={editingAttribute}
+        onCancel={handleBackToList}
+        onSuccess={handleBackToList}
+      />
+    );
+  };
 
-  const PositionAttributeListComponent = (view: string) => (view === "list" ? (
-    <PositionAttributeList
-      positionId={positionId}
-      onCreate={handleCreate}
-      onEdit={handleEdit}
-    />
-  ) : (
-    <AttributeForm
-      key={editingAttribute?.id ?? "new"}
-      attribute={editingAttribute}
-      onCancel={handleBackToList}
-      onSuccess={handleBackToList}
-    />
-  ));
+  const renderListView = () => {
+    if (positionId) {
+      return (
+        <PositionAttributeList
+          positionId={positionId}
+          onCreate={handleCreate}
+          onEdit={handleEdit}
+        />
+      );
+    }
+    return <ProfileAttributeList onCreate={handleCreate} onEdit={handleEdit} />;
+  };
 
   return (
     <Modal
@@ -61,11 +77,7 @@ export function AttributeLibraryModal(
       size="70%"
       padding="lg"
     >
-      {positionId ? PositionAttributeListComponent(view) : (
-        <Text>
-          Attribute list for candidate profile
-        </Text>
-      )}
+      {view === "list" ? renderListView() : renderFormView()}
     </Modal>
   );
 }

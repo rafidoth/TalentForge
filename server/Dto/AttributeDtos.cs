@@ -29,11 +29,11 @@ public record AttributeSearchQueryDto(
     int PageSize = 20
 );
 
-// Response DTO for a single attribute
 public record AttributeDto
 {
     public Guid Id { get; init; } = Guid.Empty;
     public string Name { get; init; } = string.Empty;
+    public string Description { get; init; } = string.Empty;
     public int TypeId { get; init; }
     public string TypeName { get; init; } = string.Empty;
     public int CategoryId { get; init; }
@@ -43,8 +43,6 @@ public record AttributeDto
     public uint Version { get; init; }
 };
 
-// Response DTO for dropdown options
 public record DropdownOptionDto(Guid Id, string Label);
 
-// Response DTO for categories
 public record AttributeCategoryDto(int Id, string Name);

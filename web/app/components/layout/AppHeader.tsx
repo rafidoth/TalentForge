@@ -1,27 +1,26 @@
-import { AppShell, Burger, Group, Title, Badge } from '@mantine/core';
-import { useUserRole } from '~/auth/store';
-import { UserMenuContainer } from './UserMenuContainer';
+import { AppShell, Burger, Group, Title } from "@mantine/core";
+import { UserMenuContainer } from "./UserMenuContainer";
+import { Link } from "react-router";
 
 interface AppHeaderProps {
-    opened: boolean;
-    toggle: () => void;
+  opened: boolean;
+  toggle: () => void;
 }
 
 export function AppHeader({ opened, toggle }: AppHeaderProps) {
-    const role = useUserRole();
-
-    return (
-        <AppShell.Header>
-            <Group h="100%" px="md" justify="space-between">
-                <Group>
-                    <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-                    <Title order={4}>TalentForge</Title>
-                </Group>
-
-                <Group>
-                    <UserMenuContainer />
-                </Group>
-            </Group>
-        </AppShell.Header>
-    );
+  return (
+    <AppShell.Header>
+      <Group h="100%" px="md" justify="space-between">
+        <Group>
+          <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+          <Link to={"/"} style={{ textDecoration: "none", color: "inherit" }}>
+            <Title order={4}>TalentForge</Title>
+          </Link>
+        </Group>
+        <Group>
+          <UserMenuContainer />
+        </Group>
+      </Group>
+    </AppShell.Header>
+  );
 }
