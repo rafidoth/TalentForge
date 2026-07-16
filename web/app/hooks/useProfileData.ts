@@ -13,8 +13,8 @@ export function useUpdateMeSection() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: UpdateMeSectionDto) => updateMeSection(data),
-        onSuccess: (data) => {
-            queryClient.setQueryData(['profile', 'me'], data);
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ['profile', 'me'] });
         },
     });
 }

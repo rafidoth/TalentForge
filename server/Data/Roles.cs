@@ -7,5 +7,6 @@ public static class Roles
     public const string Recruiter = "Recruiter";
 
     public const string AdminOrRecruiter = Admin + "," + Recruiter;
+    public const string AdminOrCandidate = Admin + "," + Candidate;
 
 }

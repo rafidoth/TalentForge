@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using server.Dto;
 using server.Entities;
 using server.Services.ProfileServices;
+using server.Services.ProjectsServices;
 
 namespace server.Controllers
 {
@@ -13,6 +14,7 @@ namespace server.Controllers
     [Route("api/profile")]
     public class ProfileController(
         IProfileService profileService,
+        IProjectsService projectsService,
         UserManager<ApplicationUser> userManager
     ) : ControllerBase
     {
@@ -76,25 +78,37 @@ namespace server.Controllers
         [HttpGet("projects")]
         public async Task<IActionResult> GetProjects()
         {
-            return Ok();
+            var user = await userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+            var projects = await projectsService.GetAllProjectsByUserAsync(user.Id);
+            return Ok(projects);
         }
 
         [HttpPost("projects")]
-        public async Task<IActionResult> AddProject()
+        public async Task<IActionResult> AddProject(CreateProjectDto dto)
         {
-            return Ok();
+            var user = await userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+            var project = await projectsService.CreateProjectAsync(user.Id, dto);
+            return Ok(project);
         }
 
-        [HttpPut("projects")]
-        public async Task<IActionResult> UpdateProject()
+        [HttpPut("projects/{id}")]
+        public async Task<IActionResult> UpdateProject(Guid id, UpdateProjectDto dto)
         {
-            return Ok();
+            var user = await userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+            var project = await projectsService.UpdateProjectAsync(user.Id, id, dto);
+            return Ok(project);
         }
 
-        [HttpDelete("projects")]
-        public async Task<IActionResult> RemoveProject()
+        [HttpDelete("projects/{id}")]
+        public async Task<IActionResult> RemoveProject(Guid id)
         {
-            return Ok();
+            var user = await userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+            await projectsService.DeleteProjectAsync(user.Id, id);
+            return NoContent();
         }
 
 

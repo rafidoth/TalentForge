@@ -12,6 +12,7 @@ namespace server.Entities
         public bool IsPublic { get; set; }
         public int MaxProjects { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
         public ICollection<PositionAttribute> PositionAttributes { get; set; } = new List<PositionAttribute>();
         public ICollection<PositionAccessRule> AccessRules { get; set; } = new List<PositionAccessRule>();
         public ICollection<PositionTechnologyTag> TechnologyTags { get; set; } = new List<PositionTechnologyTag>();

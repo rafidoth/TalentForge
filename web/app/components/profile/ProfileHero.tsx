@@ -23,7 +23,6 @@ interface ProfileHeroProps {
 export function ProfileHero({ attributes, email, role }: ProfileHeroProps) {
     const displayName = getDisplayName(attributes);
     const imageUrl = getProfileImageUrl(attributes);
-    const location = getAttributeValue(attributes, 'Address');
 
     return (
         <Paper
@@ -47,7 +46,7 @@ export function ProfileHero({ attributes, email, role }: ProfileHeroProps) {
                         {displayName}
                     </Title>
                     {email && (
-                        <Text size="sm" c="dimmed">
+                        <Text size="xl" c="dimmed">
                             {email}
                         </Text>
                     )}
@@ -55,18 +54,6 @@ export function ProfileHero({ attributes, email, role }: ProfileHeroProps) {
                     <Group gap="sm" mt={4}>
                         {role && (
                             RoleBadge({ role: role as UserRole })
-                        )}
-
-                        {location && (
-                            <Group gap={4}>
-                                <MapPinIcon
-                                    size={16}
-                                    weight="fill"
-                                />
-                                <Text  >
-                                    {location}
-                                </Text>
-                            </Group>
                         )}
                     </Group>
                 </Stack>

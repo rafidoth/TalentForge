@@ -1,6 +1,7 @@
-import { AppShell, Burger, Group, Title } from "@mantine/core";
+import { AppShell, Burger, Button, Group, Title } from "@mantine/core";
 import { UserMenuContainer } from "./UserMenuContainer";
 import { Link } from "react-router";
+import { useUserRole } from "~/auth/store";
 
 interface AppHeaderProps {
   opened: boolean;
@@ -8,6 +9,7 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ opened, toggle }: AppHeaderProps) {
+  const role = useUserRole();
   return (
     <AppShell.Header>
       <Group h="100%" px="md" justify="space-between">
@@ -18,6 +20,11 @@ export function AppHeader({ opened, toggle }: AppHeaderProps) {
           </Link>
         </Group>
         <Group>
+          {role === "Administrator" && (
+            <Link to="/app/users" style={{ textDecoration: "none" }}>
+              <Button variant="subtle">Manage Users</Button>
+            </Link>
+          )}
           <UserMenuContainer />
         </Group>
       </Group>

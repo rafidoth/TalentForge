@@ -1,9 +1,5 @@
 import { useState } from "react";
 import type { RouteHandle } from "~/auth/types";
-
-export const handle: RouteHandle = {
-  allowedRoles: ["Administrator", "Recruiter"]
-};
 import {
   Container,
   Stack,
@@ -20,7 +16,6 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
 import { useNavigate } from "react-router";
-import { useAuthStore } from "~/auth/store";
 import {
   usePositions,
   useCreatePosition,
@@ -28,7 +23,9 @@ import {
   useDuplicatePosition,
 } from "~/hooks/usePositions";
 import { PositionGrid, PositionsToolbar } from "~/components/positions";
-import { Roles } from "~/Constants";
+export const handle: RouteHandle = {
+  allowedRoles: ["Administrator", "Recruiter"]
+};
 
 export default function PositionsPage() {
 

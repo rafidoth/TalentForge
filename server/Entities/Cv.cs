@@ -8,7 +8,7 @@ namespace server.Entities
         [Key]
         public Guid Id { get; set; }
 
-        public string CandidateId { get; set; } = string.Empty;
+        public Guid CandidateId { get; set; }
 
         [ForeignKey("CandidateId")]
         public ApplicationUser Candidate { get; set; } = null!;

@@ -7,10 +7,10 @@ import { AutoSaveHeader } from './AutoSaveHeader';
 import { ProfileAttributeInput } from './ProfileAttributeInput';
 
 interface MeSectionEditorProps {
-    attributes: ProfileAttributeDto[];
+    attributes?: ProfileAttributeDto[];
 }
 
-export function MeSectionEditor({ attributes }: MeSectionEditorProps) {
+export function MeSectionEditor({ attributes = [] }: MeSectionEditorProps) {
     const { mutate, isPending, isSuccess, isError } = useUpdateMeSection();
 
     const {
@@ -21,7 +21,7 @@ export function MeSectionEditor({ attributes }: MeSectionEditorProps) {
     } = useProfileAutoSave({ attributes, mutate });
 
     return (
-        <Paper p="xl" withBorder shadow="sm" radius="md">
+        <Paper p="xl">
             <AutoSaveHeader
                 title="Me"
                 icon={<UserIcon size={20} />}

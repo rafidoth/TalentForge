@@ -8,7 +8,6 @@ namespace server.Entities
 
         [ForeignKey("ProjectId")]
         public Project Project { get; set; } = null!;
-
         public Guid TagId { get; set; }
 
         [ForeignKey("TagId")]

@@ -6,3 +6,7 @@ export { MeSectionEditor } from './MeSectionEditor';
 export { AutoSaveHeader } from './AutoSaveHeader';
 export { ProfileAttributeInput } from './ProfileAttributeInput';
 export { getAttributeValue, getProfileImageUrl, getDisplayName } from './profileUtils';
+export { ProjectsSection } from './ProjectsSection';
+export { ProjectFormModal } from './ProjectFormModal';
+export { ProfileInfoSection } from './ProfileInfoSection';
+export { ProjectDetailsModal } from './ProjectDetailsModal';

@@ -2,12 +2,12 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import type { ProfileAttributeDto, UpdateMeSectionDto } from '~/api/types';
 
 interface UseProfileAutoSaveProps {
-    attributes: ProfileAttributeDto[];
+    attributes?: ProfileAttributeDto[];
     mutate: (dto: UpdateMeSectionDto, options?: any) => void;
     autoSaveIntervalMs?: number;
 }
 
-export function useProfileAutoSave({ attributes, mutate, autoSaveIntervalMs = 5000 }: UseProfileAutoSaveProps) {
+export function useProfileAutoSave({ attributes = [], mutate, autoSaveIntervalMs = 5000 }: UseProfileAutoSaveProps) {
     const [localValues, setLocalValues] = useState<Record<string, string>>({});
     const lastSavedValues = useRef<Record<string, string>>({});
 

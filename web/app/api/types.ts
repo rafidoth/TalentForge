@@ -131,3 +131,37 @@ export interface AddProfileAttributeDto {
   value: any;
 }
 
+// Project DTOs
+export interface ProjectDto {
+  id: string;
+  name: string;
+  startDate: string | null;
+  endDate: string | null;
+  description: string | null;
+  tags: TagDto[];
+  version: number;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+export interface CreateProjectDto {
+  name: string;
+  startDate: string | null;
+  endDate: string | null;
+  description: string | null;
+  tags: string[];
+}
+
+export interface UpdateProjectDto {
+  name?: string;
+  startDate?: string | null;
+  endDate?: string | null;
+  description?: string | null;
+  tags?: string[];
+  version: number;
+}
+
+export interface TagDto {
+  id: string;
+  name: string;
+}

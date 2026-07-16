@@ -66,7 +66,7 @@ export function AttributeLibraryModal({
         />
       );
     }
-    return <ProfileAttributeList onCreate={handleCreate} onEdit={handleEdit} />;
+    return <ProfileAttributeList onCreate={handleCreate} />;
   };
 
   return (

@@ -3,6 +3,8 @@ using server.Entities;
 using server.Services.AttributeLibraryServices;
 using server.Services.PositionServices;
 using server.Services.ProfileServices;
+using server.Services.ProjectsServices;
+using server.Services.TagsServices;
 using server.Services.UserServices;
 using server.Utils;
 
@@ -19,6 +21,8 @@ namespace server.Extensions
             services.AddScoped<IUserConfirmation<ApplicationUser>, UserConfirmation>();
             services.AddScoped<IPositionService, PositionService>();
             services.AddScoped<IPositionAttributeService, PositionAttributeService>();
+            services.AddScoped<IProjectsService, ProjectsService>();
+            services.AddScoped<ITagsService, TagsService>();
             return services;
         }
     }
