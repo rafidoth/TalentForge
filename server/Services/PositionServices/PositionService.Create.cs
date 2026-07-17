@@ -17,7 +17,14 @@ namespace server.Services.PositionServices
             return MapToDto(position);
         }
 
-        private Position BuildPosition(string Title, string? ShortDescription = null, bool? IsPublic = true, int? MaxProjects = 5)
-            => new() { Title = Title, ShortDescription = ShortDescription, IsPublic = IsPublic ?? true, MaxProjects = MaxProjects ?? 5, CreatedAt = DateTime.UtcNow };
+        private Position BuildPosition(string Title, string? ShortDescription = null, bool? IsPublic = true, int? MaxProjects = 5) => new()
+        {
+            Title = Title,
+            ShortDescription = ShortDescription,
+            IsPublic = IsPublic ?? true,
+            MaxProjects = MaxProjects ?? 5,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
     }
 }

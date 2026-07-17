@@ -11,6 +11,7 @@ namespace server.Services.PositionServices
         private async Task<Position> UpdatePosition(Position position, UpdatePositionDto dto)
         {
             position = BuildUpdatedPosition(position, dto);
+            position.UpdatedAt = DateTime.UtcNow;
             await db.SaveChangesAsync();
             return position;
         }
