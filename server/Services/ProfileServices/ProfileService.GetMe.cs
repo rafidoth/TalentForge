@@ -11,7 +11,11 @@ namespace server.Services.ProfileServices
         public async Task<MeSectionDto> GetMeSectionAsync(string userId)
         {
             var meAttributes = await db.ProfileAttributes
-                .Where(pa => pa.UserId == userId && pa.Attribute.Category!.Name == "Personal Information")
+                .Where(
+                    pa => pa.UserId == userId &&
+                    pa.Attribute.Category!.Name == "Personal Information" &&
+                    pa.Attribute.IsBuiltin == true
+                )
                 .Include(pa => pa.Attribute)
                     .ThenInclude(a => a.DropdownOptions)
                 .Select(pa => new ProfileAttributeDto
