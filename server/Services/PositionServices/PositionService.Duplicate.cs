@@ -6,7 +6,7 @@ namespace server.Services.PositionServices
     public partial class PositionService
     {
         public async Task<PositionDto> DuplicatePositionAsync(Guid id)
-            => MapToDto(await DuplicatePositionWithNewTitle(await GetPositionById(id)));
+            => MapToDto(await DuplicatePositionWithNewTitle(await GetPositionWithDetailsById(id)));
 
         private async Task<Position> DuplicatePositionWithNewTitle(Position existingPosition)
         {

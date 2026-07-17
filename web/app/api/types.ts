@@ -169,3 +169,22 @@ export interface TagDto {
 export interface CreatePositionTagDto {
   tagIds: string[];
 }
+
+export enum RuleOperator {
+  Equals = 0,
+  NotEquals = 1,
+  GreaterThan = 2,
+  GreaterThanOrEqual = 3,
+  LessThan = 4,
+  LessThanOrEqual = 5,
+  Contains = 6,
+}
+
+export interface PositionAccessRuleDto {
+  id?: string;
+  attributeId: string;
+  attributeName?: string;
+  attributeTypeName?: string;
+  operator: RuleOperator;
+  expectedValue: string;
+}

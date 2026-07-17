@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using server.Data;
 using server.Dto;
 using server.Services.PositionServices;
@@ -15,10 +16,14 @@ namespace server.Controllers
         IPositionTagsService positionTagsService
     ) : ControllerBase
     {
+
+        [Authorize(Roles = Roles.AdminOrCandidate)]
         [HttpGet("candidate")]
         public async Task<IActionResult> GetCandidatePositions([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            return Ok();
+            var userId = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+            return Ok(await positionService.GetCandidatePositionsAsync(userId, pageNumber, pageSize));
         }
 
         [HttpGet("{id:guid}")]

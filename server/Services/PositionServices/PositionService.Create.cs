@@ -7,16 +7,7 @@ namespace server.Services.PositionServices
     public partial class PositionService
     {
         public async Task<PositionDto> CreatePositionAsync(CreatePositionDto dto)
-        {
-            ValidateTitle(dto.Title);
-            return await CreateAsync(dto.Title);
-        }
-
-        private void ValidateTitle(string title)
-        {
-            if (string.IsNullOrWhiteSpace(title) || title.Length > 255)
-                throw new ValidationException("Title", "Title is required and must be <= 255 characters.");
-        }
+            => await CreateAsync(dto.Title);
 
         private async Task<PositionDto> CreateAsync(string title)
         {

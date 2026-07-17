@@ -8,7 +8,6 @@ namespace server.Entities
         GreaterThanOrEqual,
         LessThan,
         LessThanOrEqual,
-        Contains,
-        Checked
+        Contains
     }
 }

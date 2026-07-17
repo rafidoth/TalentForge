@@ -35,8 +35,11 @@ public record CreatePositionAttributeResponseDto : CreatePositionAttributeDto
 
 public record PositionAccessRuleDto
 {
+    public Guid? Id { get; init; }
     [Required(ErrorMessage = PositionConstraints.AttributeIdRequiredErrorMessage)]
     public Guid AttributeId { get; init; }
+    public string? AttributeName { get; init; }
+    public string? AttributeTypeName { get; init; }
     [Required(ErrorMessage = PositionConstraints.OrderRequiredErrorMessage)]
     public RuleOperator Operator { get; init; }
     [Required(ErrorMessage = PositionConstraints.ExpectedValueRequiredErrorMessage)]
@@ -68,10 +71,6 @@ public record UpdatePositionDto
 
     [Range(PositionConstraints.MaxProjectsMin, PositionConstraints.MaxProjectsMax, ErrorMessage = PositionConstraints.MaxProjectsRangeErrorMessage)]
     public int? MaxProjects { get; init; }
-
-    public List<PositionAttributeDto>? Attributes { get; init; } = new();
-    public List<PositionAccessRuleDto>? AccessRules { get; init; } = new();
-    public List<PositionTechnologyTagDto>? TechnologyTags { get; init; } = new();
 }
 
 public record CreatePositionTagDto

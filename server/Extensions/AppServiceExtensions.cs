@@ -23,6 +23,7 @@ namespace server.Extensions
             services.AddScoped<IPositionService, PositionService>();
             services.AddScoped<IPositionAttributeService, PositionAttributeService>();
             services.AddScoped<IPositionTagsService, PositionTagsService>();
+            services.AddScoped<IPositionAccessRuleService, PositionAccessRuleService>();
             services.AddScoped<IProjectsService, ProjectsService>();
             services.AddScoped<ITagsService, TagsService>();
             services.AddScoped<ICvService, CvService>();

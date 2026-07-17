@@ -6,6 +6,7 @@ namespace server.Services.PositionServices
     public interface IPositionService
     {
         Task<PagedResponse<PositionDto>> GetAllPositionsAsync(int pageNumber, int pageSize);
+        Task<PagedResponse<PositionDto>> GetCandidatePositionsAsync(string userId, int pageNumber, int pageSize);
         Task<PositionDto> CreatePositionAsync(CreatePositionDto dto);
         Task<PositionDto> DuplicatePositionAsync(Guid id);
         Task<PositionDto> UpdatePositionAsync(Guid id, UpdatePositionDto dto);

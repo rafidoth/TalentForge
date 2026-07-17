@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { usePosition } from "~/hooks/usePositions";
 import { Container, Title, Text, Stack, Loader, Center, Group, Badge, Button, Tabs, ActionIcon, Menu, Modal, Table, Card } from "@mantine/core";
-import { ArrowLeftIcon, GlobeHemisphereEastIcon, GlobeSimpleIcon, LockKeyIcon } from "@phosphor-icons/react";
+import { ArrowLeftIcon, GlobeHemisphereEastIcon, GlobeSimpleIcon, LockIcon, LockKeyIcon } from "@phosphor-icons/react";
 import { OverviewTab } from "~/components/positions/positionDetails/OverviewTab";
 import { AttributesTab } from "~/components/positions/positionDetails/AttributesTab";
 import { TechnologyTagsTab } from "~/components/positions/positionDetails/TechnologyTagsTab";
+import { PositionAccessRulesModal } from "~/components/positions/positionDetails/AccessRulesModal";
 
 export default function PositionDetails() {
   const { id } = useParams();
@@ -32,7 +33,7 @@ export default function PositionDetails() {
                 variant="transparent"
                 style={{ width: 'auto', height: 'auto', padding: '4px' }}
               >
-                {position.isPublic ? <GlobeSimpleIcon size={36} /> : <Text size="lg" fw={500} c="dimmed">Private</Text>}
+                {position.isPublic ? <GlobeSimpleIcon size={36} /> : <LockIcon size={36} />}
               </ActionIcon>
             </Menu.Target>
             <Menu.Dropdown>
@@ -63,39 +64,12 @@ export default function PositionDetails() {
         <AttributesTab positionId={id!} position={position} />
 
 
-        <Modal
+        <PositionAccessRulesModal
+          positionId={id!}
+          isPublic={position.isPublic}
           opened={accessModalOpened}
           onClose={() => setAccessModalOpened(false)}
-          title={<Title order={4}>Manage Access Rules</Title>}
-          size="lg"
-          centered
-        >
-          {!position.isPublic ? (
-            <Center p="xl" style={{ flexDirection: 'column' }}>
-              <LockKeyIcon size={48} color="gray" opacity={0.5} />
-              <Text c="dimmed" mt="md" ta="center">
-                This position is currently private. There are no active access rules to display.
-              </Text>
-            </Center>
-          ) : (
-            <Table>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>Rule Type</Table.Th>
-                  <Table.Th>Description</Table.Th>
-                  <Table.Th>Status</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                <Table.Tr>
-                  <Table.Td>Default Access</Table.Td>
-                  <Table.Td>Accessible by everyone globally</Table.Td>
-                  <Table.Td><Badge color="green" variant="light">Active</Badge></Table.Td>
-                </Table.Tr>
-              </Table.Tbody>
-            </Table>
-          )}
-        </Modal>
+        />
       </Stack>
     </Container>
   );
