@@ -7,21 +7,16 @@ namespace server.Entities
     {
         [Key]
         public Guid Id { get; set; }
-
-        public Guid CandidateId { get; set; }
-
+        public string CandidateId { get; set; } = string.Empty;
         [ForeignKey("CandidateId")]
         public ApplicationUser Candidate { get; set; } = null!;
-
         public Guid PositionId { get; set; }
-
         [ForeignKey("PositionId")]
         public Position Position { get; set; } = null!;
-
+        public List<Guid> ChosenProjectIds { get; set; } = new();
         public DateTime CreatedAt { get; set; }
-
+        public DateTime UpdatedAt { get; set; }
         public int LikeCount { get; set; }
-
         public ICollection<CvLike> Likes { get; set; } = new List<CvLike>();
     }
 }

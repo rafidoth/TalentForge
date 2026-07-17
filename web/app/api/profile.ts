@@ -50,3 +50,8 @@ export async function searchTags(prefix: string, n: number = 10): Promise<TagDto
     const res = await api.get<TagDto[]>("/tags", { params: { prefix, n } });
     return res.data;
 }
+
+export async function createTag(name: string): Promise<TagDto> {
+    const res = await api.post<TagDto>("/tags", { name });
+    return res.data;
+}

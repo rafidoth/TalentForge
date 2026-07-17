@@ -36,7 +36,8 @@ public class TagsService(ApplicationDbContext db) : ITagsService
     {
         if (!string.IsNullOrWhiteSpace(dto.Prefix))
         {
-            query = query.Where(t => t.Name.StartsWith(dto.Prefix));
+            var searchTerm = dto.Prefix.ToLower();
+            query = query.Where(t => t.Name.ToLower().Contains(searchTerm));
         }
 
         return query;

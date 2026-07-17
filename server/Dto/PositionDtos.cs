@@ -73,3 +73,9 @@ public record UpdatePositionDto
     public List<PositionAccessRuleDto>? AccessRules { get; init; } = new();
     public List<PositionTechnologyTagDto>? TechnologyTags { get; init; } = new();
 }
+
+public record CreatePositionTagDto
+{
+    [Required]
+    public List<Guid> TagIds { get; init; } = new();
+}

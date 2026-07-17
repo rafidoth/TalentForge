@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { usePosition } from "~/hooks/usePositions";
-import { Container, Title, Text, Stack, Loader, Center, Group, Badge, Button, Tabs, ActionIcon, Menu, Modal, Table } from "@mantine/core";
+import { Container, Title, Text, Stack, Loader, Center, Group, Badge, Button, Tabs, ActionIcon, Menu, Modal, Table, Card } from "@mantine/core";
 import { ArrowLeftIcon, GlobeHemisphereEastIcon, GlobeSimpleIcon, LockKeyIcon } from "@phosphor-icons/react";
 import { OverviewTab } from "~/components/positions/positionDetails/OverviewTab";
 import { AttributesTab } from "~/components/positions/positionDetails/AttributesTab";
@@ -46,7 +46,7 @@ export default function PositionDetails() {
                   <Text size="sm" c="dimmed">
                     {position.isPublic
                       ? "This position is accessible by everyone."
-                      : "This position is private and restricted."}
+                      : "This position is restricted."}
                   </Text>
                 </Stack>
               </Menu.Item>
@@ -58,31 +58,10 @@ export default function PositionDetails() {
           </Menu>
         </Group>
 
-        {position.shortDescription && (
-          <Text fw={500} c="dimmed">
-            {position.shortDescription}
-          </Text>
-        )}
+        <OverviewTab positionId={id!} position={position} />
+        <TechnologyTagsTab positionId={id!} />
+        <AttributesTab positionId={id!} position={position} />
 
-        <Tabs defaultValue="overview">
-          <Tabs.List>
-            <Tabs.Tab value="overview">Overview</Tabs.Tab>
-            <Tabs.Tab value="attributes">Attributes</Tabs.Tab>
-            <Tabs.Tab value="tags">Tags</Tabs.Tab>
-          </Tabs.List>
-
-          <Tabs.Panel value="overview" pt="md">
-            <OverviewTab positionId={id!} position={position} />
-          </Tabs.Panel>
-
-          <Tabs.Panel value="attributes" pt="md">
-            <AttributesTab positionId={id!} position={position} />
-          </Tabs.Panel>
-
-          <Tabs.Panel value="tags" pt="md">
-            <TechnologyTagsTab positionId={id!} position={position} />
-          </Tabs.Panel>
-        </Tabs>
 
         <Modal
           opened={accessModalOpened}

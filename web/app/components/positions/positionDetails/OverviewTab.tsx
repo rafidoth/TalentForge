@@ -1,6 +1,6 @@
 import { Card, Stack, TextInput, NumberInput, Checkbox, Group, Button } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useUpdatePosition } from "~/hooks/usePositions";
 import type { PositionDto } from "~/api/positions";
 
@@ -11,6 +11,7 @@ interface OverviewTabProps {
 
 export function OverviewTab({ positionId, position }: OverviewTabProps) {
   const updateMutation = useUpdatePosition();
+  const [changed, setChanged] = useState(false);
 
   const form = useForm({
     initialValues: {
@@ -31,18 +32,24 @@ export function OverviewTab({ positionId, position }: OverviewTabProps) {
   }, [position]);
 
   const handleSave = (values: typeof form.values) => {
+    setChanged(false);
     updateMutation.mutate({ id: positionId, dto: values });
   };
 
   return (
-    <Card withBorder radius="md" padding="xl">
-      <form onSubmit={form.onSubmit(handleSave)}>
+    <Card withBorder={false}>
+      <form onSubmit={form.onSubmit(handleSave)} onChange={() => setChanged(true)}>
         <Stack gap="md">
           <TextInput label="Title" {...form.getInputProps("title")} required />
           <TextInput label="Short Description" {...form.getInputProps("shortDescription")} />
           <NumberInput label="Max Projects" {...form.getInputProps("maxProjects")} />
           <Group justify="flex-end">
-            <Button type="submit" loading={updateMutation.isPending}>Save Overview</Button>
+            {
+              changed &&
+              <Button variant="light" type="submit" loading={updateMutation.isPending}>
+                Save
+              </Button>
+            }
           </Group>
         </Stack>
       </form>

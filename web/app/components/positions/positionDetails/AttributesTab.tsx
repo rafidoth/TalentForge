@@ -18,26 +18,39 @@ export function AttributesTab({ positionId, position }: AttributesTabProps) {
 
   const attributes = data?.pages.flatMap(page => page.data) || [];
 
-  // Ensure the UI matches the order explicitly
   const sortedAttributes = [...attributes].sort((a, b) => a.order - b.order);
 
+  const noAttributes = sortedAttributes.length === 0;
   return (
-    <Card withBorder radius="md" padding="xl">
-      <Stack gap="md">
-        <Group justify="end">
-          <Button
-            onClick={() => setAttributeLibraryOpened(true)}
-            leftSection={<PlusIcon />}
-          >
-            Attribute Library
-          </Button>
+    <Card withBorder={false} >
+      <Stack>
+        <Group justify="space-between" align="center">
+          <Text fw={600} size="xl">Attributes</Text>
+          {!noAttributes && (
+            <Button
+              onClick={() => setAttributeLibraryOpened(true)}
+              leftSection={<PlusIcon />}
+              w={200}
+            >
+              Attribute Library
+            </Button>
+          )}
         </Group>
 
         {isLoading ? (
           <Center p="xl"><Loader /></Center>
-        ) : sortedAttributes.length === 0 ? (
+        ) : noAttributes ? (
           <Center p="xl">
-            <Text c="dimmed">No attributes added yet. Open the library to add some.</Text>
+            <Stack align="center">
+              <Text c="dimmed">No attributes added yet. Open the library to add some.</Text>
+              <Button
+                onClick={() => setAttributeLibraryOpened(true)}
+                leftSection={<PlusIcon />}
+                w={200}
+              >
+                Attribute Library
+              </Button>
+            </Stack>
           </Center>
         ) : (
           <SimpleGrid cols={{ base: 1, xs: 2, sm: 2, md: 3 }} spacing="md">

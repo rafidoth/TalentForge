@@ -11,7 +11,8 @@ namespace server.Controllers
     [Route("api/positions")]
     public class PositionController(
         IPositionService positionService,
-        IPositionAttributeService positionAttributeService
+        IPositionAttributeService positionAttributeService,
+        IPositionTagsService positionTagsService
     ) : ControllerBase
     {
         [HttpGet("candidate")]
@@ -89,6 +90,24 @@ namespace server.Controllers
             await positionAttributeService.DeleteAsync(id, attributeId);
             return NoContent();
         }
+
+
+        [Authorize(Roles = Roles.AdminOrRecruiter)]
+        [HttpPost("{id:guid}/tags")]
+        public async Task<IActionResult> UpdateTagsOfPosition(Guid id, [FromBody] CreatePositionTagDto dto)
+        {
+            var result = await positionTagsService.UpdateTagsOfPositionAsync(id, dto);
+            return Ok(result);
+        }
+
+        [Authorize(Roles = Roles.AdminOrRecruiter)]
+        [HttpGet("{id:guid}/tags")]
+        public async Task<IActionResult> GetTagsOfPosition(Guid id)
+        {
+            var result = await positionTagsService.GetTagsOfPositionAsync(id);
+            return Ok(result);
+        }
+
 
 
     }

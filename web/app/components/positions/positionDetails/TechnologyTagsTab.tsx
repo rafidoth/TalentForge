@@ -1,70 +1,74 @@
-import { Card, Stack, Text, Table, TextInput, ActionIcon, Button, Group } from "@mantine/core";
-import { useState, useEffect } from "react";
-import { TrashIcon, PlusIcon } from "@phosphor-icons/react";
-import { useUpdatePosition } from "~/hooks/usePositions";
-import type { PositionDto } from "~/api/positions";
+import { useState, useEffect, useRef } from "react";
+import { Card, Stack, Text, Center, Loader, Group, CheckIcon } from "@mantine/core";
+import { TagsInput } from "~/components/common/TagsInput";
+import { usePositionTags, useUpdatePositionTags } from "~/hooks/usePositions";
+import type { TagDto } from "~/api/types";
+import { Check, ChecksIcon } from "@phosphor-icons/react";
 
 interface TechnologyTagsTabProps {
   positionId: string;
-  position: PositionDto;
 }
 
-export function TechnologyTagsTab({ positionId, position }: TechnologyTagsTabProps) {
-  const updateMutation = useUpdatePosition();
-  const [technologyTags, setTechnologyTags] = useState<any[]>([]);
+export function TechnologyTagsTab({ positionId }: TechnologyTagsTabProps) {
+  const { data: selectedTags, isLoading } = usePositionTags(positionId);
+  const updateTagsMutation = useUpdatePositionTags(positionId);
+
+  const [localTags, setLocalTags] = useState<TagDto[]>([]);
+  const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    setTechnologyTags(position.technologyTags || []);
-  }, [position]);
+    if (selectedTags) {
+      setLocalTags(selectedTags);
+    }
+  }, [selectedTags]);
 
-  const handleSave = () => {
-    updateMutation.mutate({ id: positionId, dto: { technologyTags } });
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
+  }, []);
+
+  const handleTagsChange = (newTags: TagDto[]) => {
+    setLocalTags(newTags);
+
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+    }
+
+    saveTimerRef.current = setTimeout(() => {
+      updateTagsMutation.mutate({ tagIds: newTags.map(t => t.id) }, {
+        onSuccess: () => {
+          setSaved(true);
+          setTimeout(() => setSaved(false), 2000);
+        }
+      });
+    }, 1500);
   };
 
+  if (isLoading) {
+    return (
+      <Card withBorder={false} w={400}>
+        <Stack gap="md">
+          <Text fw={600} size="xl">Technology Tags</Text>
+          <Center><Loader size="sm" /></Center>
+        </Stack>
+      </Card>
+    );
+  }
+
   return (
-    <Card withBorder radius="md" padding="xl">
+    <Card withBorder={false} w={"50%"}>
       <Stack gap="md">
-        <Text fw={500}>Technology Tags</Text>
-        <Table>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Tag ID</Table.Th>
-              <Table.Th></Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {technologyTags.map((tag, index) => (
-              <Table.Tr key={index}>
-                <Table.Td>
-                  <TextInput 
-                    value={tag.tagId || ''} 
-                    onChange={(e) => {
-                      const newTags = [...technologyTags];
-                      newTags[index].tagId = e.currentTarget.value;
-                      setTechnologyTags(newTags);
-                    }}
-                    placeholder="Guid"
-                  />
-                </Table.Td>
-                <Table.Td>
-                  <ActionIcon color="red" onClick={() => setTechnologyTags(technologyTags.filter((_, i) => i !== index))}>
-                    <TrashIcon />
-                  </ActionIcon>
-                </Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
-        <Button 
-          variant="light" 
-          leftSection={<PlusIcon />} 
-          onClick={() => setTechnologyTags([...technologyTags, { tagId: '' }])}
-        >
-          Add Technology Tag
-        </Button>
-        <Group justify="flex-end">
-          <Button onClick={handleSave} loading={updateMutation.isPending}>Save Tags</Button>
+        <Group>
+          <Text fw={600} size="xl">Technology Tags</Text>
+          {saved && <ChecksIcon size={20} color="green" />}
         </Group>
+        <TagsInput
+          selectedTagsList={localTags}
+          setSelectedTagsList={handleTagsChange}
+          placeholder="Search and add tags..."
+        />
       </Stack>
     </Card>
   );

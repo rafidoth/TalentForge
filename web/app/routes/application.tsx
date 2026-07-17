@@ -1,4 +1,4 @@
-import { AppShell } from '@mantine/core';
+import { AppShell, Container } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Outlet } from 'react-router';
 import { AppHeader } from '~/components/layout';
@@ -18,7 +18,9 @@ export default function Application() {
         >
             <AppHeader opened={opened} toggle={toggle} />
             <AppShell.Main>
-                <Outlet />
+                <Container size="md" py="xl">
+                    <Outlet />
+                </Container>
             </AppShell.Main>
         </AppShell>
     );

@@ -16,6 +16,7 @@ namespace server.Services.PositionServices
                 throw new NotFoundException("Position", positionId);
             }
         }
+
         public async Task<PagedResponse<PositionDto>> GetAllPositionsAsync(int pageNumber = 1, int pageSize = 10)
         {
             var query = db.Positions.AsNoTracking().Select(p => new PositionDto
@@ -35,8 +36,6 @@ namespace server.Services.PositionServices
                 maxPageSize: 10
             );
         }
-
-
 
         public async Task<PositionDto> CreatePositionAsync(CreatePositionDto dto)
         {
@@ -132,7 +131,6 @@ namespace server.Services.PositionServices
         private async Task<Position> UpdatePosition(Position position, UpdatePositionDto dto)
         {
             position = BuildUpdatedPosition(position, dto);
-            await UpdateExternalPositionData(position, dto);
             await db.SaveChangesAsync();
             return position;
         }

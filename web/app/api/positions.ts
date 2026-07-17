@@ -1,5 +1,5 @@
 import api from "./index";
-import type { PaginatedResponse, PositionAttributeDto, CreatePositionAttributeDto } from "./types";
+import type { PaginatedResponse, PositionAttributeDto, CreatePositionAttributeDto, CreatePositionTagDto, TagDto } from "./types";
 
 export interface PositionDto {
   id: string;
@@ -88,4 +88,14 @@ export const removePositionAttribute = async (
   attributeId: string
 ) => {
   await api.delete(`/positions/${positionId}/attributes/${attributeId}`);
+};
+
+export const getPositionTags = async (positionId: string) => {
+  const { data } = await api.get<TagDto[]>(`/positions/${positionId}/tags`);
+  return data;
+};
+
+export const updatePositionTags = async (positionId: string, dto: CreatePositionTagDto) => {
+  const { data } = await api.post<TagDto[]>(`/positions/${positionId}/tags`, dto);
+  return data;
 };
