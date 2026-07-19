@@ -67,16 +67,6 @@ export default function Profile() {
     return (
         <Container py="xl">
             <Stack gap="lg">
-                <Group>
-                    <Button
-                        variant="subtle"
-                        color="myColor"
-                        leftSection={<ArrowLeftIcon size={18} />}
-                        onClick={() => navigate('/app')}
-                    >
-                        Back to Dashboard
-                    </Button>
-                </Group>
                 <ProfileHero
                     attributes={meAttributes}
                     email={email}

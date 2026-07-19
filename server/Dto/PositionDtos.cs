@@ -78,3 +78,11 @@ public record CreatePositionTagDto
     [Required]
     public List<Guid> TagIds { get; init; } = new();
 }
+
+public record LatestPositionDto
+{
+    public Guid Id { get; init; }
+    public string Title { get; init; } = null!;
+    public DateTime UpdatedAt { get; init; }
+    public bool IsPublic { get; init; }
+}

@@ -17,6 +17,13 @@ namespace server.Controllers
     ) : ControllerBase
     {
 
+        [HttpGet("latest")]
+        public async Task<IActionResult> GetLatestPositions()
+        {
+            var result = await positionService.GetLatestPositionsAsync();
+            return Ok(result);
+        }
+
         [Authorize(Roles = Roles.AdminOrCandidate)]
         [HttpGet("candidate")]
         public async Task<IActionResult> GetCandidatePositions([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)

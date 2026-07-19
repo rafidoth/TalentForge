@@ -23,6 +23,7 @@ import {
   useDuplicatePosition,
 } from "~/hooks/usePositions";
 import { PositionGrid, PositionsToolbar } from "~/components/positions";
+
 export const handle: RouteHandle = {
   allowedRoles: ["Administrator", "Recruiter"]
 };

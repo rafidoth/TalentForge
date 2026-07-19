@@ -1,7 +1,7 @@
 import { Card, Text, Group, Badge, ActionIcon, Menu, Stack, Box, ThemeIcon } from '@mantine/core';
 import { DotsThreeIcon, CopyIcon, TrashIcon, CalendarBlankIcon, UsersIcon, CaretRightIcon } from '@phosphor-icons/react';
 import type { PositionDto } from '~/api/positions';
-import { format } from "date-fns"
+import { formatDate } from '~/utils/date';
 
 import classes from './PositionCard.module.css';
 
@@ -70,7 +70,7 @@ export function PositionCard({ position, onDelete, onDuplicate, onClick }: Posit
             <CalendarBlankIcon size={12} weight="bold" />
           </ThemeIcon>
           <Text fz="sm" c="dimmed">
-            Created: <Text span fw={500} c="var(--mantine-color-text)">{position.createdAt ? format(new Date(position.createdAt), 'MMM d, yyyy') : 'N/A'}</Text>
+            Created: <Text span fw={500} c="var(--mantine-color-text)">{formatDate(position.createdAt)}</Text>
           </Text>
         </Group>
       </Stack>

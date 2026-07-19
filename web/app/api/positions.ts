@@ -43,6 +43,16 @@ export const fetchPositions = async (
   return data;
 };
 
+
+export const fetchCandidateAccessiblePositions = async (
+  pageNumber: number = 1,
+  pageSize: number = 10,
+): Promise<PaginatedResponse<PositionDto>> => {
+  const fetchPositionsUrl = `/positions/candidate?pageNumber=${pageNumber}&pageSize=${pageSize}`;
+  const { data } = await api.get<PaginatedResponse<PositionDto>>(fetchPositionsUrl)
+  return data;
+};
+
 export const createPosition = async (dto: CreatePositionDto) => {
   const { data } = await api.post<PositionDto>("/positions", dto);
   return data;
@@ -97,5 +107,17 @@ export const getPositionTags = async (positionId: string) => {
 
 export const updatePositionTags = async (positionId: string, dto: CreatePositionTagDto) => {
   const { data } = await api.post<TagDto[]>(`/positions/${positionId}/tags`, dto);
+  return data;
+};
+
+export interface LatestPositionDto {
+  id: string;
+  title: string;
+  updatedAt: string;
+  isPublic: boolean;
+}
+
+export const getLatestPositions = async () => {
+  const { data } = await api.get<LatestPositionDto[]>("/positions/latest");
   return data;
 };

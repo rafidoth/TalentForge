@@ -1,7 +1,8 @@
-import { Menu, Avatar, Text, UnstyledButton, useMantineColorScheme, Skeleton, Badge, Title } from '@mantine/core';
-import { MoonStarsIcon, SunDimIcon, UserCircleIcon, SignOutIcon } from '@phosphor-icons/react';
+import { useState } from 'react';
+import { Menu, Avatar, Text, UnstyledButton, Group, useMantineTheme, Skeleton } from '@mantine/core';
+import { CaretDown, Heart, Star, Chat, Gear, ArrowsLeftRight, SignOut, Pause, Trash, GearIcon, SignOutIcon, CaretDownIcon } from '@phosphor-icons/react';
+import classes from './AppHeader/AppHeader.module.css';
 import { useNavigate } from 'react-router';
-import { useUserRole } from '~/auth/store';
 
 export interface UserMenuProps {
     avatarUrl: string;
@@ -11,9 +12,9 @@ export interface UserMenuProps {
     onLogout: () => void;
 }
 
-export function UserMenu({ avatarUrl, displayName, email, isLoading, onLogout }: UserMenuProps) {
-    const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-    const role = useUserRole();
+export function UserMenu({ avatarUrl, displayName, isLoading, onLogout }: UserMenuProps) {
+    const theme = useMantineTheme();
+    const [userMenuOpened, setUserMenuOpened] = useState(false);
     const navigate = useNavigate();
 
     if (isLoading) {
@@ -21,50 +22,52 @@ export function UserMenu({ avatarUrl, displayName, email, isLoading, onLogout }:
     }
 
     return (
-        <Menu shadow="md" width={240} position="bottom-end">
+        <Menu
+            width={260}
+            position="bottom-end"
+            transitionProps={{ transition: 'pop-top-right' }}
+            onClose={() => setUserMenuOpened(false)}
+            onOpen={() => setUserMenuOpened(true)}
+            withinPortal
+        >
             <Menu.Target>
-                <UnstyledButton>
-                    <Avatar src={avatarUrl} radius="xl" size="md" />
+                <UnstyledButton
+                    className={`${classes.user} ${userMenuOpened ? classes.userActive : ''}`}
+                >
+                    <Group gap={7}>
+                        <Avatar src={avatarUrl} alt="" radius="xl" size={20} />
+                        <Text fw={500} size="sm" lh={1} mr={3}>
+                            {displayName}
+                        </Text>
+                        <CaretDownIcon size={12} weight="bold" />
+                    </Group>
                 </UnstyledButton>
             </Menu.Target>
-
             <Menu.Dropdown>
-                <Menu.Label>
-                    <Title order={2} fw={700}>
-                        {displayName}
-                    </Title>
-                    <Text>{email}</Text>
-                    {role && (
-                        <Badge color="blue" variant="outline" size="sm" mt={4}>
-                            {role}
-                        </Badge>
-                    )}
-                </Menu.Label>
-
-                <Menu.Divider />
-
                 <Menu.Item
-                    leftSection={<UserCircleIcon size={16} />}
-                    onClick={() => navigate('/app/profile')}
+                    leftSection={<Heart size={16} color={theme.colors.red[6]} weight="bold" />}
                 >
-                    Profile
+                    Liked posts
+                </Menu.Item>
+                <Menu.Item
+                    leftSection={<Star size={16} color={theme.colors.yellow[6]} weight="bold" />}
+                >
+                    Saved posts
+                </Menu.Item>
+                <Menu.Item
+                    leftSection={<Chat size={16} color={theme.colors.blue[6]} weight="bold" />}
+                >
+                    Your comments
                 </Menu.Item>
 
-                <Menu.Item
-                    leftSection={colorScheme === 'dark' ? <SunDimIcon size={16} /> : <MoonStarsIcon size={16} />}
-                    onClick={() => toggleColorScheme()}
-                >
-                    {colorScheme === 'dark' ? 'Light Theme' : 'Dark Theme'}
+                <Menu.Label>Settings</Menu.Label>
+                <Menu.Item leftSection={<GearIcon size={16} weight="bold" />} onClick={() => navigate('/app/profile')}>
+                    Profile settings
                 </Menu.Item>
-
-                <Menu.Divider />
-
-                <Menu.Item
-                    leftSection={<SignOutIcon size={16} />}
-                    onClick={onLogout}
-                >
+                <Menu.Item leftSection={<SignOutIcon size={16} weight="bold" />} onClick={onLogout}>
                     Logout
                 </Menu.Item>
+
             </Menu.Dropdown>
         </Menu>
     );

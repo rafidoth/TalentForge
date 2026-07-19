@@ -7,6 +7,10 @@ namespace server.Services.PositionServices
 {
     public partial class PositionService
     {
+        public async Task<List<LatestPositionDto>> GetLatestPositionsAsync()
+            => await db.Positions.AsNoTracking().OrderByDescending(p => p.UpdatedAt).Take(7)
+                .Select(p => new LatestPositionDto { Id = p.Id, Title = p.Title, UpdatedAt = p.UpdatedAt, IsPublic = p.IsPublic }).ToListAsync();
+
         public async Task<PagedResponse<PositionDto>> GetAllPositionsAsync(int pageNumber = 1, int pageSize = 10)
             => await PagedResponse.CreateAsync(db.Positions.AsNoTracking().Select(MapToDtoExpr()), pageNumber, pageSize, 10);
 
