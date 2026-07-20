@@ -50,6 +50,12 @@ public class AttributeController(IAttributeService attributeService) : Controlle
         return NoContent();
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetAttributeById(Guid id)
+    {
+        var result = await attributeService.GetAttributeDtoByIdAsync(id);
+        return Ok(result);
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetAttributes([FromQuery] AttributeSearchQueryDto dto)
