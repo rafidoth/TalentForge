@@ -242,7 +242,14 @@ const theme: MantineThemeOverride = {
                 withRowBorders: true,
                 withColumnBorders: false,
             },
-        }
+        },
+        Modal: {
+            defaultProps: {
+                overlayOpacity: 0.55,
+                overlayBlur: 3,
+                centered: true,
+            },
+        },
     }
 };
 
