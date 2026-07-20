@@ -28,8 +28,14 @@ export function useProfileAttributeList() {
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState<string | null>("all");
 
-  const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
-    useAttributes(search);
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, activeTab]);
+
+  const { data, isLoading } =
+    useAttributes(search, page, 10);
 
   const { data: profileAttributesData } = useProfileAttributes();
   const { mutate: addToProfile, isPending: isAdding } =
@@ -44,8 +50,10 @@ export function useProfileAttributeList() {
   }, [fetchLookups]);
 
   const attributes = useMemo(() => {
-    return data?.pages.flatMap((page) => page.data) || [];
+    return data?.data || [];
   }, [data]);
+
+  const totalPages = data?.totalPages || 1;
 
   const filteredAttributes = useMemo(() => {
     if (!activeTab || activeTab === "all") return attributes;
@@ -136,9 +144,9 @@ export function useProfileAttributeList() {
     activeTab,
     setActiveTab,
     isLoading,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
+    page,
+    setPage,
+    totalPages,
     categories,
     filteredAttributes,
     profileAttributeMap,

@@ -10,8 +10,13 @@ export default [
         route("profile", "routes/profile.tsx"),
         route("users", "routes/administrator/users.tsx"),
         route("positions", "routes/positions.tsx"),
+        route("attributes", "routes/attribute-library.tsx"),
+        route("cvs", "routes/cvs.tsx"),
         route("position/:id", "routes/position-details.tsx"),
-        route("c/positions", "routes/candidate-positions.tsx")
+        route("c/positions", "routes/candidate-positions.tsx"),
+        route("c/projects", "routes/candidate-projects.tsx"),
+        route("c/cvs", "routes/candidate-cvs.tsx"),
+        route("c/cv/:positionId/:cvId", "routes/candidate-cv.tsx")
     ])
 ] satisfies RouteConfig;
 

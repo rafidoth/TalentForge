@@ -7,28 +7,29 @@ import {
   Text,
   Center,
   Box,
-  SimpleGrid,
   Title,
+  Select,
+  Pagination,
 } from "@mantine/core";
 import { MagnifyingGlassIcon, PlusIcon } from "@phosphor-icons/react";
+import { useState, useMemo } from "react";
 import { useProfileAttributeList } from "./useProfileAttributeList";
-import { ProfileAttributeCardContent } from "./ProfileAttributeCardContent";
-import { ProfileAttributeCategoryTabs } from "./ProfileAttributeCategoryTabs";
+import { ProfileAttributeTable } from "./ProfileAttributeTable";
+import { ProfileAttributeActionModal } from "./ProfileAttributeActionModal";
+import type { AttributeDto } from "../../api/types";
 
-export interface ProfileAttributeListProps {
-  onCreate: () => void;
-}
+export interface ProfileAttributeListProps { }
 
-export function ProfileAttributeList({ onCreate }: ProfileAttributeListProps) {
+export function ProfileAttributeList({ }: ProfileAttributeListProps) {
   const {
     search,
     setSearch,
     activeTab,
     setActiveTab,
     isLoading,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
+    page,
+    setPage,
+    totalPages,
     categories,
     filteredAttributes,
     profileAttributeMap,
@@ -50,6 +51,58 @@ export function ProfileAttributeList({ onCreate }: ProfileAttributeListProps) {
     handleRemoveProfileAttribute,
   } = useProfileAttributeList();
 
+  const [selectedAttribute, setSelectedAttribute] = useState<AttributeDto | null>(null);
+
+  const categoryOptions = useMemo(() => {
+    return [
+      { value: "all", label: "All Categories" },
+      { value: "recent", label: "Recently Used" },
+      ...categories.map(c => ({ value: c.name, label: c.name }))
+    ];
+  }, [categories]);
+
+  // Exclude builtins
+  const displayAttributes = useMemo(() => {
+    return filteredAttributes.filter(a => !a.isBuiltin);
+  }, [filteredAttributes]);
+
+  const handleRowClick = (attribute: AttributeDto) => {
+    setSelectedAttribute(attribute);
+    const isAdded = profileAttributeMap.has(attribute.id);
+    if (isAdded) {
+      handleInitiateEdit(attribute);
+    } else {
+      handleInitiateAdd(attribute);
+    }
+  };
+
+  const handleModalClose = () => {
+    setSelectedAttribute(null);
+    setAddingAttrId(null);
+    setEditingProfileAttrId(null);
+  };
+
+  const handleModalConfirm = () => {
+    if (!selectedAttribute) return;
+    const isAdded = profileAttributeMap.has(selectedAttribute.id);
+    if (isAdded) {
+      handleConfirmEdit(selectedAttribute);
+    } else {
+      handleConfirmAdd(selectedAttribute);
+    }
+    // Note: Wait for success to close modal, or let the hooks handle it.
+    // The hook currently closes the forms on success automatically by setting ids to null.
+    // We can observe addingAttrId and editingProfileAttrId to close the modal.
+  };
+
+  const isModalOpen = !!selectedAttribute && (addingAttrId === selectedAttribute.id || editingProfileAttrId === selectedAttribute.id);
+
+  const handleModalRemove = () => {
+    if (selectedAttribute) {
+      handleRemoveProfileAttribute(selectedAttribute);
+    }
+  };
+
   const renderContent = () => {
     if (isLoading) {
       return (
@@ -59,7 +112,7 @@ export function ProfileAttributeList({ onCreate }: ProfileAttributeListProps) {
       );
     }
 
-    if (filteredAttributes.length === 0) {
+    if (displayAttributes.length === 0) {
       return (
         <Center h={300}>
           <Text c="dimmed">No attributes found in this category.</Text>
@@ -69,48 +122,15 @@ export function ProfileAttributeList({ onCreate }: ProfileAttributeListProps) {
 
     return (
       <Stack gap="xl">
-        <SimpleGrid cols={{ base: 1, xs: 2, sm: 2, md: 3 }} spacing="md">
-          {filteredAttributes.map((attr) => {
-            if (attr.isBuiltin) return null;
-            const isAddedToProfile = profileAttributeMap.has(attr.id);
-            const isAddingThis = addingAttrId === attr.id;
-            const isEditingThis = editingProfileAttrId === attr.id;
+        <ProfileAttributeTable
+          attributes={displayAttributes}
+          profileAttributeMap={profileAttributeMap}
+          onRowClick={handleRowClick}
+        />
 
-            return (
-              <ProfileAttributeCardContent
-                key={attr.id}
-                attribute={attr}
-                isAddedToProfile={isAddedToProfile}
-                isAddingThis={isAddingThis}
-                isEditingThis={isEditingThis}
-                addValue={addValue}
-                editValue={editValue}
-                isAdding={isAdding}
-                isUpdating={isUpdating}
-                isRemoving={isRemoving}
-                onAddValueChange={(val) => setAddValue(val)}
-                onEditValueChange={(val) => setEditValue(val)}
-                onCancelAdd={() => setAddingAttrId(null)}
-                onCancelEdit={() => setEditingProfileAttrId(null)}
-                onConfirmAdd={() => handleConfirmAdd(attr)}
-                onConfirmEdit={() => handleConfirmEdit(attr)}
-                onInitiateAdd={() => handleInitiateAdd(attr)}
-                onInitiateEdit={() => handleInitiateEdit(attr)}
-                onRemove={() => handleRemoveProfileAttribute(attr)}
-              />
-            );
-          })}
-        </SimpleGrid>
-
-        {hasNextPage && activeTab === "all" && (
-          <Center>
-            <Button
-              variant="light"
-              onClick={() => fetchNextPage()}
-              loading={isFetchingNextPage}
-            >
-              Load More
-            </Button>
+        {totalPages > 1 && activeTab === "all" && (
+          <Center mt="md">
+            <Pagination total={totalPages} value={page} onChange={setPage} />
           </Center>
         )}
       </Stack>
@@ -119,33 +139,46 @@ export function ProfileAttributeList({ onCreate }: ProfileAttributeListProps) {
 
   return (
     <Stack gap="md">
-      <Title size="h1" mb="md">
-        Attributes
+      <Title size="h3" mb="md">
+        Manage Profile Attributes
       </Title>
-      <Group justify="space-between">
-        <TextInput
-          placeholder="Search by prefix..."
-          leftSection={<MagnifyingGlassIcon size={16} />}
-          value={search}
-          onChange={(e) => setSearch(e.currentTarget.value)}
-          flex={1}
-        />
-        <Button leftSection={<PlusIcon size={16} />} onClick={onCreate}>
-          New
-        </Button>
+      <Group align="flex-end" justify="space-between">
+        <Group flex={1} align="flex-end">
+          <TextInput
+            placeholder="Search by prefix..."
+            leftSection={<MagnifyingGlassIcon size={16} />}
+            value={search}
+            onChange={(e) => setSearch(e.currentTarget.value)}
+            style={{ flex: 1 }}
+          />
+          {categories.length > 0 && (
+            <Select
+              data={categoryOptions}
+              value={activeTab}
+              onChange={(val) => setActiveTab(val || "all")}
+              allowDeselect={false}
+              w={200}
+            />
+          )}
+        </Group>
       </Group>
-
-      {categories.length > 0 && (
-        <ProfileAttributeCategoryTabs
-          categories={categories}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-        />
-      )}
 
       <Box style={{ minHeight: 300, position: "relative" }}>
         {renderContent()}
       </Box>
+
+      <ProfileAttributeActionModal
+        opened={isModalOpen}
+        onClose={handleModalClose}
+        attribute={selectedAttribute}
+        isAdded={selectedAttribute ? profileAttributeMap.has(selectedAttribute.id) : false}
+        value={selectedAttribute && profileAttributeMap.has(selectedAttribute.id) ? editValue : addValue}
+        onChange={selectedAttribute && profileAttributeMap.has(selectedAttribute.id) ? setEditValue : setAddValue}
+        onConfirm={handleModalConfirm}
+        onRemove={handleModalRemove}
+        isLoading={isAdding || isUpdating}
+        isRemoving={isRemoving}
+      />
     </Stack>
   );
 }

@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { Container, Title, Table, Pagination, Text, Skeleton, Center, Paper, Tooltip } from '@mantine/core';
+import { Container, Title, Table, Pagination, Text, Skeleton, Center, Paper, Tooltip, Modal, Button, Group, Stack } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { useCandidatePositions } from '~/hooks/usePositions';
+import { useCreateCv, useCheckCvExists } from '~/hooks/useCvs';
 import { useNavigate } from 'react-router';
 import { formatDate } from '~/utils/date';
 
@@ -9,9 +11,20 @@ export default function CandidatePositions() {
     const pageSize = 10;
     const { data, isLoading } = useCandidatePositions(page, pageSize);
     const navigate = useNavigate();
+    const [opened, { open, close }] = useDisclosure(false);
+    const [selectedPosition, setSelectedPosition] = useState<any>(null);
+    const createCvMutation = useCreateCv();
+    const { data: cvExistsData, isLoading: isCheckingCv } = useCheckCvExists(selectedPosition?.id);
 
-
-
+    const handleCreateCv = () => {
+        if (!selectedPosition) return;
+        createCvMutation.mutate({ positionId: selectedPosition.id }, {
+            onSuccess: (res) => {
+                close();
+                navigate(`/app/c/cv/${selectedPosition.id}/${res.cvId}`);
+            }
+        });
+    };
     return (
         <Container size="xl" py="xl">
             <Title order={2} mb="lg">Available Positions</Title>
@@ -19,6 +32,7 @@ export default function CandidatePositions() {
                 <Table.ScrollContainer minWidth={500}>
                     <Table
                         highlightOnHover
+                        highlightOnHoverColor='blue.0'
                         withTableBorder={false}
                         withColumnBorders={false}
                         withRowBorders
@@ -47,18 +61,20 @@ export default function CandidatePositions() {
                                 </Table.Tr>
                             ) : (
                                 data?.data?.map((position) => (
-                                    <Tooltip 
-                                        key={position.id} 
-                                        label={`Create CV For ${position.title}`} 
-                                        position="top" 
-                                        withArrow 
+                                    <Tooltip
+                                        key={position.id}
+                                        label={`Create CV For ${position.title}`}
+                                        position="top"
+                                        withArrow
                                         openDelay={300}
                                     >
                                         <Table.Tr
-                                            onClick={() => navigate(`/app/c/positions/${position.id}`)}
+                                            onClick={() => {
+                                                setSelectedPosition(position);
+                                                open();
+                                            }}
                                             style={{ cursor: "pointer" }}
                                             tabIndex={0}
-                                            onKeyDown={(e) => e.key === "Enter" && navigate(`/app/c/positions/${position.id}`)}
                                         >
                                             <Table.Td>
                                                 <Text fw={500} lineClamp={1}>{position.title}</Text>
@@ -86,6 +102,43 @@ export default function CandidatePositions() {
                     </Center>
                 ) : null}
             </Paper>
+
+            <Modal opened={opened} onClose={close} title="Position Details" size="lg" centered>
+                {selectedPosition && (
+                    <Stack>
+                        <Title order={3}>{selectedPosition.title}</Title>
+                        <Text size="sm" c="dimmed">
+                            Posted on {formatDate(selectedPosition.createdAt)}
+                        </Text>
+
+                        <Text mt="md" style={{ whiteSpace: 'pre-line' }}>
+                            {selectedPosition.description || selectedPosition.shortDescription || "No description available."}
+                        </Text>
+
+                        <Group justify="flex-end" mt="xl">
+                            <Button variant="default" onClick={close}>Cancel</Button>
+                            {cvExistsData?.exists ? (
+                                <Button
+                                    onClick={() => {
+                                        close();
+                                        navigate(`/app/c/cv/${selectedPosition.id}/${cvExistsData.cvId}`);
+                                    }}
+                                >
+                                    View CV
+                                </Button>
+                            ) : (
+                                <Button
+                                    onClick={handleCreateCv}
+                                    loading={createCvMutation.isPending || isCheckingCv}
+                                    disabled={isCheckingCv}
+                                >
+                                    Create CV
+                                </Button>
+                            )}
+                        </Group>
+                    </Stack>
+                )}
+            </Modal>
         </Container>
     );
 }

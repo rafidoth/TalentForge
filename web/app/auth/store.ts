@@ -53,6 +53,7 @@ export const useAuthStore = create<AuthState>()((set) => ({
 export const useIsAuthenticated = () => useAuthStore((state) => state.isAuthenticated);
 export const useUserId = () => useAuthStore((state) => state.userId);
 export const useUserRole = () => useAuthStore((state) => state.role);
+export const useUserEmail = () => useAuthStore((state) => state.email);
 export const useAuthLoading = () => useAuthStore((state) => state.isLoading);
 export const useCheckAuth = () => useAuthStore((state) => state.checkAuth);
 export const useLogout = () => useAuthStore((state) => state.logout);

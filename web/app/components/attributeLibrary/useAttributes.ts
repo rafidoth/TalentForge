@@ -30,14 +30,10 @@ import type {
   UpdateProfileAttributeValueDto,
 } from "../../api/types";
 
-export const useAttributes = (search: string = "") => {
-  return useInfiniteQuery({
-    queryKey: ["attributes", search],
-    queryFn: ({ pageParam }) =>
-      fetchAttributes(search, pageParam as number, 10),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) =>
-      lastPage.hasNextPage ? lastPage.pageNumber + 1 : undefined,
+export const useAttributes = (search: string = "", pageNumber: number = 1, pageSize: number = 10) => {
+  return useQuery({
+    queryKey: ["attributes", search, pageNumber, pageSize],
+    queryFn: () => fetchAttributes(search, pageNumber, pageSize),
   });
 };
 

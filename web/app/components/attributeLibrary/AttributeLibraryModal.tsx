@@ -1,6 +1,6 @@
 import { Modal, Text } from "@mantine/core";
 import { useState } from "react";
-import { PositionAttributeList } from "./AttributeList";
+import { BaseAttributeList } from "./BaseAttributeList";
 import { ProfileAttributeList } from "./ProfileAttributeList";
 import { AttributeForm } from "./AttributeForm";
 import type { AttributeDto } from "../../api/types";
@@ -59,14 +59,15 @@ export function AttributeLibraryModal({
   const renderListView = () => {
     if (positionId) {
       return (
-        <PositionAttributeList
+        <BaseAttributeList
+          mode="position"
           positionId={positionId}
           onCreate={handleCreate}
           onEdit={handleEdit}
         />
       );
     }
-    return <ProfileAttributeList onCreate={handleCreate} />;
+    return <ProfileAttributeList />;
   };
 
   return (

@@ -17,7 +17,10 @@ public partial class CvService
 
     public async Task<PagedResponse<CvListDto>> GetCvsByCandidateIdAsync(string candidateId, int page, int size)
     {
-        var q = db.Cvs.Include(c => c.Position).Where(c => c.CandidateId == candidateId).OrderByDescending(c => c.CreatedAt);
+        var q = db.Cvs
+                  .Include(c => c.Position)
+                  .Where(c => c.CandidateId == candidateId)
+                  .OrderByDescending(c => c.CreatedAt);
         var pageResponse = await PagedResponse.CreateAsync(q, page, size);
         var name = ExtractCandidateName(await GetCandidateProfileAttributesAsync(candidateId));
         return MapPagedResponse(pageResponse, c => MapToCvListDto(c, name));
@@ -71,4 +74,19 @@ public partial class CvService
 
     private CvDetailDto MapToCvDetailDto(Cv cv, string name, List<ProfileAttributeDto> attrs, List<ProjectDto> projects)
         => new() { Id = cv.Id, CandidateId = cv.CandidateId, PositionId = cv.PositionId, PositionTitle = cv.Position.Title, CandidateName = name, CreatedAt = cv.CreatedAt, LikeCount = cv.LikeCount, Attributes = attrs, Projects = projects };
+
+    public async Task<CheckCvExistsResponseDto> CheckCvExistsAsync(string candidateId, Guid positionId)
+    {
+        var existingCv = await db.Cvs
+            .AsNoTracking()
+            .Where(cv => cv.CandidateId == candidateId && cv.PositionId == positionId)
+            .Select(cv => new { cv.Id })
+            .FirstOrDefaultAsync();
+
+        return new CheckCvExistsResponseDto
+        {
+            Exists = existingCv != null,
+            CvId = existingCv?.Id
+        };
+    }
 }

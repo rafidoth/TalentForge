@@ -8,6 +8,7 @@ export interface PositionDto {
   isPublic: boolean;
   maxProjects: number;
   createdAt: string;
+  updatedAt: string;
   accessRules?: any[];
   technologyTags?: any[];
 }

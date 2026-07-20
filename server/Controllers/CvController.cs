@@ -17,7 +17,6 @@ namespace server.Controllers
         public async Task<IActionResult> CreateCv([FromBody] CreateCvDto dto)
         {
             var result = await cvService.CreateCvAsync(GetUserIdString(), dto);
-            if (!result.Success) return BadRequest(result);
             return Ok(result);
         }
 
@@ -25,9 +24,26 @@ namespace server.Controllers
         public async Task<IActionResult> GetCvById(Guid id)
             => Ok(await cvService.GetCvByIdAsync(id));
 
-        [HttpGet("candidate/{candidateId}")]
-        public async Task<IActionResult> GetCvsByCandidateId(string candidateId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
-            => Ok(await cvService.GetCvsByCandidateIdAsync(candidateId, pageNumber, pageSize));
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> UpdateCv(Guid id, [FromBody] UpdateCvDto dto)
+        {
+            var result = await cvService.UpdateCvAsync(id, GetUserIdString(), dto);
+            return Ok(result);
+        }
+
+        [HttpGet("exists/{positionId:guid}")]
+        public async Task<IActionResult> CheckCvExists(Guid positionId)
+        {
+            var result = await cvService.CheckCvExistsAsync(GetUserIdString(), positionId);
+            return Ok(result);
+        }
+
+        [HttpGet("candidate")]
+        public async Task<IActionResult> GetCvsByCandidateId([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await cvService.GetCvsByCandidateIdAsync(GetUserIdString(), pageNumber, pageSize);
+            return Ok(result);
+        }
 
         [HttpGet("position/{positionId:guid}")]
         public async Task<IActionResult> GetCvsByPositionId(Guid positionId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)

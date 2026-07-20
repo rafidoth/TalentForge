@@ -1,8 +1,8 @@
 import { Container, Title, Paper, Table, Text, Badge, Skeleton, ActionIcon } from "@mantine/core";
 import { useNavigate } from "react-router";
 import { useLatestPositions } from "~/hooks/usePositions";
-import { CaretRight, CaretRightIcon } from "@phosphor-icons/react";
 import { useUserRole } from "~/auth/store";
+import { formatDate } from "~/utils/date";
 
 export default function AppHome() {
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ export default function AppHome() {
   return (
     <Container size="xl" py="xl">
       <Paper withBorder={false} p="md" radius="md">
-        <Title order={4} mb="md">Recent Positions</Title>
+        <Title order={4} mb="md">Latest Positions</Title>
 
         <Table.ScrollContainer minWidth={500}>
           <Table highlightOnHover verticalSpacing="sm">
@@ -21,7 +21,6 @@ export default function AppHome() {
                 <Table.Th>Title</Table.Th>
                 <Table.Th>Last Updated</Table.Th>
                 <Table.Th>Visibility</Table.Th>
-                <Table.Th aria-label="Action" />
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -44,15 +43,15 @@ export default function AppHome() {
                 latestPositions?.map((position) => (
                   <Table.Tr
                     key={position.id}
-                    onClick={() => navigate(`/app/${role == "Candidate" && "c"}/position/${position.id}`)}
+                    onClick={() => navigate(`/app/c/positions`)}
                     style={{ cursor: "pointer" }}
                   >
                     <Table.Td>
-                      <Text fw={500}>{position.title}</Text>
+                      <Text fw={500} size="sm">{position.title}</Text>
                     </Table.Td>
                     <Table.Td>
-                      <Text size="sm" c="dimmed">
-                        {new Date(position.updatedAt).toLocaleDateString()}
+                      <Text size="sm" >
+                        {formatDate(position.updatedAt)}
                       </Text>
                     </Table.Td>
                     <Table.Td>
@@ -61,11 +60,6 @@ export default function AppHome() {
                       ) : (
                         <Badge color="gray" variant="light">Private</Badge>
                       )}
-                    </Table.Td>
-                    <Table.Td align="right">
-                      <ActionIcon variant="subtle" color="gray">
-                        <CaretRightIcon size={18} />
-                      </ActionIcon>
                     </Table.Td>
                   </Table.Tr>
                 ))

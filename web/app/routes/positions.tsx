@@ -12,6 +12,9 @@ import {
   Text,
   Loader,
   Center,
+  Title,
+  ActionIcon,
+  Tooltip,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
@@ -22,16 +25,20 @@ import {
   useDeletePosition,
   useDuplicatePosition,
 } from "~/hooks/usePositions";
-import { PositionGrid, PositionsToolbar } from "~/components/positions";
+import { PositionTable } from "~/components/positions/PositionTable";
+import { MagnifyingGlass, Plus, Copy, Trash } from "@phosphor-icons/react";
 
 export const handle: RouteHandle = {
   allowedRoles: ["Administrator", "Recruiter"]
 };
 
 export default function PositionsPage() {
-
   const [page, setPage] = useState(1);
-  const pageSize = 8; // Adjust for nice 4-column grid layout (2 rows)
+  const [search, setSearch] = useState("");
+  const pageSize = 10;
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isDeletingBulk, setIsDeletingBulk] = useState(false);
+  const [isDuplicatingBulk, setIsDuplicatingBulk] = useState(false);
 
   const { data: pagedData, isLoading, isError } = usePositions(page, pageSize);
   const createMutation = useCreatePosition();
@@ -51,19 +58,53 @@ export default function PositionsPage() {
     },
   });
 
+  const handleToggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
 
-
-  const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this position?")) {
-      deleteMutation.mutate(id);
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    if (confirm(`Are you sure you want to delete ${selectedIds.size} position(s)?`)) {
+      setIsDeletingBulk(true);
+      try {
+        const promises = Array.from(selectedIds).map(id => 
+          deleteMutation.mutateAsync(id)
+        );
+        await Promise.all(promises);
+        setSelectedIds(new Set());
+      } catch (error) {
+        console.error("Failed to delete some positions.", error);
+      } finally {
+        setIsDeletingBulk(false);
+      }
     }
   };
 
-  const handleDuplicate = (id: string) => {
-    duplicateMutation.mutate(id);
+  const handleBulkDuplicate = async () => {
+    if (selectedIds.size === 0) return;
+    setIsDuplicatingBulk(true);
+    try {
+      const promises = Array.from(selectedIds).map(id => 
+        duplicateMutation.mutateAsync(id)
+      );
+      await Promise.all(promises);
+      setSelectedIds(new Set());
+    } catch (error) {
+      console.error("Failed to duplicate some positions.", error);
+    } finally {
+      setIsDuplicatingBulk(false);
+    }
   };
 
-  const handleCardClick = (id: string) => {
+  const handleRowClick = (id: string) => {
     navigate(`/app/position/${id}`);
   };
 
@@ -82,8 +123,56 @@ export default function PositionsPage() {
 
   return (
     <Container size="xl" py="xl">
-      <Stack gap="xl">
-        <PositionsToolbar onAdd={open} />
+      <Stack gap="md">
+        <Group justify="space-between">
+          <Title size="h1">Positions</Title>
+        </Group>
+
+        <Group align="flex-end" justify="space-between">
+          <Group flex={1} align="flex-end">
+            <TextInput
+              placeholder="Search positions..."
+              leftSection={<MagnifyingGlass size={16} />}
+              value={search}
+              onChange={(e) => setSearch(e.currentTarget.value)}
+              w={250}
+            />
+
+            <Group gap="xs" align="center" ml="auto">
+              <Tooltip label="New Position" withArrow>
+                <ActionIcon variant="light" size="lg" color="gray" onClick={open}>
+                  <Plus size={20} />
+                </ActionIcon>
+              </Tooltip>
+
+              <Tooltip label="Duplicate Position" withArrow>
+                <ActionIcon 
+                  variant="light" 
+                  size="lg" 
+                  color="blue"
+                  disabled={selectedIds.size === 0} 
+                  onClick={handleBulkDuplicate}
+                  loading={isDuplicatingBulk}
+                >
+                  <Copy size={20} />
+                </ActionIcon>
+              </Tooltip>
+
+              <Tooltip label="Delete Position" withArrow>
+                <ActionIcon 
+                  variant="light" 
+                  size="lg" 
+                  color="red"
+                  disabled={selectedIds.size === 0} 
+                  onClick={handleBulkDelete}
+                  loading={isDeletingBulk}
+                >
+                  <Trash size={20} />
+                </ActionIcon>
+              </Tooltip>
+            </Group>
+          </Group>
+        </Group>
 
         {isLoading ? (
           <Center p="xl" mih={300}>
@@ -95,11 +184,11 @@ export default function PositionsPage() {
           </Center>
         ) : (
           <Stack gap="xl">
-            <PositionGrid
-              data={pagedData?.data || []}
-              onDelete={handleDelete}
-              onDuplicate={handleDuplicate}
-              onClick={handleCardClick}
+            <PositionTable
+              positions={pagedData?.data || []}
+              selectedIds={selectedIds}
+              onToggleSelect={handleToggleSelect}
+              onRowClick={handleRowClick}
             />
 
             {(pagedData?.totalPages || 0) > 1 && (

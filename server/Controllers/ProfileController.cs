@@ -111,7 +111,20 @@ namespace server.Controllers
             return NoContent();
         }
 
+        [HttpGet("attributes/position/{positionId}")]
+        public async Task<IActionResult> GetCandidateAttributesForPosition(Guid positionId)
+        {
+            var user = await userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
 
+            var result = await profileService.GetCandidateAttributesForPositionAsync(user.Id, positionId);
+            if (result == null)
+            {
+                return NotFound(new { message = "Position not found." });
+            }
+
+            return Ok(result);
+        }
 
     }
 

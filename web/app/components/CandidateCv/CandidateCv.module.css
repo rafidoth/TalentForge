@@ -1,0 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+.cvWrapper,
+.cvWrapper h1,
+.cvWrapper h2,
+.cvWrapper h3,
+.cvWrapper h4,
+.cvWrapper h5,
+.cvWrapper h6,
+.cvWrapper p,
+.cvWrapper span,
+.cvWrapper div,
+.cvWrapper input,
+.cvWrapper button {
+    font-family: "PT Serif", serif;
+}

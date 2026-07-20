@@ -1,5 +1,5 @@
 import api from "./index";
-import type { MeSectionDto, UpdateMeSectionDto, ProfileAttributeDto, AddProfileAttributeDto, UpdateProfileAttributeValueDto, ProjectDto, CreateProjectDto, UpdateProjectDto, TagDto } from "./types";
+import type { MeSectionDto, UpdateMeSectionDto, ProfileAttributeDto, AddProfileAttributeDto, UpdateProfileAttributeValueDto, ProjectDto, CreateProjectDto, UpdateProjectDto, TagDto, CandidatePositionAttributesDto } from "./types";
 
 export async function fetchMeSection(): Promise<MeSectionDto> {
     const res = await api.get<MeSectionDto>("/profile/me");
@@ -53,5 +53,10 @@ export async function searchTags(prefix: string, n: number = 10): Promise<TagDto
 
 export async function createTag(name: string): Promise<TagDto> {
     const res = await api.post<TagDto>("/tags", { name });
+    return res.data;
+}
+
+export async function fetchCandidatePositionAttributes(positionId: string): Promise<CandidatePositionAttributesDto> {
+    const res = await api.get<CandidatePositionAttributesDto>(`/profile/attributes/position/${positionId}`);
     return res.data;
 }

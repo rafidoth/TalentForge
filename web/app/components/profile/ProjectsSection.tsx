@@ -4,47 +4,22 @@ import {
   Stack,
   Text,
   Badge,
-  ActionIcon,
   Center,
   Loader,
   ThemeIcon,
   Title,
   Divider,
+  Button,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { useState } from "react";
-import { PlusIcon, FolderIcon } from "@phosphor-icons/react";
+import { FolderIcon, GearIcon } from "@phosphor-icons/react";
 import { useProjects } from "~/hooks/useProjects";
-import { ProjectFormModal } from "./ProjectFormModal";
-import { ProjectDetailsModal } from "./ProjectDetailsModal";
 import type { ProjectDto } from "~/api/types";
 import { formatTimePeriod } from "./profileUtils";
+import { useNavigate } from "react-router";
 
 export function ProjectsSection() {
   const { data: projects, isLoading } = useProjects();
-  const [projectModalOpened, { open: openForm, close: closeForm }] =
-    useDisclosure(false);
-
-  const [projectDetailsOpened, { open: openDetails, close: closeDetails }] =
-    useDisclosure(false);
-  const [selectedProject, setSelectedProject] = useState<ProjectDto | null>(
-    null,
-  );
-
-  const handleProjectClick = (project: ProjectDto) => {
-    setSelectedProject(project);
-    openDetails();
-  };
-
-  const handleEditClick = (project: ProjectDto) => {
-    closeDetails();
-    openForm();
-  };
-
-  const handleAddClick = () => {
-    setSelectedProject(null);
-    openForm();
-  };
+  const navigate = useNavigate();
 
   return (
     <Paper p="xl" withBorder={false} shadow="none">
@@ -57,16 +32,14 @@ export function ProjectsSection() {
             Projects
           </Title>
         </Group>
-        <ActionIcon
-          variant="outline"
+        <Button
+          variant="light"
           color="myColor"
-          radius="xl"
-          size="lg"
-          onClick={handleAddClick}
-          aria-label="Add project"
+          leftSection={<GearIcon size={18} />}
+          onClick={() => navigate("/app/c/projects")}
         >
-          <PlusIcon size={18} />
-        </ActionIcon>
+          Manage
+        </Button>
       </Group>
       <Divider mb="md" />
 
@@ -88,8 +61,6 @@ export function ProjectsSection() {
               withBorder
               p="md"
               radius="md"
-              style={{ cursor: "pointer" }}
-              onClick={() => handleProjectClick(project)}
             >
               <Group justify="space-between" align="flex-start">
                 <Stack gap={4} style={{ flex: 1 }}>
@@ -119,19 +90,6 @@ export function ProjectsSection() {
           ))}
         </Stack>
       )}
-
-      <ProjectFormModal
-        opened={projectModalOpened}
-        onClose={closeForm}
-        project={selectedProject}
-      />
-
-      <ProjectDetailsModal
-        opened={projectDetailsOpened}
-        onClose={closeDetails}
-        project={selectedProject}
-        onEdit={handleEditClick}
-      />
     </Paper>
   );
 }

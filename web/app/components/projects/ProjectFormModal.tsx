@@ -1,10 +1,11 @@
-import { Modal, TextInput, Textarea, Select, MultiSelect, Button, Group, Stack, Title } from '@mantine/core';
+import { Modal, TextInput, Textarea, Select, MultiSelect, Button, Group, Stack, Title, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useState, useEffect } from 'react';
 import { useCreateProject, useUpdateProject } from '~/hooks/useProjects';
 import { searchTags } from '~/api/profile';
 import type { TagDto, ProjectDto } from '~/api/types';
 import { MarkdownEditor } from '~/components/common/MarkdownEditor';
+import { TagsInput } from '~/components/common/TagsInput';
 
 const MONTHS = [
     { value: '01', label: 'January' },
@@ -50,9 +51,7 @@ export function ProjectFormModal({ opened, onClose, project }: ProjectFormModalP
     const { mutate: createProject, isPending: isCreating } = useCreateProject();
     const { mutate: updateProject, isPending: isUpdating } = useUpdateProject();
     const isPending = isCreating || isUpdating;
-    const [tagSearch, setTagSearch] = useState('');
-    const [tagOptions, setTagOptions] = useState<{ value: string; label: string }[]>([]);
-    const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+    const [localTags, setLocalTags] = useState<TagDto[]>([]);
 
     const form = useForm({
         initialValues: {
@@ -82,9 +81,7 @@ export function ProjectFormModal({ opened, onClose, project }: ProjectFormModalP
                     description: project.description || '',
                 });
 
-                const currentTagIds = project.tags.map(t => t.id);
-                setSelectedTagIds(currentTagIds);
-                setTagOptions(project.tags.map(t => ({ value: t.id, label: t.name })));
+                setLocalTags(project.tags || []);
             } else {
                 form.setValues({
                     name: '',
@@ -93,28 +90,10 @@ export function ProjectFormModal({ opened, onClose, project }: ProjectFormModalP
                     endYear: '',
                     description: '',
                 });
-                setSelectedTagIds([]);
-                setTagOptions([]);
+                setLocalTags([]);
             }
         }
     }, [opened, project]);
-
-    useEffect(() => {
-        if (tagSearch.length === 0) return;
-        const timeout = setTimeout(async () => {
-            try {
-                const results = await searchTags(tagSearch);
-                setTagOptions((prev) => {
-                    const existing = prev.filter((o) => selectedTagIds.includes(o.value));
-                    const newOpts = results
-                        .filter((t: TagDto) => !existing.some((e) => e.value === t.id))
-                        .map((t: TagDto) => ({ value: t.id, label: t.name }));
-                    return [...existing, ...newOpts];
-                });
-            } catch { /* ignore */ }
-        }, 300);
-        return () => clearTimeout(timeout);
-    }, [tagSearch, selectedTagIds]);
 
     const buildDateOnly = (month: string, year: string): string | null => {
         if (!month || !year) return null;
@@ -127,7 +106,7 @@ export function ProjectFormModal({ opened, onClose, project }: ProjectFormModalP
             startDate: buildDateOnly(values.startMonth, values.startYear),
             endDate: buildDateOnly(values.endMonth, values.endYear),
             description: values.description || null,
-            tags: selectedTagIds,
+            tags: localTags.map(t => t.id),
         };
 
         if (project) {
@@ -153,8 +132,7 @@ export function ProjectFormModal({ opened, onClose, project }: ProjectFormModalP
 
     const handleClose = () => {
         form.reset();
-        setSelectedTagIds([]);
-        setTagOptions([]);
+        setLocalTags([]);
         onClose();
     };
 
@@ -205,24 +183,20 @@ export function ProjectFormModal({ opened, onClose, project }: ProjectFormModalP
                             {...form.getInputProps('endYear')}
                         />
                     </Group>
-
+                    <Stack gap="xs" w={"50%"}>
+                        <Text size="sm" fw={500}>Tags</Text>
+                        <TagsInput
+                            selectedTagsList={localTags}
+                            setSelectedTagsList={setLocalTags}
+                            placeholder="Search and select tags"
+                        />
+                    </Stack>
                     <MarkdownEditor
                         label="Description"
                         description="Brief description of the project"
                         {...form.getInputProps('description')}
                     />
 
-                    <MultiSelect
-                        label="Tags"
-                        placeholder="Search and select tags"
-                        data={tagOptions}
-                        value={selectedTagIds}
-                        onChange={setSelectedTagIds}
-                        searchable
-                        onSearchChange={setTagSearch}
-                        nothingFoundMessage={tagSearch.length > 0 ? 'No tags found' : 'Type to search tags'}
-                        clearable
-                    />
 
                     <Group justify="flex-end" mt="md">
                         <Button variant="default" onClick={handleClose}>Cancel</Button>

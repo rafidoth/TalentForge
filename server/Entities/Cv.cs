@@ -14,6 +14,7 @@ namespace server.Entities
         [ForeignKey("PositionId")]
         public Position Position { get; set; } = null!;
         public List<Guid> ChosenProjectIds { get; set; } = new();
+        public bool IsPublished { get; set; } = false;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public int LikeCount { get; set; }

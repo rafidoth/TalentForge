@@ -17,18 +17,17 @@ export const useAttributeStore = create<AttributeState>()(
       types: [],
       isLoading: false,
       fetchLookups: async () => {
-        // If already fetched, don't fetch again!
         if (get().categories.length > 0 && get().types.length > 0) {
-          return; 
+          return;
         }
 
         set({ isLoading: true });
         try {
           const data = await fetchAttributeTypesAndCategories();
-          set({ 
-            categories: data.categories, 
-            types: data.types, 
-            isLoading: false 
+          set({
+            categories: data.categories,
+            types: data.types,
+            isLoading: false
           });
         } catch (error) {
           console.error("Failed to fetch attribute lookups", error);
@@ -37,7 +36,7 @@ export const useAttributeStore = create<AttributeState>()(
       },
     }),
     {
-      name: 'attribute-lookup-storage', // key in localStorage
+      name: 'attribute-lookup-storage',
     }
   )
 );

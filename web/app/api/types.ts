@@ -25,6 +25,7 @@ export interface ProfileAttributeDto {
   attributeName: string;
   typeName: string;
   categoryName: string;
+  isBuiltin?: boolean;
   value: any;
   dropdownOptions: DropdownOptionDto[] | null;
   version: number;
@@ -187,4 +188,9 @@ export interface PositionAccessRuleDto {
   attributeTypeName?: string;
   operator: RuleOperator;
   expectedValue: string;
+}
+
+export interface CandidatePositionAttributesDto {
+  filledAttributes: ProfileAttributeDto[];
+  missingAttributes: AttributeDto[];
 }

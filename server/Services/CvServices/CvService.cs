@@ -16,7 +16,8 @@ public partial class CvService(ApplicationDbContext db) : ICvService
         => FormatName(ExtractAttr(attrs, "First Name"), ExtractAttr(attrs, "Last Name"));
 
     private string ExtractAttr(List<ProfileAttribute> a, string n)
-        => a.FirstOrDefault(x => x.Attribute.Name == n)?.Value.GetString() ?? "";
+        => a.FirstOrDefault(x => x.Attribute.Name == n)?
+        .Value.GetString() ?? "";
 
     private string FormatName(string f, string l)
         => string.IsNullOrWhiteSpace(f) ? l : $"{f} {l}".Trim();
@@ -29,11 +30,14 @@ public partial class CvService(ApplicationDbContext db) : ICvService
             PositionId = cv.PositionId,
             PositionTitle = cv.Position.Title,
             CandidateName = candidateName,
+            IsPublished = cv.IsPublished,
             CreatedAt = cv.CreatedAt,
             LikeCount = cv.LikeCount
         };
 
     private async Task<List<ProfileAttribute>> GetCandidateProfileAttributesAsync(string candidateId)
-        => await db.ProfileAttributes.Include(pa => pa.Attribute).ThenInclude(a => a.Category)
-             .Where(pa => pa.UserId == candidateId).ToListAsync();
+        => await db.ProfileAttributes
+                   .Include(pa => pa.Attribute)
+                   .Where(pa => pa.UserId == candidateId)
+                   .ToListAsync();
 }

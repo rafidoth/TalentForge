@@ -234,6 +234,14 @@ const theme: MantineThemeOverride = {
                 withBorder: true
             },
             styles: {}
+        },
+        Table: {
+            defaultProps: {
+                highlightOnHover: true,
+                highlightOnHoverColor: 'blue.0',
+                withRowBorders: true,
+                withColumnBorders: false,
+            },
         }
     }
 };

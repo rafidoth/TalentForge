@@ -16,8 +16,7 @@ public record MissingAttributeDto
 
 public record CreateCvResponseDto
 {
-    public bool Success { get; init; }
-    public Guid? CvId { get; init; }
+    public Guid CvId { get; init; }
     public List<MissingAttributeDto> MissingAttributes { get; init; } = new();
 }
 
@@ -28,6 +27,7 @@ public record CvListDto
     public Guid PositionId { get; init; }
     public string PositionTitle { get; init; } = string.Empty;
     public string CandidateName { get; init; } = string.Empty;
+    public bool IsPublished { get; init; }
     public DateTime CreatedAt { get; init; }
     public int LikeCount { get; init; }
 }
@@ -36,4 +36,10 @@ public record CvDetailDto : CvListDto
 {
     public List<ProfileAttributeDto> Attributes { get; init; } = new();
     public List<ProjectDto> Projects { get; init; } = new();
+}
+
+public record CheckCvExistsResponseDto
+{
+    public bool Exists { get; init; }
+    public Guid? CvId { get; init; }
 }

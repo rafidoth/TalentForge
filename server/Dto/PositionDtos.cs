@@ -12,6 +12,7 @@ public record PositionDto
     public bool IsPublic { get; init; }
     public int MaxProjects { get; init; }
     public DateTime CreatedAt { get; init; }
+    public DateTime UpdatedAt { get; init; }
 }
 
 public record PositionAttributeDto
