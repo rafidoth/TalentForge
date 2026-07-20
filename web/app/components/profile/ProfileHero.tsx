@@ -31,7 +31,6 @@ export function ProfileHero({ attributes, email, role }: ProfileHeroProps) {
             withBorder={false}
         >
             <Group align="flex-start" gap="xl" wrap="wrap">
-
                 <Stack align='center' style={{ flex: 1, minWidth: 200 }}>
                     <Avatar
                         src={imageUrl}
@@ -50,7 +49,6 @@ export function ProfileHero({ attributes, email, role }: ProfileHeroProps) {
                             {email}
                         </Text>
                     )}
-
                     <Group gap="sm" mt={4}>
                         {role && (
                             RoleBadge({ role: role as UserRole })

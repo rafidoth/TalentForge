@@ -45,23 +45,6 @@ export function UserMenu({ avatarUrl, displayName, isLoading, onLogout }: UserMe
                 </UnstyledButton>
             </Menu.Target>
             <Menu.Dropdown>
-                <Menu.Item
-                    leftSection={<Heart size={16} color={theme.colors.red[6]} weight="bold" />}
-                >
-                    Liked posts
-                </Menu.Item>
-                <Menu.Item
-                    leftSection={<Star size={16} color={theme.colors.yellow[6]} weight="bold" />}
-                >
-                    Saved posts
-                </Menu.Item>
-                <Menu.Item
-                    leftSection={<Chat size={16} color={theme.colors.blue[6]} weight="bold" />}
-                >
-                    Your comments
-                </Menu.Item>
-
-                <Menu.Label>Settings</Menu.Label>
                 <Menu.Item leftSection={<GearIcon size={16} weight="bold" />} onClick={() => navigate('/app/profile')}>
                     Profile settings
                 </Menu.Item>
