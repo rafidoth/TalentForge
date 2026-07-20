@@ -12,46 +12,50 @@ import {
   Pagination
 } from "@mantine/core";
 import { MagnifyingGlassIcon, PlusIcon } from "@phosphor-icons/react";
-import { useState, useMemo } from "react";
-import { useProfileAttributeList } from "./useProfileAttributeList";
+import { useMemo } from "react";
 import { ProfileAttributeTable } from "./ProfileAttributeTable";
 import { ProfileAttributeActionModal } from "./ProfileAttributeActionModal";
 import type { AttributeDto } from "../../api/types";
-
+import { useProfileAttributeStore, getDefaultValueForType } from "~/store/profileAttributeStore";
+import { useAttributes, useAttributeTypesAndCategories } from "./useAttributes";
+import {
+  useProfileAttributes,
+  useAddProfileAttribute,
+  useUpdateProfileAttribute,
+  useDeleteProfileAttribute,
+} from "./useProfileAttributes";
 export interface ProfileAttributeListProps { }
 
 export function ProfileAttributeList({ }: ProfileAttributeListProps) {
   const {
-    search,
-    setSearch,
-    activeTab,
-    setActiveTab,
-    page,
-    setPage,
-    totalPages,
-    isLoading,
-    categories,
-    filteredAttributes,
-    profileAttributeMap,
-    addingAttrId,
-    setAddingAttrId,
-    addValue,
-    setAddValue,
-    editingProfileAttrId,
-    setEditingProfileAttrId,
-    editValue,
-    setEditValue,
-    isAdding,
-    isUpdating,
-    isRemoving,
-    handleInitiateAdd,
-    handleConfirmAdd,
-    handleInitiateEdit,
-    handleConfirmEdit,
-    handleRemoveProfileAttribute,
-  } = useProfileAttributeList();
+    search, setSearch,
+    activeTab, setActiveTab,
+    page, setPage,
+    selectedAttribute, setSelectedAttribute,
+    modalValue, setModalValue,
+  } = useProfileAttributeStore();
 
-  const [selectedAttribute, setSelectedAttribute] = useState<AttributeDto | null>(null);
+  const { data: globalAttributesData, isLoading: isLoadingGlobal } = useAttributes(search, page, 10);
+  const { data: categoriesData } = useAttributeTypesAndCategories();
+  const { data: profileAttributesData } = useProfileAttributes();
+
+  const { mutate: addProfileAttribute, isPending: isAdding } = useAddProfileAttribute();
+  const { mutate: updateProfileAttribute, isPending: isUpdating } = useUpdateProfileAttribute();
+  const { mutate: deleteProfileAttribute, isPending: isRemoving } = useDeleteProfileAttribute();
+
+  const categories = categoriesData?.categories || [];
+  const attributes = globalAttributesData?.data || [];
+  const totalPages = globalAttributesData?.totalPages || 1;
+
+  const profileAttributeMap = useMemo(() => {
+    const map = new Map<string, string>();
+    if (profileAttributesData) {
+      for (const pa of profileAttributesData) {
+        map.set(pa.attributeId, pa.id);
+      }
+    }
+    return map;
+  }, [profileAttributesData]);
 
   const categoryOptions = useMemo(() => {
     return [
@@ -61,50 +65,59 @@ export function ProfileAttributeList({ }: ProfileAttributeListProps) {
     ];
   }, [categories]);
 
-  // Exclude builtins
   const displayAttributes = useMemo(() => {
-    return filteredAttributes.filter(a => !a.isBuiltin);
-  }, [filteredAttributes]);
+    let filtered = attributes;
+    if (activeTab === "recent") {
+      filtered = attributes.slice(0, 5);
+    } else if (activeTab && activeTab !== "all") {
+      filtered = attributes.filter(attr => attr.categoryName === activeTab);
+    }
+    return filtered.filter(a => !a.isBuiltin);
+  }, [attributes, activeTab]);
 
   const handleRowClick = (attribute: AttributeDto) => {
-    setSelectedAttribute(attribute);
     const isAdded = profileAttributeMap.has(attribute.id);
     if (isAdded) {
-      handleInitiateEdit(attribute);
+      const profileAttr = profileAttributesData?.find(pa => pa.attributeId === attribute.id);
+      setSelectedAttribute(attribute, profileAttr?.value);
     } else {
-      handleInitiateAdd(attribute);
+      setSelectedAttribute(attribute, getDefaultValueForType(attribute.typeName));
     }
   };
 
   const handleModalClose = () => {
     setSelectedAttribute(null);
-    setAddingAttrId(null);
-    setEditingProfileAttrId(null);
   };
 
   const handleModalConfirm = () => {
     if (!selectedAttribute) return;
-    const isAdded = profileAttributeMap.has(selectedAttribute.id);
-    if (isAdded) {
-      handleConfirmEdit(selectedAttribute);
+    const profileAttrId = profileAttributeMap.get(selectedAttribute.id);
+    if (profileAttrId) {
+      const profileAttr = profileAttributesData?.find(pa => pa.id === profileAttrId);
+      if (profileAttr) {
+        updateProfileAttribute(
+          { profileAttributeId: profileAttrId, value: modalValue, version: profileAttr.version },
+          { onSuccess: () => setSelectedAttribute(null) }
+        );
+      }
     } else {
-      handleConfirmAdd(selectedAttribute);
+      addProfileAttribute(
+        { attributeId: selectedAttribute.id, value: modalValue },
+        { onSuccess: () => setSelectedAttribute(null) }
+      );
     }
-    // Note: Wait for success to close modal, or let the hooks handle it.
-    // The hook currently closes the forms on success automatically by setting ids to null.
-    // We can observe addingAttrId and editingProfileAttrId to close the modal.
   };
 
-  const isModalOpen = !!selectedAttribute && (addingAttrId === selectedAttribute.id || editingProfileAttrId === selectedAttribute.id);
-
   const handleModalRemove = () => {
-    if (selectedAttribute) {
-      handleRemoveProfileAttribute(selectedAttribute);
+    if (!selectedAttribute) return;
+    const profileAttrId = profileAttributeMap.get(selectedAttribute.id);
+    if (profileAttrId) {
+      deleteProfileAttribute(profileAttrId, { onSuccess: () => setSelectedAttribute(null) });
     }
   };
 
   const renderContent = () => {
-    if (isLoading) {
+    if (isLoadingGlobal) {
       return (
         <Center h={300}>
           <Loader />
@@ -130,11 +143,11 @@ export function ProfileAttributeList({ }: ProfileAttributeListProps) {
 
         {totalPages > 1 && activeTab === "all" && (
           <Center>
-            <Pagination 
-              total={totalPages} 
-              value={page} 
-              onChange={setPage} 
-              color="blue" 
+            <Pagination
+              total={totalPages}
+              value={page}
+              onChange={setPage}
+              color="blue"
               withEdges
             />
           </Center>
@@ -174,12 +187,12 @@ export function ProfileAttributeList({ }: ProfileAttributeListProps) {
       </Box>
 
       <ProfileAttributeActionModal
-        opened={isModalOpen}
+        opened={!!selectedAttribute}
         onClose={handleModalClose}
         attribute={selectedAttribute}
         isAdded={selectedAttribute ? profileAttributeMap.has(selectedAttribute.id) : false}
-        value={selectedAttribute && profileAttributeMap.has(selectedAttribute.id) ? editValue : addValue}
-        onChange={selectedAttribute && profileAttributeMap.has(selectedAttribute.id) ? setEditValue : setAddValue}
+        value={modalValue}
+        onChange={setModalValue}
         onConfirm={handleModalConfirm}
         onRemove={handleModalRemove}
         isLoading={isAdding || isUpdating}

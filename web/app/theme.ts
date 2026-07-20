@@ -238,7 +238,7 @@ const theme: MantineThemeOverride = {
         Table: {
             defaultProps: {
                 highlightOnHover: true,
-                highlightOnHoverColor: 'blue.0',
+                highlightOnHoverColor: 'var(--mantine-color-default-hover)',
                 withRowBorders: true,
                 withColumnBorders: false,
             },

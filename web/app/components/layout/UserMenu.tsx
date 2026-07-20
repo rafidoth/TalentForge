@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Menu, Avatar, Text, UnstyledButton, Group, useMantineTheme, Skeleton } from '@mantine/core';
-import { CaretDown, Heart, Star, Chat, Gear, ArrowsLeftRight, SignOut, Pause, Trash, GearIcon, SignOutIcon, CaretDownIcon } from '@phosphor-icons/react';
+import { Menu, Avatar, Text, UnstyledButton, Group, useMantineTheme, Skeleton, useMantineColorScheme } from '@mantine/core';
+import { CaretDown, Heart, Star, Chat, Gear, ArrowsLeftRight, SignOut, Pause, Trash, GearIcon, SignOutIcon, CaretDownIcon, Moon, Sun } from '@phosphor-icons/react';
 import classes from './AppHeader/AppHeader.module.css';
 import { useNavigate } from 'react-router';
 
@@ -15,6 +15,7 @@ export interface UserMenuProps {
 export function UserMenu({ avatarUrl, displayName, isLoading, onLogout }: UserMenuProps) {
     const theme = useMantineTheme();
     const [userMenuOpened, setUserMenuOpened] = useState(false);
+    const { colorScheme, toggleColorScheme } = useMantineColorScheme();
     const navigate = useNavigate();
 
     if (isLoading) {
@@ -63,6 +64,12 @@ export function UserMenu({ avatarUrl, displayName, isLoading, onLogout }: UserMe
                 <Menu.Label>Settings</Menu.Label>
                 <Menu.Item leftSection={<GearIcon size={16} weight="bold" />} onClick={() => navigate('/app/profile')}>
                     Profile settings
+                </Menu.Item>
+                <Menu.Item
+                    leftSection={colorScheme === 'dark' ? <Sun size={16} weight="bold" /> : <Moon size={16} weight="bold" />}
+                    onClick={() => toggleColorScheme()}
+                >
+                    {colorScheme === 'dark' ? 'Light mode' : 'Dark mode'}
                 </Menu.Item>
                 <Menu.Item leftSection={<SignOutIcon size={16} weight="bold" />} onClick={onLogout}>
                     Logout

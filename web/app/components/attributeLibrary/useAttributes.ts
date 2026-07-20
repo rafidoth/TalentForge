@@ -17,18 +17,11 @@ import {
   addPositionAttribute,
   removePositionAttribute,
 } from "../../api/positions";
-import {
-  fetchProfileAttributes,
-  addProfileAttribute,
-  updateProfileAttribute,
-  deleteProfileAttribute,
-} from "../../api/profile";
+
 import type {
   CreateAttributeDto,
   UpdateAttributeDto,
   CreatePositionAttributeDto,
-  AddProfileAttributeDto,
-  UpdateProfileAttributeValueDto,
   AttributeDto,
 } from "../../api/types";
 
@@ -136,40 +129,3 @@ export const useRemovePositionAttribute = () => {
   });
 };
 
-export const useProfileAttributes = () => {
-  return useQuery({
-    queryKey: ["profileAttributes"],
-    queryFn: () => fetchProfileAttributes(),
-  });
-};
-
-export const useAddProfileAttribute = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (dto: AddProfileAttributeDto) => addProfileAttribute(dto),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profileAttributes"] });
-    },
-  });
-};
-
-export const useUpdateProfileAttribute = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (dto: UpdateProfileAttributeValueDto) => updateProfileAttribute(dto),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profileAttributes"] });
-    },
-  });
-};
-
-export const useDeleteProfileAttribute = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (profileAttributeId: string) =>
-      deleteProfileAttribute(profileAttributeId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profileAttributes"] });
-    },
-  });
-};

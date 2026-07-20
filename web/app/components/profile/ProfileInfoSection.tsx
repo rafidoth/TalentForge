@@ -15,7 +15,7 @@ import {
 } from '@mantine/core';
 import { IdentificationCardIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react';
 import { AttributeLibraryModal } from '~/components/attributeLibrary';
-import { useProfileAttributes, useDeleteProfileAttribute } from '~/components/attributeLibrary/useAttributes';
+import { useProfileAttributes, useDeleteProfileAttribute } from '~/components/attributeLibrary/useProfileAttributes';
 
 export function ProfileInfoSection() {
     const [attributeLibraryOpened, setAttributeLibraryOpened] = useState(false);
@@ -79,7 +79,7 @@ export function ProfileInfoSection() {
                     </Center>
                 ) : (
                     <SimpleGrid cols={{ base: 1, xs: 2, sm: 2, md: 3 }} spacing="md">
-                        {profileAttributes.map((attr) => (
+                        {profileAttributes.map((attr: any) => (
                             <Paper
                                 key={attr.id}
                                 withBorder
