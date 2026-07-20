@@ -1,23 +1,29 @@
 import { TextInput, Group, Stack, Loader, Text, Center, Box, Title, Select, ActionIcon, Tooltip, Button, Pagination } from "@mantine/core";
-import { MagnifyingGlass, Plus, Trash, PencilSimple, PlusCircle, MinusCircle, MagnifyingGlassIcon, PencilSimpleIcon, TrashIcon, MinusCircleIcon } from "@phosphor-icons/react";
+import { Plus, PencilSimpleIcon, TrashIcon, PlusCircle, MinusCircleIcon, MagnifyingGlassIcon } from "@phosphor-icons/react";
 import { useState, useMemo, useEffect } from "react";
 import { useAttributes, usePositionAttributes, useAddPositionAttribute, useRemovePositionAttribute, useDeleteAttribute } from "./useAttributes";
 import { AttributeLibraryTable } from "./AttributeLibraryTable";
-import type { AttributeDto } from "../../api/types";
+import type { AttributeDto, PaginatedResponse } from "../../api/types";
 import { useAttributeStore } from "~/store/attributeStore";
 import { useNavigate } from "react-router";
 
 export interface BaseAttributeListProps {
+  attributesData: PaginatedResponse<AttributeDto> | undefined;
+  attributesLoading: boolean;
   mode: "global" | "position";
   positionId?: string;
-  onCreate: () => void;
-  onEdit: (attribute: AttributeDto) => void;
+  onCreate?: () => void;
+  onEdit?: (attribute: AttributeDto) => void;
 }
 
-export function BaseAttributeList({ mode, positionId, onCreate, onEdit }: BaseAttributeListProps) {
-  const [search, setSearch] = useState("");
-  const [activeTab, setActiveTab] = useState<string | null>("all");
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+export function BaseAttributeList({ attributesData, attributesLoading, mode, positionId, onCreate, onEdit }: BaseAttributeListProps) {
+  const {
+    search, setSearch,
+    page, setPage,
+    activeTab, setActiveTab,
+    selectedIds, toggleSelection, clearSelection,
+    categories, fetchLookups
+  } = useAttributeStore();
 
   const [isAddingBulk, setIsAddingBulk] = useState(false);
   const [isRemovingBulk, setIsRemovingBulk] = useState(false);
@@ -25,32 +31,19 @@ export function BaseAttributeList({ mode, positionId, onCreate, onEdit }: BaseAt
 
   const navigate = useNavigate();
 
-  const [page, setPage] = useState(1);
-
-  // Reset page when search or category changes
-  useEffect(() => {
-    setPage(1);
-  }, [search, activeTab]);
-
-  const {
-    data,
-    isLoading,
-  } = useAttributes(search, page, 10);
 
   const { data: positionAttributesData } = usePositionAttributes(mode === "position" ? positionId : undefined);
   const addPositionAttributeMutation = useAddPositionAttribute();
   const removePositionAttributeMutation = useRemovePositionAttribute();
   const deleteAttributeMutation = useDeleteAttribute();
 
-  const { categories, fetchLookups } = useAttributeStore();
-
   useEffect(() => {
     fetchLookups();
   }, [fetchLookups]);
 
   const attributes = useMemo(() => {
-    return data?.data || [];
-  }, [data]);
+    return attributesData?.data || [];
+  }, [attributesData]);
 
   const filteredAttributes = useMemo(() => {
     let filtered = attributes;
@@ -61,8 +54,6 @@ export function BaseAttributeList({ mode, positionId, onCreate, onEdit }: BaseAt
     }
     return filtered.filter(a => !a.isBuiltin);
   }, [attributes, activeTab]);
-
-  const totalPages = data?.totalPages || 1;
 
   const addedAttributeIds = useMemo(() => {
     return new Set<string>(
@@ -81,15 +72,7 @@ export function BaseAttributeList({ mode, positionId, onCreate, onEdit }: BaseAt
   }, [categories]);
 
   const handleToggleSelect = (attributeId: string) => {
-    setSelectedIds(prev => {
-      const next = new Set(prev);
-      if (next.has(attributeId)) {
-        next.delete(attributeId);
-      } else {
-        next.add(attributeId);
-      }
-      return next;
-    });
+    toggleSelection(attributeId);
   };
 
   const selectedNotAdded = useMemo(() => {
@@ -111,11 +94,7 @@ export function BaseAttributeList({ mode, positionId, onCreate, onEdit }: BaseAt
         })
       );
       await Promise.all(promises);
-      setSelectedIds(prev => {
-        const next = new Set(prev);
-        selectedNotAdded.forEach(id => next.delete(id));
-        return next;
-      });
+      clearSelection();
     } catch (error) {
       console.error("Failed to add some attributes.", error);
     } finally {
@@ -134,11 +113,7 @@ export function BaseAttributeList({ mode, positionId, onCreate, onEdit }: BaseAt
         })
       );
       await Promise.all(promises);
-      setSelectedIds(prev => {
-        const next = new Set(prev);
-        selectedAdded.forEach(id => next.delete(id));
-        return next;
-      });
+      clearSelection();
     } catch (error) {
       console.error("Failed to remove some attributes.", error);
     } finally {
@@ -150,7 +125,7 @@ export function BaseAttributeList({ mode, positionId, onCreate, onEdit }: BaseAt
     if (selectedIds.size !== 1) return;
     const selectedId = Array.from(selectedIds)[0];
     const attribute = attributes.find(a => a.id === selectedId);
-    if (attribute) {
+    if (attribute && onEdit) {
       onEdit(attribute);
     }
   };
@@ -168,7 +143,7 @@ export function BaseAttributeList({ mode, positionId, onCreate, onEdit }: BaseAt
         deleteAttributeMutation.mutateAsync(attrId)
       );
       await Promise.all(promises);
-      setSelectedIds(new Set());
+      clearSelection();
     } catch (error) {
       console.error("Failed to delete some attributes.", error);
     } finally {
@@ -177,7 +152,7 @@ export function BaseAttributeList({ mode, positionId, onCreate, onEdit }: BaseAt
   };
 
   const renderContent = () => {
-    if (isLoading) {
+    if (attributesLoading) {
       return (
         <Center h={300}>
           <Loader />
@@ -203,9 +178,15 @@ export function BaseAttributeList({ mode, positionId, onCreate, onEdit }: BaseAt
           hideStatus={mode === "global"}
         />
 
-        {totalPages > 1 && activeTab === "all" && (
-          <Center mt="md">
-            <Pagination total={totalPages} value={page} onChange={setPage} />
+        {attributesData && attributesData.totalPages > 1 && activeTab === "all" && (
+          <Center>
+            <Pagination
+              total={attributesData.totalPages}
+              value={page}
+              onChange={setPage}
+              color="blue"
+              withEdges
+            />
           </Center>
         )}
       </Stack>
@@ -246,7 +227,7 @@ export function BaseAttributeList({ mode, positionId, onCreate, onEdit }: BaseAt
             {mode === "global" && (
               <>
                 <Tooltip label="New Attribute" withArrow>
-                  <ActionIcon variant="light" size="lg" color="gray" onClick={onCreate}>
+                  <ActionIcon variant="light" size="lg" color="gray" onClick={onCreate} disabled={!onCreate}>
                     <Plus size={20} />
                   </ActionIcon>
                 </Tooltip>
@@ -256,7 +237,7 @@ export function BaseAttributeList({ mode, positionId, onCreate, onEdit }: BaseAt
                     variant="light"
                     size="lg"
                     color="blue"
-                    disabled={selectedIds.size !== 1}
+                    disabled={selectedIds.size !== 1 || !onEdit}
                     onClick={handleEdit}
                   >
                     <PencilSimpleIcon size={20} />

@@ -9,7 +9,7 @@ import {
   Box,
   Title,
   Select,
-  Pagination,
+  Pagination
 } from "@mantine/core";
 import { MagnifyingGlassIcon, PlusIcon } from "@phosphor-icons/react";
 import { useState, useMemo } from "react";
@@ -26,10 +26,10 @@ export function ProfileAttributeList({ }: ProfileAttributeListProps) {
     setSearch,
     activeTab,
     setActiveTab,
-    isLoading,
     page,
     setPage,
     totalPages,
+    isLoading,
     categories,
     filteredAttributes,
     profileAttributeMap,
@@ -129,8 +129,14 @@ export function ProfileAttributeList({ }: ProfileAttributeListProps) {
         />
 
         {totalPages > 1 && activeTab === "all" && (
-          <Center mt="md">
-            <Pagination total={totalPages} value={page} onChange={setPage} />
+          <Center>
+            <Pagination 
+              total={totalPages} 
+              value={page} 
+              onChange={setPage} 
+              color="blue" 
+              withEdges
+            />
           </Center>
         )}
       </Stack>

@@ -33,6 +33,11 @@ export async function fetchAttributes(
     return res.data;
 }
 
+export async function fetchAttributeById(id: string): Promise<AttributeDto> {
+    const res = await api.get(`/attributes/${id}`);
+    return res.data;
+}
+
 export async function createAttribute(dto: CreateAttributeDto): Promise<AttributeDto> {
     const res = await api.post("/attributes", dto);
     return res.data;

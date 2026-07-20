@@ -10,6 +10,7 @@ import {
   updateAttribute,
   deleteAttribute,
   fetchAttributeTypesAndCategories,
+  fetchAttributeById,
 } from "../../api/attributes";
 import {
   fetchPositionAttributes,
@@ -28,6 +29,7 @@ import type {
   CreatePositionAttributeDto,
   AddProfileAttributeDto,
   UpdateProfileAttributeValueDto,
+  AttributeDto,
 } from "../../api/types";
 
 export const useAttributes = (search: string = "", pageNumber: number = 1, pageSize: number = 10) => {
@@ -54,13 +56,24 @@ export const useCreateAttribute = () => {
   });
 };
 
-export const useUpdateAttribute = () => {
+export const useUpdateAttribute = (conflictHandler: (latestData: AttributeDto) => void) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, dto }: { id: string; dto: UpdateAttributeDto }) =>
       updateAttribute(id, dto),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["attributes"] });
+    },
+    onError: async (error: any, variables) => {
+      const { id } = variables;
+      if (error.response && error.response.status === 409) {
+        const latest: AttributeDto = await queryClient.fetchQuery({
+          queryKey: ["attribute", id],
+          queryFn: () => fetchAttributeById(id),
+        });
+        conflictHandler(latest);
+        queryClient.invalidateQueries({ queryKey: ["attributes"] });
+      }
     },
   });
 };

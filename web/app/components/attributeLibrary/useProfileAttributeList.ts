@@ -26,16 +26,10 @@ function getDefaultValueForType(typeName: string): any {
 
 export function useProfileAttributeList() {
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const [activeTab, setActiveTab] = useState<string | null>("all");
 
-  const [page, setPage] = useState(1);
-
-  useEffect(() => {
-    setPage(1);
-  }, [search, activeTab]);
-
-  const { data, isLoading } =
-    useAttributes(search, page, 10);
+  const { data, isLoading } = useAttributes(search, page, 10);
 
   const { data: profileAttributesData } = useProfileAttributes();
   const { mutate: addToProfile, isPending: isAdding } =
@@ -52,8 +46,6 @@ export function useProfileAttributeList() {
   const attributes = useMemo(() => {
     return data?.data || [];
   }, [data]);
-
-  const totalPages = data?.totalPages || 1;
 
   const filteredAttributes = useMemo(() => {
     if (!activeTab || activeTab === "all") return attributes;
@@ -143,10 +135,10 @@ export function useProfileAttributeList() {
     setSearch,
     activeTab,
     setActiveTab,
-    isLoading,
     page,
     setPage,
-    totalPages,
+    totalPages: data?.totalPages || 1,
+    isLoading,
     categories,
     filteredAttributes,
     profileAttributeMap,

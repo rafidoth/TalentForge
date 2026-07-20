@@ -3,10 +3,14 @@ import { useState } from "react";
 import { BaseAttributeList } from "~/components/attributeLibrary/BaseAttributeList";
 import { AttributeForm } from "~/components/attributeLibrary/AttributeForm";
 import type { AttributeDto } from "~/api/types";
+import { useAttributes } from "~/components/attributeLibrary/useAttributes";
+import { useAttributeStore } from "~/store/attributeStore";
 
 export default function AttributeLibraryPage() {
     const [view, setView] = useState<"list" | "create" | "edit">("list");
     const [editingAttribute, setEditingAttribute] = useState<AttributeDto | null>(null);
+    const { search, page } = useAttributeStore();
+    const { data: attributes, isLoading } = useAttributes(search, page, 10);
 
     const handleCreate = () => {
         setEditingAttribute(null);
@@ -23,6 +27,7 @@ export default function AttributeLibraryPage() {
         setEditingAttribute(null);
     };
 
+
     return (
         <Container size="xl" py="xl">
             {view === "list" ? (
@@ -30,6 +35,8 @@ export default function AttributeLibraryPage() {
                     mode="global"
                     onCreate={handleCreate}
                     onEdit={handleEdit}
+                    attributesData={attributes}
+                    attributesLoading={isLoading}
                 />
             ) : (
                 <AttributeForm

@@ -1,9 +1,8 @@
 import { Modal, Text } from "@mantine/core";
-import { useState } from "react";
 import { BaseAttributeList } from "./BaseAttributeList";
 import { ProfileAttributeList } from "./ProfileAttributeList";
-import { AttributeForm } from "./AttributeForm";
-import type { AttributeDto } from "../../api/types";
+import { useAttributes } from "./useAttributes";
+import { useAttributeStore } from "~/store/attributeStore";
 
 export interface AttributeLibraryModalProps {
   opened: boolean;
@@ -11,61 +10,33 @@ export interface AttributeLibraryModalProps {
   positionId?: string;
 }
 
+function PositionAttributeList({ positionId }: { positionId: string }) {
+  const { search, page } = useAttributeStore();
+  const { data: attributesData, isLoading: attributesLoading } = useAttributes(search, page, 10);
+
+  return (
+    <BaseAttributeList
+      mode="position"
+      positionId={positionId}
+      attributesData={attributesData}
+      attributesLoading={attributesLoading}
+    />
+  );
+}
+
 export function AttributeLibraryModal({
   opened,
   onClose,
   positionId,
 }: AttributeLibraryModalProps) {
-  const [view, setView] = useState<"list" | "create" | "edit">("list");
-  const [editingAttribute, setEditingAttribute] = useState<AttributeDto | null>(
-    null,
-  );
 
   const handleClose = () => {
-    setView("list");
-    setEditingAttribute(null);
     onClose();
-  };
-
-  const handleEdit = (attribute: AttributeDto) => {
-    setEditingAttribute(attribute);
-    setView("edit");
-  };
-
-  const handleCreate = () => {
-    setEditingAttribute(null);
-    setView("create");
-  };
-
-  const handleBackToList = () => {
-    setView("list");
-    setEditingAttribute(null);
-  };
-
-  const renderFormView = () => {
-    if (!positionId) {
-      return <Text>No Attributes found</Text>;
-    }
-    return (
-      <AttributeForm
-        key={editingAttribute?.id ?? "new"}
-        attribute={editingAttribute}
-        onCancel={handleBackToList}
-        onSuccess={handleBackToList}
-      />
-    );
   };
 
   const renderListView = () => {
     if (positionId) {
-      return (
-        <BaseAttributeList
-          mode="position"
-          positionId={positionId}
-          onCreate={handleCreate}
-          onEdit={handleEdit}
-        />
-      );
+      return <PositionAttributeList positionId={positionId} />;
     }
     return <ProfileAttributeList />;
   };
@@ -78,7 +49,7 @@ export function AttributeLibraryModal({
       size="70%"
       padding="lg"
     >
-      {view === "list" ? renderListView() : renderFormView()}
+      {renderListView()}
     </Modal>
   );
 }
