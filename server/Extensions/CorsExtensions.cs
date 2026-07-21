@@ -2,13 +2,15 @@ namespace server.Extensions
 {
     public static class CorsExtensions
     {
-        public static IServiceCollection AddCorsPolicy(this IServiceCollection services)
+        public static IServiceCollection AddCorsPolicy(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddCors(options =>
             {
+                var clientUrl = configuration["ClientUrl"] ?? throw new ArgumentException(
+                                        "Client URL is not configured.");
                 options.AddPolicy("AllowFrontend", policy =>
                 {
-                    policy.WithOrigins("http://localhost:5173")
+                    policy.WithOrigins(clientUrl)
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials();

@@ -1,4 +1,4 @@
-import { Box, SimpleGrid, Title } from '@mantine/core';
+import { Box, MantineProvider, SimpleGrid, Title } from '@mantine/core';
 import React from 'react';
 
 interface AuthLayoutProps {
@@ -118,7 +118,6 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           </Title>
         </Box>
 
-        {/* Right Side: Form Content */}
         <Box
           style={{
             display: "flex",
@@ -128,7 +127,9 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           }}
           py={40}
         >
-          {children}
+          <MantineProvider forceColorScheme="light">
+            {children}
+          </MantineProvider>
         </Box>
       </SimpleGrid>
     </Box>

@@ -8,7 +8,7 @@ builder.Services.AddDatabase(builder.Configuration)
                 .AddApplicationServices()
                 .AddIdentityHandlersAndStores()
                 .AddIdentityAuth(builder.Configuration)
-                .AddCorsPolicy()
+                .AddCorsPolicy(builder.Configuration)
                 .AddApiDoc();
 
 builder.Services.AddControllers();
