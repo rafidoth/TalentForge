@@ -1,5 +1,12 @@
-import { Select, Textarea, TextInput, NumberInput, Checkbox, Group } from '@mantine/core';
 import type { DropdownOptionDto } from '~/api/types';
+import { ProfileAttributeInputDropdown } from './ProfileAttributeInputDropdown';
+import { ProfileAttributeInputTextarea } from './ProfileAttributeInputTextarea';
+import { ProfileAttributeInputNumeric } from './ProfileAttributeInputNumeric';
+import { ProfileAttributeInputBoolean } from './ProfileAttributeInputBoolean';
+import { ProfileAttributeInputDate } from './ProfileAttributeInputDate';
+import { ProfileAttributeInputPeriod } from './ProfileAttributeInputPeriod';
+import { ProfileAttributeInputText } from './ProfileAttributeInputText';
+import { ProfileAttributeInputImage } from './ProfileAttributeInputImage';
 
 export interface AttributeDef {
     id: string;
@@ -8,107 +15,46 @@ export interface AttributeDef {
     dropdownOptions: DropdownOptionDto[] | null;
 }
 
-interface ProfileAttributeInputProps {
+export interface ProfileAttributeInputProps {
     attribute: AttributeDef;
     value: any;
     onChange: (id: string, value: any) => void;
 }
 
-export function ProfileAttributeInput({ attribute, value, onChange }: ProfileAttributeInputProps) {
-    const handleChange = (val: any) => onChange(attribute.id, val);
-
+export function ProfileAttributeInput(props: ProfileAttributeInputProps) {
+    const { attribute } = props;
     const isDropdown = attribute.dropdownOptions && attribute.dropdownOptions.length > 0;
 
     if (isDropdown) {
-        return (
-            <Select
-                label={attribute.attributeName}
-                data={attribute.dropdownOptions!.map(opt => ({ value: opt.id, label: opt.label }))}
-                value={value}
-                onChange={(val) => handleChange(val || '')}
-                searchable
-                clearable
-            />
-        );
+        return <ProfileAttributeInputDropdown {...props} />;
     }
     
     const typeNameLower = attribute.typeName.toLowerCase();
 
+    if (typeNameLower.includes('image')) {
+        return <ProfileAttributeInputImage {...props} />;
+    }
+
     if (typeNameLower.includes('text') && attribute.attributeName.toLowerCase().includes('description')) {
-        return (
-            <Textarea
-                label={attribute.attributeName}
-                value={value || ''}
-                onChange={(e) => handleChange(e.target.value)}
-                minRows={3}
-            />
-        );
+        return <ProfileAttributeInputTextarea {...props} />;
     }
 
     if (typeNameLower.includes('numeric')) {
-        return (
-            <NumberInput
-                label={attribute.attributeName}
-                value={value === '' ? '' : value}
-                onChange={handleChange}
-            />
-        );
+        return <ProfileAttributeInputNumeric {...props} />;
     }
 
     if (typeNameLower.includes('boolean')) {
-        return (
-            <Checkbox
-                label={attribute.attributeName}
-                checked={!!value}
-                onChange={(e) => handleChange(e.currentTarget.checked)}
-                mt="md"
-            />
-        );
+        return <ProfileAttributeInputBoolean {...props} />;
     }
 
     if (typeNameLower.includes('date')) {
-        return (
-            <TextInput
-                type="date"
-                label={attribute.attributeName}
-                value={value || ''}
-                onChange={(e) => handleChange(e.currentTarget.value)}
-            />
-        );
+        return <ProfileAttributeInputDate {...props} />;
     }
 
     if (typeNameLower.includes('period')) {
-        return (
-            <Group grow align="flex-start">
-                <TextInput 
-                    type="date" 
-                    label={`${attribute.attributeName} (Start)`}
-                    value={value?.[0] || ''} 
-                    onChange={(e) => {
-                        const arr = Array.isArray(value) ? [...value] : ['', ''];
-                        arr[0] = e.currentTarget.value;
-                        handleChange(arr);
-                    }} 
-                />
-                <TextInput 
-                    type="date" 
-                    label={`${attribute.attributeName} (End)`}
-                    value={value?.[1] || ''} 
-                    onChange={(e) => {
-                        const arr = Array.isArray(value) ? [...value] : ['', ''];
-                        arr[1] = e.currentTarget.value;
-                        handleChange(arr);
-                    }} 
-                />
-            </Group>
-        );
+        return <ProfileAttributeInputPeriod {...props} />;
     }
 
-    return (
-        <TextInput
-            label={attribute.attributeName}
-            value={value || ''}
-            onChange={(e) => handleChange(e.target.value)}
-        />
-    );
+    // Default
+    return <ProfileAttributeInputText {...props} />;
 }
