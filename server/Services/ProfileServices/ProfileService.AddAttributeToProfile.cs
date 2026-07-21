@@ -40,7 +40,8 @@ namespace server.Services.ProfileServices
                     ValidateOneToManyValue(value, attribute);
                     break;
                 default:
-                    throw new Exception($"Unsupported attribute type '{attribute.Type.Name}' for attribute '{attribute.Name}'.");
+                    ValidateStringRelatedTypes(value, attribute);
+                    break;
             }
         }
 
