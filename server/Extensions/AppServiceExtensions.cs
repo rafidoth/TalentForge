@@ -7,6 +7,7 @@ using server.Services.ProjectsServices;
 using server.Services.TagsServices;
 using server.Services.UserServices;
 using server.Services.CvServices;
+using server.Services.CloudinaryServices;
 using server.Utils;
 
 namespace server.Extensions
@@ -27,6 +28,7 @@ namespace server.Extensions
             services.AddScoped<IProjectsService, ProjectsService>();
             services.AddScoped<ITagsService, TagsService>();
             services.AddScoped<ICvService, CvService>();
+            services.AddScoped<ICloudinaryService, CloudinaryService>();
             return services;
         }
     }

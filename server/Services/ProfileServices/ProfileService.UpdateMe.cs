@@ -47,6 +47,7 @@ namespace server.Services.ProfileServices
 
         private void UpdateProfileAttributeValue(ProfileAttribute profileAttribute, JsonElement newValue, uint existingVersion)
         {
+            CleanupOldCloudinaryImage(profileAttribute, newValue);
             profileAttribute.Value = newValue;
             profileAttribute.UpdatedAt = DateTime.UtcNow;
 
@@ -57,6 +58,7 @@ namespace server.Services.ProfileServices
         {
             var profileAttributes = await db.ProfileAttributes
                 .Include(pa => pa.Attribute)
+                    .ThenInclude(a => a.Type)
                 .Where(pa => pa.UserId == userId && profileAttributeIds.Contains(pa.Id))
                 .ToListAsync();
 

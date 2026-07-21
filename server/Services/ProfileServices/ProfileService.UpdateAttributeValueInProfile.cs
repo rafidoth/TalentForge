@@ -29,6 +29,7 @@ namespace server.Services.ProfileServices
         )
         {
             ValidateAttributeValueType(pa.Attribute, dto.Value);
+            CleanupOldCloudinaryImage(pa, dto.Value);
             UpdateProfileAttributeFields(pa, dto);
             await db.SaveChangesAsync();
         }

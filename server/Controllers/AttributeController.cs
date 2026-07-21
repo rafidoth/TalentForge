@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using server.Data;
 using server.Dto;
 using server.Services.AttributeLibraryServices;
+using Microsoft.AspNetCore.Identity;
+using server.Entities;
+using server.Services.CloudinaryServices;
 
 namespace server.Controllers;
 
@@ -62,5 +65,23 @@ public class AttributeController(IAttributeService attributeService) : Controlle
     {
         var results = await attributeService.SearchAsync(dto);
         return Ok(results);
+    }
+
+    [HttpGet("image/upload")]
+    public IActionResult GetImageUploadSignature(
+        [FromQuery] string attributeName,
+        [FromQuery] string? folder = "talentforge_attributes",
+        [FromServices] ICloudinaryService cloudinaryService = null!,
+        [FromServices] UserManager<ApplicationUser> userManager = null!
+    )
+    {
+        var user = userManager.GetUserAsync(User).Result;
+        var userId = user!.Id;
+        var sanitizedAttr = System.Text.RegularExpressions.Regex.Replace(attributeName ?? "attr", @"[^a-zA-Z0-9_-]", "_");
+        var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        var publicId = $"{userId}_{sanitizedAttr}_{timestamp}";
+
+        var signatureData = cloudinaryService.GenerateSignature(publicId, folder ?? "talentforge_attributes");
+        return Ok(signatureData);
     }
 }
