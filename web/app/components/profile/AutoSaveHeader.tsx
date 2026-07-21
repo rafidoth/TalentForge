@@ -1,4 +1,4 @@
-import { Group, Title, Transition, Tooltip, ActionIcon } from '@mantine/core';
+import { Group, Title, Transition, Tooltip, ActionIcon, Button } from '@mantine/core';
 import { CheckCircleIcon, CheckIcon, SpinnerGapIcon, WarningCircleIcon } from '@phosphor-icons/react';
 import React from 'react';
 
@@ -62,17 +62,17 @@ export function AutoSaveHeader({
 
                 {hasChanges && (
                     <Tooltip label="Save changes" withArrow position="bottom">
-                        <ActionIcon
+                        <Button
                             onClick={onSave}
                             disabled={isPending}
                             loading={isPending}
-                            variant="outline"
+                            variant="subtle"
                             radius="xl"
                             color="myColor"
                             size="sm"
                         >
-                            <CheckIcon size={16} weight="bold" />
-                        </ActionIcon>
+                            Save Changes
+                        </Button>
                     </Tooltip>
                 )}
             </Group>

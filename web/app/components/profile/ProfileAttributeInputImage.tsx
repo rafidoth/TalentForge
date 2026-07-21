@@ -3,11 +3,13 @@ import {
     Stack,
     Image,
     Text,
-    FileInput,
     Progress,
     Alert,
-    Group,
     Button,
+    FileButton,
+    Box,
+    Overlay,
+    Center,
 } from "@mantine/core";
 import {
     UploadSimpleIcon,
@@ -17,7 +19,7 @@ import {
 import type { AttributeDef } from "./ProfileAttributeInput";
 import { useCloudinaryUpload } from "~/hooks/useCloudinaryUpload";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 interface Props {
@@ -87,29 +89,41 @@ export function ProfileAttributeInputImage({
                 {attribute.attributeName}
             </Text>
 
-            {displayUrl && (
-                <Group align="flex-start" gap="md">
-                    <Image
-                        src={displayUrl}
-                        alt={attribute.attributeName}
-                        w={120}
-                        h={120}
-                        radius="md"
-                        fit="cover"
-                        fallbackSrc="https://placehold.co/120x120?text=No+Image"
-                    />
-                </Group>
-            )}
-
-            <FileInput
-                leftSection={<ImageIcon size={16} />}
-                placeholder="Choose image to replace..."
-                accept={ALLOWED_TYPES.join(",")}
-                value={selectedFile}
-                onChange={handleFileSelect}
-                disabled={isUploading}
-                clearable
-            />
+            <FileButton onChange={handleFileSelect} accept={ALLOWED_TYPES.join(",")} disabled={isUploading}>
+                {(props) => (
+                    <Box
+                        {...props}
+                        pos="relative"
+                        w="100%"
+                        maw={100}
+                        h={100}
+                        style={{
+                            cursor: isUploading ? "not-allowed" : "pointer",
+                            borderRadius: "var(--mantine-radius-md)",
+                            overflow: "hidden",
+                            backgroundColor: "var(--mantine-color-gray-1)",
+                        }}
+                    >
+                        <Image
+                            src={displayUrl}
+                            alt={attribute.attributeName}
+                            w="100%"
+                            h="100%"
+                            fit="cover"
+                            fallbackSrc="https://placehold.co/300x200?text=Upload+Image"
+                        />
+                        <Overlay color="#000" backgroundOpacity={0.5} zIndex={1} />
+                        <Center pos="absolute" top={0} left={0} right={0} bottom={0} >
+                            <Stack align="center" gap={4}>
+                                <ImageIcon size={32} color="white" opacity={0.8} />
+                                <Text c="white" size="sm" fw={500} ta="center">
+                                    Click to replace image
+                                </Text>
+                            </Stack>
+                        </Center>
+                    </Box>
+                )}
+            </FileButton>
 
             {validationError && (
                 <Alert color="red" variant="light" icon={<WarningCircleIcon size={16} />}>
