@@ -21,7 +21,7 @@ export function MeSectionEditor({ attributes = [] }: MeSectionEditorProps) {
     } = useProfileAutoSave({ attributes, mutate });
 
     return (
-        <Paper p="xl">
+        <Paper >
             <AutoSaveHeader
                 title="Me"
                 icon={<UserIcon size={20} />}

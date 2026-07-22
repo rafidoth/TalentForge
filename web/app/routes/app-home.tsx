@@ -11,7 +11,7 @@ export default function AppHome() {
 
   return (
     <Container size="xl" py="xl">
-      <Paper withBorder={false} p="md" radius="md">
+      <Paper withBorder={false} radius="md">
         <Title order={4} mb="md">Latest Positions</Title>
 
         <Table.ScrollContainer minWidth={500}>

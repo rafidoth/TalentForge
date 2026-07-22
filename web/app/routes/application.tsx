@@ -14,7 +14,6 @@ export default function Application() {
     return (
         <AppShell
             header={{ height: 60 }}
-            padding="md"
         >
             <AppHeader opened={opened} toggle={toggle} />
             <AppShell.Main>

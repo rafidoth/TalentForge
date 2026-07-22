@@ -26,7 +26,7 @@ export function ProfileInfoSection() {
 
     return (
         <>
-            <Paper p="xl" withBorder={false} shadow="none">
+            <Paper withBorder={false} shadow="none">
                 <Group justify="space-between" mb="md">
                     <Group gap="sm">
                         <ThemeIcon variant="light" size="lg" radius="md" color="myColor">
