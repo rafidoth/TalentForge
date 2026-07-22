@@ -16,33 +16,13 @@ import {
 import { IdentificationCardIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react';
 import { AttributeLibraryModal } from '~/components/attributeLibrary';
 import { useProfileAttributes, useDeleteProfileAttribute } from '~/components/attributeLibrary/useProfileAttributes';
+import { ProfileInfoSectionAttributeValueDisplay } from './ProfileInfoSectionAttributeValueDisplay';
+import type { ProfileAttributeDto } from '~/api/types';
 
 export function ProfileInfoSection() {
     const [attributeLibraryOpened, setAttributeLibraryOpened] = useState(false);
     const { data: profileAttributes, isLoading: isLoadingAttributes } = useProfileAttributes();
     const { mutate: removeAttribute, isPending: isRemovingAttribute } = useDeleteProfileAttribute();
-
-    const formatValue = (value: any, typeName: string): string => {
-        if (value === null || value === undefined || value === '') return '—';
-        const name = typeName.toLowerCase();
-        if (name.includes('boolean')) {
-            return value === true || value === 'true' ? 'Yes' : 'No';
-        }
-        if (name.includes('period') && Array.isArray(value)) {
-            return `${value[0]} → ${value[1]}`;
-        }
-        if (name.includes('one') && Array.isArray(value)) {
-            return value.join(', ') || '—';
-        }
-        if (typeof value === 'object') {
-            try {
-                return JSON.stringify(value);
-            } catch {
-                return String(value);
-            }
-        }
-        return String(value);
-    };
 
     return (
         <>
@@ -79,10 +59,10 @@ export function ProfileInfoSection() {
                     </Center>
                 ) : (
                     <SimpleGrid cols={{ base: 1, xs: 2, sm: 2, md: 3 }} spacing="md">
-                        {profileAttributes.map((attr: any) => (
+                        {profileAttributes.map((attr: ProfileAttributeDto) => (
                             <Paper
                                 key={attr.id}
-                                withBorder
+                                shadow="md"
                                 p="md"
                                 radius="md"
                                 style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
@@ -106,9 +86,7 @@ export function ProfileInfoSection() {
                                     </ActionIcon>
                                 </Group>
 
-                                <Text size="xl" fw={500} mt="xs" c={formatValue(attr.value, attr.typeName) === '—' ? 'red' : undefined}>
-                                    {formatValue(attr.value, attr.typeName)}
-                                </Text>
+                                <ProfileInfoSectionAttributeValueDisplay value={attr.value} dropdownOptions={attr.dropdownOptions} typeName={attr.typeName} />
                             </Paper>
                         ))}
                     </SimpleGrid>

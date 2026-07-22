@@ -28,7 +28,7 @@ export function ProfileAttributeInput(props: ProfileAttributeInputProps) {
     if (isDropdown) {
         return <ProfileAttributeInputDropdown {...props} />;
     }
-    
+
     const typeNameLower = attribute.typeName.toLowerCase();
 
     if (typeNameLower.includes('image')) {
@@ -55,6 +55,5 @@ export function ProfileAttributeInput(props: ProfileAttributeInputProps) {
         return <ProfileAttributeInputPeriod {...props} />;
     }
 
-    // Default
     return <ProfileAttributeInputText {...props} />;
 }

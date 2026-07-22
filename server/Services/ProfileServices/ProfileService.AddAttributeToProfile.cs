@@ -36,9 +36,6 @@ namespace server.Services.ProfileServices
                 case AttributeTypes.Period:
                     ValidatePeriodValue(value, attribute);
                     break;
-                case AttributeTypes.OneToMany:
-                    ValidateOneToManyValue(value, attribute);
-                    break;
                 default:
                     ValidateStringRelatedTypes(value, attribute);
                     break;
@@ -51,6 +48,7 @@ namespace server.Services.ProfileServices
                 AttributeTypes.String,
                 AttributeTypes.Text,
                 AttributeTypes.Image,
+                AttributeTypes.OneToMany,
             };
 
             if (stringRelatedTypes.Contains(attribute.Type!.Name))
@@ -104,17 +102,6 @@ namespace server.Services.ProfileServices
                 throw new Exception($"Invalid period for attribute '{attribute.Name}'. Start date must be before or equal to end date.");
         }
 
-        private void ValidateOneToManyValue(JsonElement value, AppAttribute attribute)
-        {
-            if (value.ValueKind != JsonValueKind.Array)
-                throw new Exception($"Invalid value type for attribute '{attribute.Name}'. Expected an array of strings representing the selected options.");
-
-            foreach (var item in value.EnumerateArray())
-            {
-                if (item.ValueKind != JsonValueKind.String)
-                    throw new Exception($"Invalid value type for attribute '{attribute.Name}'. Expected all items in the array to be strings.");
-            }
-        }
 
     }
 }

@@ -48,8 +48,6 @@ namespace server.Controllers
             return Ok(new { message = "Attribute added to profile successfully." });
         }
 
-
-
         [HttpPut("attributes")]
         public async Task<IActionResult> UpdateAttributeValueInProfile(UpdateProfileAttributeValueDto dto)
         {

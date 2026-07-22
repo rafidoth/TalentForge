@@ -1,19 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
     Stack,
-    Image,
     Text,
     Progress,
     Alert,
     Button,
-    FileButton,
-    Box,
-    Overlay,
     Center,
 } from "@mantine/core";
 import {
     UploadSimpleIcon,
-    ImageIcon,
+    CameraIcon,
     WarningCircleIcon,
 } from "@phosphor-icons/react";
 import type { AttributeDef } from "./ProfileAttributeInput";
@@ -21,6 +17,7 @@ import { useCloudinaryUpload } from "~/hooks/useCloudinaryUpload";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const FALLBACK_IMAGE = "https://placehold.co/120x120?text=No+Image";
 
 interface Props {
     attribute: AttributeDef;
@@ -36,6 +33,7 @@ export function ProfileAttributeInputImage({
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [validationError, setValidationError] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const { upload, isUploading, error: uploadError } =
         useCloudinaryUpload(attribute.attributeName);
@@ -81,7 +79,8 @@ export function ProfileAttributeInputImage({
     };
 
     const currentImageUrl = typeof value === "string" && value.length > 0 ? value : null;
-    const displayUrl = previewUrl || currentImageUrl;
+    const hasRealImage = Boolean(previewUrl || currentImageUrl);
+    const displayUrl = previewUrl || currentImageUrl || FALLBACK_IMAGE;
 
     return (
         <Stack gap="sm">
@@ -89,41 +88,60 @@ export function ProfileAttributeInputImage({
                 {attribute.attributeName}
             </Text>
 
-            <FileButton onChange={handleFileSelect} accept={ALLOWED_TYPES.join(",")} disabled={isUploading}>
-                {(props) => (
-                    <Box
-                        {...props}
-                        pos="relative"
-                        w="100%"
-                        maw={100}
-                        h={100}
-                        style={{
-                            cursor: isUploading ? "not-allowed" : "pointer",
-                            borderRadius: "var(--mantine-radius-md)",
-                            overflow: "hidden",
-                            backgroundColor: "var(--mantine-color-gray-1)",
-                        }}
-                    >
-                        <Image
-                            src={displayUrl}
-                            alt={attribute.attributeName}
-                            w="100%"
-                            h="100%"
-                            fit="cover"
-                            fallbackSrc="https://placehold.co/300x200?text=Upload+Image"
-                        />
-                        <Overlay color="#000" backgroundOpacity={0.5} zIndex={1} />
-                        <Center pos="absolute" top={0} left={0} right={0} bottom={0} >
-                            <Stack align="center" gap={4}>
-                                <ImageIcon size={32} color="white" opacity={0.8} />
-                                <Text c="white" size="sm" fw={500} ta="center">
-                                    Click to replace image
-                                </Text>
-                            </Stack>
-                        </Center>
-                    </Box>
+            <div
+                onClick={() => !isUploading && fileInputRef.current?.click()}
+                style={{
+                    position: "relative",
+                    width: 120,
+                    height: 120,
+                    borderRadius: 12,
+                    overflow: "hidden",
+                    cursor: isUploading ? "default" : "pointer",
+                    border: hasRealImage ? "none" : "1px dashed var(--mantine-color-gray-4)",
+                }}
+            >
+                <img
+                    src={displayUrl}
+                    alt={attribute.attributeName}
+                    style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        display: "block",
+                        opacity: hasRealImage ? 1 : 0.5,
+                    }}
+                />
+
+                {hasRealImage ? (
+                    <Center className="image-hover-overlay" style={overlayStyle(true)}>
+                        <CameraIcon size={20} />
+                        <Text size="xs" fw={500} c="white">
+                            Click to replace photo
+                        </Text>
+                    </Center>
+                ) : (
+                    <Center style={overlayStyle(false)}>
+                        <UploadSimpleIcon size={20} />
+                        <Text size="xs" fw={500} c="dimmed">
+                            Upload photo
+                        </Text>
+                    </Center>
                 )}
-            </FileButton>
+
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept={ALLOWED_TYPES.join(",")}
+                    onChange={(e) => handleFileSelect(e.currentTarget.files?.[0] ?? null)}
+                    disabled={isUploading}
+                    style={{ display: "none" }}
+                />
+            </div>
+
+            <style>{`
+                .image-hover-overlay { opacity: 0; transition: opacity 0.15s ease; }
+                div:hover > .image-hover-overlay { opacity: 1; }
+            `}</style>
 
             {validationError && (
                 <Alert color="red" variant="light" icon={<WarningCircleIcon size={16} />}>
@@ -146,9 +164,23 @@ export function ProfileAttributeInputImage({
                     variant="light"
                     size="sm"
                 >
-                    Upload Image
+                    Upload image
                 </Button>
             )}
         </Stack>
     );
+}
+
+function overlayStyle(darkBg: boolean): React.CSSProperties {
+    return {
+        position: "absolute",
+        inset: 0,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 6,
+        background: darkBg ? "rgba(0,0,0,0.55)" : "transparent",
+        pointerEvents: "none",
+    };
 }

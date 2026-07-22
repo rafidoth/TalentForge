@@ -1,5 +1,5 @@
 import { TextInput, Group, Stack, Loader, Text, Center, Box, Title, Select, ActionIcon, Tooltip, Button, Pagination } from "@mantine/core";
-import { Plus, PencilSimpleIcon, TrashIcon, PlusCircle, MinusCircleIcon, MagnifyingGlassIcon } from "@phosphor-icons/react";
+import { PlusIcon, PencilSimpleIcon, TrashIcon, MinusCircleIcon, MagnifyingGlassIcon } from "@phosphor-icons/react";
 import { useState, useMemo, useEffect } from "react";
 import { useAttributes, usePositionAttributes, useAddPositionAttribute, useRemovePositionAttribute, useDeleteAttribute } from "./useAttributes";
 import { AttributeLibraryTable } from "./AttributeLibraryTable";
@@ -228,7 +228,7 @@ export function BaseAttributeList({ attributesData, attributesLoading, mode, pos
               <>
                 <Tooltip label="New Attribute" withArrow>
                   <ActionIcon variant="light" size="lg" color="gray" onClick={onCreate} disabled={!onCreate}>
-                    <Plus size={20} />
+                    <PlusIcon size={20} />
                   </ActionIcon>
                 </Tooltip>
 
@@ -270,7 +270,7 @@ export function BaseAttributeList({ attributesData, attributesLoading, mode, pos
                     onClick={handleBulkAdd}
                     loading={isAddingBulk}
                   >
-                    <PlusCircle size={20} />
+                    <PlusIcon size={20} />
                   </ActionIcon>
                 </Tooltip>
 

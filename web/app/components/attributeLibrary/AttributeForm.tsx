@@ -1,5 +1,6 @@
 import { TextInput, Text, Select, Button, Group, Stack, Textarea, Title, Modal, Box, Alert, Badge } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { DropdownOptionsEditor } from './DropdownOptionsEditor';
 import type { AttributeDto, CreateAttributeDto, UpdateAttributeDto } from "../../api/types";
 import { useCreateAttribute, useUpdateAttribute, useAttributeTypesAndCategories } from "./useAttributes";
 import { useState } from "react";
@@ -30,6 +31,7 @@ export function AttributeForm({ attribute, onCancel, onSuccess }: AttributeFormP
       typeId: attribute?.typeId?.toString() || "",
       value: "",
       description: "",
+      dropdownOptions: attribute?.dropdownOptions?.map(o => o.label) || [],
     },
     validate: {
       name: (value) => (value.trim().length > 0 ? null : "Name is required"),
@@ -40,12 +42,16 @@ export function AttributeForm({ attribute, onCancel, onSuccess }: AttributeFormP
 
 
 
+  const selectedType = typesAndCategories?.types.find(t => t.id.toString() === form.values.typeId);
+  const isDropdownType = selectedType?.name.toLowerCase() === 'one of many';
+
   const handleSubmit = (values: typeof form.values) => {
     if (isEditing) {
       const dto: UpdateAttributeDto = {
         name: values.name,
         categoryId: parseInt(values.categoryId),
         typeId: parseInt(values.typeId),
+        dropdownOptions: isDropdownType ? values.dropdownOptions : null,
         version: attribute.version,
       };
       updateAttribute(
@@ -59,6 +65,7 @@ export function AttributeForm({ attribute, onCancel, onSuccess }: AttributeFormP
         typeId: parseInt(values.typeId),
         value: values.value,
         description: values.description,
+        dropdownOptions: isDropdownType ? values.dropdownOptions : null,
       };
       createAttribute(dto, { onSuccess });
     }
@@ -119,6 +126,12 @@ export function AttributeForm({ attribute, onCancel, onSuccess }: AttributeFormP
             </>
           )}
 
+          {isDropdownType && (
+            <DropdownOptionsEditor 
+              {...form.getInputProps("dropdownOptions")} 
+            />
+          )}
+
           <Group justify="flex-end" mt="md">
             <Button variant="default" onClick={onCancel}>
               Cancel
@@ -162,7 +175,12 @@ export function AttributeForm({ attribute, onCancel, onSuccess }: AttributeFormP
                   <b>Description:</b> Changed from <Text span c="dimmed">"{attribute?.description || 'N/A'}"</Text> to <Text span fw={600}>"{conflict?.description || 'N/A'}"</Text>
                 </Text>
               )}
-              {conflict?.name === attribute?.name && conflict?.categoryId === attribute?.categoryId && conflict?.typeId === attribute?.typeId && conflict?.description === attribute?.description && (
+              {conflict?.dropdownOptions && JSON.stringify(conflict.dropdownOptions) !== JSON.stringify(attribute?.dropdownOptions) && (
+                <Text size="sm">
+                  <b>Dropdown Options:</b> Options were modified.
+                </Text>
+              )}
+              {conflict?.name === attribute?.name && conflict?.categoryId === attribute?.categoryId && conflict?.typeId === attribute?.typeId && conflict?.description === attribute?.description && JSON.stringify(conflict?.dropdownOptions) === JSON.stringify(attribute?.dropdownOptions) && (
                 <Text size="sm" c="dimmed">They only updated background details, none of the text fields were changed.</Text>
               )}
             </Stack>
@@ -181,6 +199,7 @@ export function AttributeForm({ attribute, onCancel, onSuccess }: AttributeFormP
                   name: form.values.name,
                   categoryId: parseInt(form.values.categoryId),
                   typeId: parseInt(form.values.typeId),
+                  dropdownOptions: isDropdownType ? form.values.dropdownOptions : null,
                   version: conflict.version,
                 };
                 updateAttribute(
