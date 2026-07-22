@@ -186,7 +186,7 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
 
     public async Task<PagedResponse<AttributeDto>> SearchAsync(AttributeSearchQueryDto dto)
     {
-        var query = BuildSearchQuery(dto.Prefix, dto.CategoryId);
+        var query = BuildSearchQuery(dto);
         var result = await PagedResponse.CreateAsync(
             query,
             dto.Page,
@@ -194,17 +194,38 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
             maxPageSize: 50
         );
         return result;
-
     }
 
-    private IQueryable<AttributeDto> BuildSearchQuery(string? prefix, int? categoryId)
+    private IQueryable<AttributeDto> BuildSearchQuery(AttributeSearchQueryDto dto)
     {
-        var query = db.Attributes
+        var baseQuery = GetBaseAttributeQuery();
+        var filteredQuery = AddSearchFilters(baseQuery, dto.Prefix, dto.CategoryId);
+        var sortedQuery = ApplySorting(filteredQuery, dto.Recent);
+        return MapQueryToAttributeDto(sortedQuery);
+    }
+
+    private IQueryable<AppAttribute> GetBaseAttributeQuery()
+    {
+        return db.Attributes
             .Include(a => a.Type)
             .Include(a => a.Category)
             .Include(a => a.DropdownOptions);
-        var mappedQuery = MapQueryToAttributeDto(query);
-        return AddSearchFilters(mappedQuery, prefix, categoryId);
+    }
+
+    private IQueryable<AppAttribute> AddSearchFilters(IQueryable<AppAttribute> query, string? prefix, int? categoryId)
+    {
+        if (!string.IsNullOrWhiteSpace(prefix))
+            query = query.Where(a => a.Name.ToLower().StartsWith(prefix.ToLower()));
+        if (categoryId.HasValue)
+            query = query.Where(a => a.CategoryId == categoryId.Value);
+        return query;
+    }
+
+    private IQueryable<AppAttribute> ApplySorting(IQueryable<AppAttribute> query, bool recent)
+    {
+        if (recent)
+            return query.OrderByDescending(a => a.CreatedAt).ThenByDescending(a => a.Id);
+        return query;
     }
 
     private IQueryable<AttributeDto> MapQueryToAttributeDto(IQueryable<AppAttribute> query)
@@ -225,15 +246,6 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
             Version = db.Entry(a).Property<uint>("Version").CurrentValue
         });
         return q;
-    }
-
-    private IQueryable<AttributeDto> AddSearchFilters(IQueryable<AttributeDto> query, string? prefix, int? categoryId)
-    {
-        if (!string.IsNullOrEmpty(prefix))
-            query = query.Where(a => a.Name.StartsWith(prefix));
-        if (categoryId.HasValue)
-            query = query.Where(a => a.CategoryId == categoryId);
-        return query;
     }
 
     public async Task<List<AttributeCategoryDto>> GetCategoriesAsync()

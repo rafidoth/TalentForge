@@ -20,6 +20,8 @@ export async function fetchAttributeTypesAndCategories(): Promise<TypesAndCatego
 
 export async function fetchAttributes(
     search?: string,
+    categoryId?: number | null,
+    recent: boolean = false,
     page: number = 1,
     pageSize: number = 20
 ): Promise<PaginatedResponse<AttributeDto>> {
@@ -28,6 +30,8 @@ export async function fetchAttributes(
         pageSize: pageSize.toString()
     });
     if (search) params.append("prefix", search);
+    if (categoryId !== undefined && categoryId !== null) params.append("categoryId", categoryId.toString());
+    if (recent) params.append("recent", "true");
 
     const res = await api.get(`/attributes?${params.toString()}`);
     return res.data;

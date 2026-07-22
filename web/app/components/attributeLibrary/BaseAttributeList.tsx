@@ -46,14 +46,8 @@ export function BaseAttributeList({ attributesData, attributesLoading, mode, pos
   }, [attributesData]);
 
   const filteredAttributes = useMemo(() => {
-    let filtered = attributes;
-    if (activeTab === "recent") {
-      filtered = attributes.slice(0, 5);
-    } else if (activeTab && activeTab !== "all") {
-      filtered = attributes.filter(attr => attr.categoryName === activeTab);
-    }
-    return filtered.filter(a => !a.isBuiltin);
-  }, [attributes, activeTab]);
+    return attributes.filter(a => !a.isBuiltin);
+  }, [attributes]);
 
   const addedAttributeIds = useMemo(() => {
     return new Set<string>(
@@ -65,9 +59,19 @@ export function BaseAttributeList({ attributesData, attributesLoading, mode, pos
 
   const categoryOptions = useMemo(() => {
     return [
-      { value: "all", label: "All Categories" },
       { value: "recent", label: "Recently Used" },
-      ...categories.map(c => ({ value: c.name, label: c.name }))
+      { value: "all", label: "All Categories" },
+      ...(categories.length > 0
+        ? [
+            {
+              group: "Categories",
+              items: categories.map((c) => ({
+                value: c.id.toString(),
+                label: c.name,
+              })),
+            },
+          ]
+        : []),
     ];
   }, [categories]);
 
@@ -178,7 +182,7 @@ export function BaseAttributeList({ attributesData, attributesLoading, mode, pos
           hideStatus={mode === "global"}
         />
 
-        {attributesData && attributesData.totalPages > 1 && activeTab === "all" && (
+        {attributesData && attributesData.totalPages > 1 && (
           <Center>
             <Pagination
               total={attributesData.totalPages}
@@ -217,7 +221,7 @@ export function BaseAttributeList({ attributesData, attributesLoading, mode, pos
             <Select
               data={categoryOptions}
               value={activeTab}
-              onChange={(val) => setActiveTab(val || "all")}
+              onChange={(val: string | null) => setActiveTab(val || "all")}
               allowDeselect={false}
               w={200}
             />

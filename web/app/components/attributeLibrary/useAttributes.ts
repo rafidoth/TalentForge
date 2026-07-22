@@ -25,10 +25,16 @@ import type {
   AttributeDto,
 } from "../../api/types";
 
-export const useAttributes = (search: string = "", pageNumber: number = 1, pageSize: number = 10) => {
+export const useAttributes = (
+  search: string = "",
+  categoryId: number | null = null,
+  recent: boolean = false,
+  pageNumber: number = 1,
+  pageSize: number = 20
+) => {
   return useQuery({
-    queryKey: ["attributes", search, pageNumber, pageSize],
-    queryFn: () => fetchAttributes(search, pageNumber, pageSize),
+    queryKey: ["attributes", search, categoryId, recent, pageNumber, pageSize],
+    queryFn: () => fetchAttributes(search, categoryId, recent, pageNumber, pageSize),
   });
 };
 

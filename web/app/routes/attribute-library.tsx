@@ -9,8 +9,12 @@ import { useAttributeStore } from "~/store/attributeStore";
 export default function AttributeLibraryPage() {
     const [view, setView] = useState<"list" | "create" | "edit">("list");
     const [editingAttribute, setEditingAttribute] = useState<AttributeDto | null>(null);
-    const { search, page } = useAttributeStore();
-    const { data: attributes, isLoading } = useAttributes(search, page, 20);
+    const { search, page, activeTab } = useAttributeStore();
+    const categoryId = activeTab && activeTab !== "all" && activeTab !== "recent"
+        ? parseInt(activeTab, 10)
+        : null;
+    const recent = activeTab === "recent";
+    const { data: attributes, isLoading } = useAttributes(search, categoryId, recent, page, 20);
 
     const handleCreate = () => {
         setEditingAttribute(null);

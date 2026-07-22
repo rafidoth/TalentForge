@@ -11,8 +11,12 @@ export interface AttributeLibraryModalProps {
 }
 
 function PositionAttributeList({ positionId }: { positionId: string }) {
-  const { search, page } = useAttributeStore();
-  const { data: attributesData, isLoading: attributesLoading } = useAttributes(search, page, 10);
+  const { search, page, activeTab } = useAttributeStore();
+  const categoryId = activeTab && activeTab !== "all" && activeTab !== "recent"
+    ? parseInt(activeTab, 10)
+    : null;
+  const recent = activeTab === "recent";
+  const { data: attributesData, isLoading: attributesLoading } = useAttributes(search, categoryId, recent, page, 10);
 
   return (
     <BaseAttributeList

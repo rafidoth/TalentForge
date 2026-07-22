@@ -58,7 +58,7 @@ export function PositionAccessRulesModal({ positionId, isPublic, opened, onClose
 
   const { data: attributesData } = useQuery({
     queryKey: ["attributes", "all"],
-    queryFn: () => fetchAttributes("", 1, 100),
+    queryFn: () => fetchAttributes("", null, false, 1, 100),
     enabled: opened,
   });
 

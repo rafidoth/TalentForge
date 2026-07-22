@@ -24,7 +24,7 @@ public record UpdateAttributeDto(
 public record AttributeSearchQueryDto(
     string? Prefix = null,
     int? CategoryId = null,
-    string? UserId = null,
+    bool Recent = false,
     int Page = 1,
     int PageSize = 20
 );

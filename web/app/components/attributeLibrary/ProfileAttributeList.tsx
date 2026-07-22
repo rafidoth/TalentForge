@@ -35,7 +35,12 @@ export function ProfileAttributeList({ }: ProfileAttributeListProps) {
     modalValue, setModalValue,
   } = useProfileAttributeStore();
 
-  const { data: globalAttributesData, isLoading: isLoadingGlobal } = useAttributes(search, page, 10);
+  const categoryId = activeTab && activeTab !== "all" && activeTab !== "recent"
+    ? parseInt(activeTab, 10)
+    : null;
+  const recent = activeTab === "recent";
+
+  const { data: globalAttributesData, isLoading: isLoadingGlobal } = useAttributes(search, categoryId, recent, page, 10);
   const { data: categoriesData } = useAttributeTypesAndCategories();
   const { data: profileAttributesData } = useProfileAttributes();
 
@@ -59,21 +64,25 @@ export function ProfileAttributeList({ }: ProfileAttributeListProps) {
 
   const categoryOptions = useMemo(() => {
     return [
-      { value: "all", label: "All Categories" },
       { value: "recent", label: "Recently Used" },
-      ...categories.map(c => ({ value: c.name, label: c.name }))
+      { value: "all", label: "All Categories" },
+      ...(categories.length > 0
+        ? [
+            {
+              group: "Categories",
+              items: categories.map((c) => ({
+                value: c.id.toString(),
+                label: c.name,
+              })),
+            },
+          ]
+        : []),
     ];
   }, [categories]);
 
   const displayAttributes = useMemo(() => {
-    let filtered = attributes;
-    if (activeTab === "recent") {
-      filtered = attributes.slice(0, 5);
-    } else if (activeTab && activeTab !== "all") {
-      filtered = attributes.filter(attr => attr.categoryName === activeTab);
-    }
-    return filtered.filter(a => !a.isBuiltin);
-  }, [attributes, activeTab]);
+    return attributes.filter(a => !a.isBuiltin);
+  }, [attributes]);
 
   const handleRowClick = (attribute: AttributeDto) => {
     const isAdded = profileAttributeMap.has(attribute.id);
@@ -174,7 +183,7 @@ export function ProfileAttributeList({ }: ProfileAttributeListProps) {
             <Select
               data={categoryOptions}
               value={activeTab}
-              onChange={(val) => setActiveTab(val || "all")}
+              onChange={(val: string | null) => setActiveTab(val || "all")}
               allowDeselect={false}
               w={200}
             />
