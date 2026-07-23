@@ -1,18 +1,17 @@
-name: Build and Push Docker Image
-
+name: Build and Push Backend Docker Image
 on:
   push:
     branches:
       - main
+    paths:
+      - 'server/**'
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-
     defaults:
       run:
         working-directory: ./server
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
