@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Group, Tabs } from "@mantine/core";
+import { Link } from "react-router";
 import classes from "./AppHeader.module.css";
 
 interface TabItem {
@@ -11,10 +12,9 @@ interface TabItem {
 interface AppHeaderTabsProps {
   tabs: TabItem[];
   activeTab: string;
-  onTabChange: (value: string) => void;
 }
 
-export function AppHeaderTabs({ tabs, activeTab, onTabChange }: AppHeaderTabsProps) {
+export function AppHeaderTabs({ tabs, activeTab }: AppHeaderTabsProps) {
   const [localTab, setLocalTab] = useState(activeTab);
 
   useEffect(() => {
@@ -24,12 +24,6 @@ export function AppHeaderTabs({ tabs, activeTab, onTabChange }: AppHeaderTabsPro
   return (
     <Tabs
       value={localTab}
-      onChange={(val) => {
-        if (val) {
-          setLocalTab(val); // Update visually instantly!
-          onTabChange(val); // Then navigate
-        }
-      }}
       variant="outline"
       visibleFrom="sm"
       classNames={{
@@ -40,7 +34,14 @@ export function AppHeaderTabs({ tabs, activeTab, onTabChange }: AppHeaderTabsPro
     >
       <Tabs.List>
         {tabs.map((tab) => (
-          <Tabs.Tab value={tab.path} key={tab.path}>
+          <Tabs.Tab 
+            value={tab.path} 
+            key={tab.path} 
+            component={Link} 
+            to={tab.path}
+            prefetch="intent"
+            onClick={() => setLocalTab(tab.path)}
+          >
             <Group gap={5} align="center">
               {tab.icon}
               {tab.label}

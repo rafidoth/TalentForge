@@ -66,7 +66,6 @@ export function AppHeader({ opened, toggle }: AppHeaderProps) {
           <AppHeaderTabs
             tabs={currentTabs}
             activeTab={activeTab}
-            onTabChange={(val) => navigate(val)}
           />
         </Container>
       </div>
