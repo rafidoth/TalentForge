@@ -30,7 +30,7 @@ export function ProfileAttributeActionModal({
   if (!attribute) return null;
 
   return (
-    <Modal opened={opened} onClose={onClose} title="Manage Attribute Value" centered>
+    <Modal opened={opened} onClose={onClose} title="Manage Attribute Value" centered size={"50%"}>
       <Stack>
         <div>
           <Group justify="space-between" mb="xs">

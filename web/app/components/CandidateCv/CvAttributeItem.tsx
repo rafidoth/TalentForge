@@ -4,6 +4,7 @@ import { IconEdit, IconCheck, IconX } from '@tabler/icons-react';
 import type { DropdownOptionDto } from '~/api/types';
 import { useAddProfileAttribute, useUpdateProfileAttribute } from '~/hooks/useProfileData';
 import { ProfileAttributeInput } from '~/components/profile/ProfileAttributeInput';
+import { MarkdownRenderer } from '~/components/common/MarkdownRenderer';
 import classes from './CandidateCv.module.css';
 
 interface CvAttributeItemProps {
@@ -127,7 +128,13 @@ export function CvAttributeItem({
             onClick={() => setIsEditing(true)}
         >
             <Text fw={500} size="lg" >{attributeName} </Text>
-            <Text size="md" >{displayValue}</Text>
+            {typeName.toLowerCase().includes('text') ? (
+                <Box style={{ flex: 1, minWidth: '100%' }}>
+                    <MarkdownRenderer content={String(displayValue)} />
+                </Box>
+            ) : (
+                <Text size="md" >{displayValue as string}</Text>
+            )}
             <ActionIcon
                 variant="transparent"
                 color="gray"

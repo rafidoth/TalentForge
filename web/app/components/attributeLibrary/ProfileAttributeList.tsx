@@ -40,7 +40,7 @@ export function ProfileAttributeList({ }: ProfileAttributeListProps) {
     : null;
   const recent = activeTab === "recent";
 
-  const { data: globalAttributesData, isLoading: isLoadingGlobal } = useAttributes(search, categoryId, recent, page, 10);
+  const { data: globalAttributesData, isLoading: isLoadingGlobal } = useAttributes(search, categoryId, recent, page, 20);
   const { data: categoriesData } = useAttributeTypesAndCategories();
   const { data: profileAttributesData } = useProfileAttributes();
 
@@ -68,14 +68,14 @@ export function ProfileAttributeList({ }: ProfileAttributeListProps) {
       { value: "all", label: "All Categories" },
       ...(categories.length > 0
         ? [
-            {
-              group: "Categories",
-              items: categories.map((c) => ({
-                value: c.id.toString(),
-                label: c.name,
-              })),
-            },
-          ]
+          {
+            group: "Categories",
+            items: categories.map((c) => ({
+              value: c.id.toString(),
+              label: c.name,
+            })),
+          },
+        ]
         : []),
     ];
   }, [categories]);

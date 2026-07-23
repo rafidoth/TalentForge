@@ -10,7 +10,6 @@ import {
     Loader,
     Stack,
     Text,
-    SimpleGrid,
     ActionIcon,
 } from '@mantine/core';
 import { IdentificationCardIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react';
@@ -45,7 +44,6 @@ export function ProfileInfoSection() {
                         Attribute Library
                     </Button>
                 </Group>
-                <Divider mb="md" />
 
                 {isLoadingAttributes ? (
                     <Center p="xl"><Loader /></Center>
@@ -58,19 +56,17 @@ export function ProfileInfoSection() {
                         </Stack>
                     </Center>
                 ) : (
-                    <SimpleGrid cols={{ base: 1, xs: 2, sm: 2, md: 3 }} spacing="md">
-                        {profileAttributes.map((attr: ProfileAttributeDto) => (
-                            <Paper
-                                key={attr.id}
-                                shadow="md"
-                                p="md"
-                                radius="md"
-                                style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
-                            >
+                    <Stack gap="lg">
+                        {profileAttributes.map((attr: ProfileAttributeDto, index) => (
+                            <div key={attr.id}>
+                                {index > 0 && <Divider mb="md" />}
                                 <Group justify="space-between" align="flex-start" wrap="nowrap">
-                                    <Text fw={600} size="md" c="dimmed" lineClamp={2}>
-                                        {attr.attributeName}
-                                    </Text>
+                                    <Stack gap="xs" style={{ flex: 1 }}>
+                                        <Text fw={600} size="md" >
+                                            {attr.attributeName}
+                                        </Text>
+                                        <ProfileInfoSectionAttributeValueDisplay value={attr.value} dropdownOptions={attr.dropdownOptions} typeName={attr.typeName} />
+                                    </Stack>
                                     <ActionIcon
                                         color="red"
                                         variant="subtle"
@@ -85,11 +81,9 @@ export function ProfileInfoSection() {
                                         <TrashIcon size={16} />
                                     </ActionIcon>
                                 </Group>
-
-                                <ProfileInfoSectionAttributeValueDisplay value={attr.value} dropdownOptions={attr.dropdownOptions} typeName={attr.typeName} />
-                            </Paper>
+                            </div>
                         ))}
-                    </SimpleGrid>
+                    </Stack>
                 )}
             </Paper>
 

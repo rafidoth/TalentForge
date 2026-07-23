@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Text, Image, Box, Group, Badge, Modal, Stack } from '@mantine/core';
 import type { DropdownOptionDto } from '~/api/types';
+import { MarkdownRenderer } from '~/components/common/MarkdownRenderer';
 
 interface Props {
     value: any;
@@ -79,16 +80,18 @@ export function ProfileInfoSectionAttributeValueDisplay({ value, typeName, dropd
 
     if (name === "One Of Many".toLowerCase() && dropdownOptions) {
         return (
-            <Stack mt="sm" >
-                {dropdownOptions.map((opt) => (
-                    <Badge
-                        key={opt.id}
-                        color={opt.id === value ? 'var(--mantine-color-blue-4)' : 'gray'}
-                    >
-                        {opt.label}
-                    </Badge>
-                ))}
-            </Stack>
+            <Group mt="sm">
+                {
+                    dropdownOptions.map((opt) => (
+                        <Badge
+                            key={opt.id}
+                            color={opt.id === value ? 'var(--mantine-color-blue-4)' : 'gray'}
+                        >
+                            <b>{opt.label}</b>
+                        </Badge>
+                    ))
+                }
+            </Group >
         );
     }
 
@@ -100,11 +103,11 @@ export function ProfileInfoSectionAttributeValueDisplay({ value, typeName, dropd
         return <Text size="xl" fw={500} mt="xs">{String(value)}</Text>;
     }
 
-    if (name.includes('text') && String(value).length > 60) {
+    if (name.includes('text')) {
         return (
-            <Text size="sm" fw={400} mt="xs" c="dimmed" style={{ whiteSpace: 'pre-wrap' }}>
-                {String(value)}
-            </Text>
+            <Box mt="xs">
+                <MarkdownRenderer content={String(value)} />
+            </Box>
         );
     }
 

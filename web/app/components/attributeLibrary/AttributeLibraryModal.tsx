@@ -50,8 +50,8 @@ export function AttributeLibraryModal({
       opened={opened}
       onClose={handleClose}
       centered
-      size="70%"
       padding="lg"
+      size="100%"
     >
       {renderListView()}
     </Modal>

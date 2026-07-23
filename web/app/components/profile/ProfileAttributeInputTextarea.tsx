@@ -1,5 +1,5 @@
-import { Textarea } from '@mantine/core';
 import type { AttributeDef } from './ProfileAttributeInput';
+import { MarkdownEditor } from '~/components/common/MarkdownEditor';
 
 interface Props {
     attribute: AttributeDef;
@@ -8,14 +8,14 @@ interface Props {
 }
 
 export function ProfileAttributeInputTextarea({ attribute, value, onChange }: Props) {
-    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => onChange(attribute.id, e.target.value);
+    const handleChange = (newValue: string) => onChange(attribute.id, newValue);
 
     return (
-        <Textarea
+        <MarkdownEditor
             label={attribute.attributeName}
             value={value || ''}
             onChange={handleChange}
-            minRows={3}
         />
     );
 }
+

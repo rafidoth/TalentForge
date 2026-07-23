@@ -35,7 +35,12 @@ export function ProfileAttributeInput(props: ProfileAttributeInputProps) {
         return <ProfileAttributeInputImage {...props} />;
     }
 
-    if (typeNameLower.includes('text') && attribute.attributeName.toLowerCase().includes('description')) {
+
+    if (typeNameLower.includes('string')) {
+        return <ProfileAttributeInputText {...props} />;
+    }
+
+    if (typeNameLower.includes('text')) {
         return <ProfileAttributeInputTextarea {...props} />;
     }
 
