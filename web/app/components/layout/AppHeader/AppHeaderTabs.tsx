@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Group, Tabs } from "@mantine/core";
 import classes from "./AppHeader.module.css";
 
@@ -14,10 +15,21 @@ interface AppHeaderTabsProps {
 }
 
 export function AppHeaderTabs({ tabs, activeTab, onTabChange }: AppHeaderTabsProps) {
+  const [localTab, setLocalTab] = useState(activeTab);
+
+  useEffect(() => {
+    setLocalTab(activeTab);
+  }, [activeTab]);
+
   return (
     <Tabs
-      value={activeTab}
-      onChange={(val) => val && onTabChange(val)}
+      value={localTab}
+      onChange={(val) => {
+        if (val) {
+          setLocalTab(val); // Update visually instantly!
+          onTabChange(val); // Then navigate
+        }
+      }}
       variant="outline"
       visibleFrom="sm"
       classNames={{
