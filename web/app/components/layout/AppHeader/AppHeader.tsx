@@ -48,8 +48,8 @@ export function AppHeader({ opened, toggle }: AppHeaderProps) {
   const currentTabs = tabsConfig[role as keyof typeof tabsConfig] || tabsConfig.Candidate;
 
   const activeTab = currentTabs.find(tab =>
-    tab.path === "/app" ? location.pathname === "/app" : location.pathname.startsWith(tab.path)
-  )?.path || "/app";
+    location.pathname === tab.path
+  )?.path || "";
 
   return (
     <AppShell.Header>

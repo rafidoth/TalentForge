@@ -1,4 +1,4 @@
-import { type MantineThemeOverride } from '@mantine/core';
+import { closeOnEscape, type MantineThemeOverride } from '@mantine/core';
 
 const theme: MantineThemeOverride = {
     colors: {
@@ -192,7 +192,7 @@ const theme: MantineThemeOverride = {
     black: 'rgba(20, 19, 19, 1)',
     autoContrast: true,
     luminanceThreshold: 0.3,
-    fontFamily: 'Rubik',
+    fontFamily: 'Raleway, sans-serif',
     fontFamilyMonospace: 'Roboto Mono',
     scale: 1,
     radius: {
@@ -248,6 +248,7 @@ const theme: MantineThemeOverride = {
                 overlayOpacity: 0.55,
                 overlayBlur: 3,
                 centered: true,
+                closeOnEscape: true,
             },
         },
     }
