@@ -1,5 +1,6 @@
 import { Table, Checkbox, Group, Text, Badge } from "@mantine/core";
 import type { PositionDto } from "~/api/positions";
+import { formatDate } from "~/utils/date";
 
 export interface PositionTableProps {
   positions: PositionDto[];
@@ -48,7 +49,7 @@ export function PositionTable({
                 </Table.Td>
                 <Table.Td>
                   <Text size="sm" c="dimmed">
-                    {new Date(position.updatedAt || position.createdAt).toLocaleDateString()}
+                    {formatDate(position.updatedAt || position.createdAt, 'MMM d, yyyy')}
                   </Text>
                 </Table.Td>
                 <Table.Td>

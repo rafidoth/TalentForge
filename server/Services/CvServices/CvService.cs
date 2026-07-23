@@ -3,9 +3,11 @@ using server.Dto;
 using server.Entities;
 using server.Exceptions;
 
+using server.Services.PositionServices;
+
 namespace server.Services.CvServices;
 
-public partial class CvService(ApplicationDbContext db) : ICvService
+public partial class CvService(ApplicationDbContext db, IPositionAccessRuleService accessRuleService) : ICvService
 {
     private async Task<Cv> FindCvOrThrowAsync(Guid cvId)
         => await db.Cvs.Include(c => c.Position)

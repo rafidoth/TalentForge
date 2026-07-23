@@ -46,10 +46,10 @@ export function CandidateCv() {
     const { mutate: updateCv, isPending: isUpdatingCv } = useUpdateCv();
 
     const [selectedProjectIds, setSelectedProjectIds] = useState<string[]>([]);
-    
+
     useEffect(() => {
         if (cvData?.projects) {
-            setSelectedProjectIds(cvData.projects.map((p: any) => p.id));
+            setSelectedProjectIds(cvData.projects.map(p => p.id));
         }
     }, [cvData]);
 
@@ -114,37 +114,42 @@ export function CandidateCv() {
             </Group>
 
             <Paper
-                shadow="md"
+                shadow="0px -10px 12px rgba(0, 0, 0, 0.1)"
                 p="xl"
                 radius={"md"}
                 className={classes.cvWrapper}
-                style={{ minHeight: '800px', color: '#333' }}
+                style={{ minHeight: '800px', color: 'var(--mantine-color-text)' }}
             >
                 <CandidateCvHeader cvId={cvId} meAttributes={meAttributes} />
                 <CandidateCvPositionAttributes groupedAttributes={groupedAttributes} />
-                <CandidateCvProjects 
-                    maxProjects={positionData?.maxProjects || 0} 
+                <CandidateCvProjects
+                    positionId={positionId || ''}
+                    maxProjects={positionData?.maxProjects || 0}
                     selectedProjectIds={selectedProjectIds}
                     setSelectedProjectIds={setSelectedProjectIds}
                 />
             </Paper>
-            <Group justify="flex-end" mt="xl">
-                <Tooltip 
-                    label="Please fill in all missing attributes before publishing your CV" 
-                    disabled={missingAttributes.length === 0}
-                    position="top-end"
-                >
-                    <Button 
-                        size="lg" 
-                        color="blue" 
-                        onClick={handlePublish} 
-                        loading={isUpdatingCv}
-                        disabled={missingAttributes.length > 0}
-                    >
-                        Publish CV
-                    </Button>
-                </Tooltip>
-            </Group>
+            {
+                !cvData?.isPublished && (
+                    <Group justify="flex-end" mt="xl">
+                        <Tooltip
+                            label="Please fill in all missing attributes before publishing your CV"
+                            disabled={missingAttributes.length === 0}
+                            position="top-end"
+                        >
+                            <Button
+                                color="blue"
+                                onClick={handlePublish}
+                                loading={isUpdatingCv}
+                                disabled={missingAttributes.length > 0}
+                            >
+                                Publish CV
+                            </Button>
+                        </Tooltip>
+                    </Group>
+
+                )
+            }
         </Container>
     );
 }

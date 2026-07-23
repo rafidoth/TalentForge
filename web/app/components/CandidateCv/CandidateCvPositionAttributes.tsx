@@ -15,8 +15,8 @@ export function CandidateCvPositionAttributes({ groupedAttributes }: CandidateCv
                         textTransform: 'uppercase',
                         letterSpacing: '1px',
                         fontSize: '1.2rem',
-                        color: '#1a1a1a',
-                        borderBottom: '2px solid #333',
+                        color: 'var(--mantine-color-text)',
+                        borderBottom: '2px solid var(--mantine-color-text)',
                         paddingBottom: '4px'
                     }}>
                         {category}

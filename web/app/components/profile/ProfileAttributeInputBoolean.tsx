@@ -1,4 +1,4 @@
-import { Checkbox } from '@mantine/core';
+import { Radio, Group } from '@mantine/core';
 import type { AttributeDef } from './ProfileAttributeInput';
 
 interface Props {
@@ -8,14 +8,24 @@ interface Props {
 }
 
 export function ProfileAttributeInputBoolean({ attribute, value, onChange }: Props) {
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => onChange(attribute.id, e.currentTarget.checked);
+    const handleChange = (val: string) => {
+        onChange(attribute.id, val === 'true');
+    };
+
+    let radioValue = '';
+    if (value === true || value === 'true') radioValue = 'true';
+    if (value === false || value === 'false') radioValue = 'false';
 
     return (
-        <Checkbox
+        <Radio.Group
             label={attribute.attributeName}
-            checked={!!value}
+            value={radioValue}
             onChange={handleChange}
-            mt="md"
-        />
+        >
+            <Group mt="xs">
+                <Radio value="true" label="Yes" />
+                <Radio value="false" label="No" />
+            </Group>
+        </Radio.Group>
     );
 }

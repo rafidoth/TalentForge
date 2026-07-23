@@ -12,8 +12,10 @@ public partial class CvService
     {
         var cv = await FindCvOrThrowAsync(cvId);
         EnsureCandidateOwnsCv(cv, candidateId);
+        await EnsureCandidateHasAccessToPositionAsync(candidateId, cv.PositionId);
+
         ApplyCvUpdates(cv, dto);
-        
+
         await db.SaveChangesAsync();
         return await GetCvByIdAsync(cvId);
     }
@@ -23,6 +25,14 @@ public partial class CvService
         if (cv.CandidateId != candidateId)
         {
             throw new UnauthorizedAccessException("You can only edit your own CV.");
+        }
+    }
+
+    private async Task EnsureCandidateHasAccessToPositionAsync(string candidateId, Guid positionId)
+    {
+        if (!await accessRuleService.HasAccessToPositionAsync(candidateId, positionId))
+        {
+            throw new UnauthorizedAccessException("You do not have access to apply for this position.");
         }
     }
 

@@ -23,7 +23,7 @@ export function ProjectTable({
 
   return (
     <Table.ScrollContainer minWidth={600}>
-      <Table withRowBorders={false} withColumnBorders={false}>
+      <Table highlightOnHover={false} withRowBorders={false} withColumnBorders={false}>
         <Table.Thead>
           <Table.Tr>
             <Table.Th w={40}></Table.Th>

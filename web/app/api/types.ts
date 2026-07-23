@@ -145,6 +145,13 @@ export interface ProjectDto {
   updatedAt: string | null;
 }
 
+export interface ProjectSearchQueryDto {
+  tagIds?: string[];
+  recent?: boolean;
+  page?: number;
+  pageSize?: number;
+}
+
 export interface CreateProjectDto {
   name: string;
   startDate: string | null;
@@ -193,4 +200,14 @@ export interface PositionAccessRuleDto {
 export interface CandidatePositionAttributesDto {
   filledAttributes: ProfileAttributeDto[];
   missingAttributes: AttributeDto[];
+}
+
+export interface PopularPositionDto {
+  id: string;
+  title: string;
+  shortDescription?: string;
+  isPublic: boolean;
+  submittedCvCount: number;
+  createdAt: string;
+  updatedAt: string;
 }

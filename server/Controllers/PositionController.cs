@@ -24,6 +24,13 @@ namespace server.Controllers
             return Ok(result);
         }
 
+        [HttpGet("popular")]
+        public async Task<IActionResult> GetPopularPositions([FromQuery] int limit = 5)
+        {
+            var result = await positionService.GetPopularPositionsAsync(limit);
+            return Ok(result);
+        }
+
         [Authorize(Roles = Roles.AdminOrCandidate)]
         [HttpGet("candidate")]
         public async Task<IActionResult> GetCandidatePositions([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
@@ -112,7 +119,6 @@ namespace server.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = Roles.AdminOrRecruiter)]
         [HttpGet("{id:guid}/tags")]
         public async Task<IActionResult> GetTagsOfPosition(Guid id)
         {

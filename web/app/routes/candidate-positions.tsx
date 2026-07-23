@@ -32,7 +32,6 @@ export default function CandidatePositions() {
                 <Table.ScrollContainer minWidth={500}>
                     <Table
                         highlightOnHover
-                        highlightOnHoverColor='blue.0'
                         withTableBorder={false}
                         withColumnBorders={false}
                         withRowBorders
@@ -77,7 +76,7 @@ export default function CandidatePositions() {
                                             tabIndex={0}
                                         >
                                             <Table.Td>
-                                                <Text fw={500} lineClamp={1}>{position.title}</Text>
+                                                <Text fw={500} lineClamp={4}>{position.title}</Text>
                                             </Table.Td>
                                             <Table.Td>
                                                 <Text size="sm" lineClamp={4}>

@@ -6,19 +6,38 @@ namespace server.Services.PositionServices
 {
     public partial class PositionAccessRuleService
     {
+        public async Task<bool> HasAccessToPositionAsync(string userId, Guid positionId)
+        {
+            var position = await FetchPositionWithRulesAsync(positionId);
+            if (position.IsPublic) return true;
+
+            var profileAttrs = await FetchUserProfileAttributesMapAsync(userId);
+            return SatisfiesAllRules(position.AccessRules, profileAttrs);
+        }
+
         public async Task<HashSet<Guid>> GetAccessiblePositionIdsAsync(string userId)
         {
-            var profileAttrs = await db.ProfileAttributes.AsNoTracking()
-                                       .Where(pa => pa.UserId == userId)
-                                       .ToDictionaryAsync(pa => pa.AttributeId, pa => pa.Value);
-
-            var restrictedPositions = await db.Positions.AsNoTracking()
-                                              .Include(p => p.AccessRules)
-                                              .Where(p => !p.IsPublic)
-                                              .ToListAsync();
-
+            var profileAttrs = await FetchUserProfileAttributesMapAsync(userId);
+            var restrictedPositions = await FetchRestrictedPositionsWithRulesAsync();
             return EvaluateAccessiblePositions(restrictedPositions, profileAttrs);
         }
+
+        private async Task<Position> FetchPositionWithRulesAsync(Guid positionId)
+            => await db.Positions.AsNoTracking()
+                 .Include(p => p.AccessRules)
+                 .FirstOrDefaultAsync(p => p.Id == positionId)
+                 ?? throw new Exceptions.NotFoundException(nameof(Position), positionId);
+
+        private async Task<Dictionary<Guid, JsonElement>> FetchUserProfileAttributesMapAsync(string userId)
+            => await db.ProfileAttributes.AsNoTracking()
+                 .Where(pa => pa.UserId == userId)
+                 .ToDictionaryAsync(pa => pa.AttributeId, pa => pa.Value);
+
+        private async Task<List<Position>> FetchRestrictedPositionsWithRulesAsync()
+            => await db.Positions.AsNoTracking()
+                 .Include(p => p.AccessRules)
+                 .Where(p => !p.IsPublic)
+                 .ToListAsync();
 
         private HashSet<Guid> EvaluateAccessiblePositions(List<Position> restrictedPositions, Dictionary<Guid, JsonElement> profileAttrs)
         {

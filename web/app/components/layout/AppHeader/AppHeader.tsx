@@ -32,7 +32,6 @@ const tabsConfig = {
     { label: "Home", path: "/app", icon: <HouseLineIcon /> },
     { label: "Attribute Library", path: "/app/attributes", icon: <TagIcon /> },
     { label: "Positions", path: "/app/positions", icon: <BriefcaseIcon /> },
-    { label: "CVs", path: "/app/cvs", icon: <FilesIcon /> },
   ],
   Administrator: [
     { label: "Home", path: "/app", icon: <HouseLineIcon /> },

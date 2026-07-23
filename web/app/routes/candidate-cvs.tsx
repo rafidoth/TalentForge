@@ -25,7 +25,7 @@ export default function CandidateCvs() {
         <Text c="dimmed">Manage all the CVs you have created for different positions.</Text>
 
         <Table.ScrollContainer minWidth={600}>
-          <Table highlightOnHover highlightOnHoverColor='blue.0' withRowBorders withColumnBorders={false} verticalSpacing="sm">
+          <Table highlightOnHover withRowBorders withColumnBorders={false} verticalSpacing="sm">
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>Position</Table.Th>

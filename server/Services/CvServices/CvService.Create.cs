@@ -9,6 +9,8 @@ public partial class CvService
 {
     public async Task<CreateCvResponseDto> CreateCvAsync(string candidateId, CreateCvDto dto)
     {
+        await EnsureCandidateHasAccessToPositionAsync(candidateId, dto.PositionId);
+
         var positionAttrs = await GetPositionWithAttributesAsync(dto.PositionId);
         var candidateAttrs = await GetCandidateProfileAttributesAsync(candidateId);
         return await ValidateAndCreateCvAsync(candidateId, positionAttrs, candidateAttrs);

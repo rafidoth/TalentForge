@@ -34,8 +34,14 @@ public record CvListDto
 
 public record CvDetailDto : CvListDto
 {
-    public List<ProfileAttributeDto> Attributes { get; init; } = new();
     public List<ProjectDto> Projects { get; init; } = new();
+}
+
+public record FullCvDetailDto : CvListDto
+{
+    public List<ProjectDto> Projects { get; init; } = new();
+    public List<ProfileAttributeDto> FilledAttributes { get; init; } = new();
+    public List<AttributeDto> MissingAttributes { get; init; } = new();
 }
 
 public record CheckCvExistsResponseDto

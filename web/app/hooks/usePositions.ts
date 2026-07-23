@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchPositions, createPosition, deletePosition, duplicatePosition, updatePosition, getPositionById, getPositionTags, updatePositionTags, getLatestPositions, fetchCandidateAccessiblePositions } from '~/api/positions';
+import { fetchPositions, createPosition, deletePosition, duplicatePosition, updatePosition, getPositionById, getPositionTags, updatePositionTags, getLatestPositions, fetchCandidateAccessiblePositions, fetchPopularPositions } from '~/api/positions';
 import type { CreatePositionTagDto } from '~/api/types';
 
 export function usePositions(pageNumber: number = 1, pageSize: number = 10) {
@@ -87,5 +87,12 @@ export function useLatestPositions() {
     return useQuery({
         queryKey: ['positions', 'latest'],
         queryFn: () => getLatestPositions(),
+    });
+}
+
+export function usePopularPositions(limit: number = 5) {
+    return useQuery({
+        queryKey: ['positions', 'popular', limit],
+        queryFn: () => fetchPopularPositions(limit),
     });
 }

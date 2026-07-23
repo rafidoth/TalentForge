@@ -1,5 +1,5 @@
 import api from "./index";
-import type { PaginatedResponse, PositionAttributeDto, CreatePositionAttributeDto, CreatePositionTagDto, TagDto } from "./types";
+import type { PaginatedResponse, PositionAttributeDto, CreatePositionAttributeDto, CreatePositionTagDto, TagDto, PopularPositionDto } from "./types";
 
 export interface PositionDto {
   id: string;
@@ -120,5 +120,10 @@ export interface LatestPositionDto {
 
 export const getLatestPositions = async () => {
   const { data } = await api.get<LatestPositionDto[]>("/positions/latest");
+  return data;
+};
+
+export const fetchPopularPositions = async (limit: number = 5) => {
+  const { data } = await api.get<PopularPositionDto[]>(`/positions/popular?limit=${limit}`);
   return data;
 };

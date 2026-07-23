@@ -3,6 +3,8 @@ import { Group, ActionIcon, TextInput, Select, NumberInput, Checkbox, Text, Butt
 import { IconEdit, IconCheck, IconX } from '@tabler/icons-react';
 import type { DropdownOptionDto } from '~/api/types';
 import { useAddProfileAttribute, useUpdateProfileAttribute } from '~/hooks/useProfileData';
+import { ProfileAttributeInput } from '~/components/profile/ProfileAttributeInput';
+import classes from './CandidateCv.module.css';
 
 interface CvAttributeItemProps {
     attributeId: string;
@@ -64,31 +66,16 @@ export function CvAttributeItem({
         return (
             <Group gap="sm" align="flex-end" mb="xs">
                 <Box style={{ flex: 1 }}>
-                    <Text size="sm" fw={500} mb={4}>{attributeName}</Text>
-                    {dropdownOptions && dropdownOptions.length > 0 ? (
-                        <Select
-                            data={dropdownOptions.map(d => ({ value: d.label, label: d.label }))}
-                            value={editValue?.toString()}
-                            onChange={(v) => setEditValue(v)}
-                            searchable
-                        />
-                    ) : typeName === 'Boolean' ? (
-                        <Checkbox
-                            checked={!!editValue}
-                            onChange={(e) => setEditValue(e.currentTarget.checked)}
-                            label="Yes"
-                        />
-                    ) : typeName === 'Numeric' ? (
-                        <NumberInput
-                            value={editValue}
-                            onChange={(v) => setEditValue(v)}
-                        />
-                    ) : (
-                        <TextInput
-                            value={editValue}
-                            onChange={(e) => setEditValue(e.currentTarget.value)}
-                        />
-                    )}
+                    <ProfileAttributeInput
+                        attribute={{
+                            id: attributeId,
+                            attributeName,
+                            typeName,
+                            dropdownOptions: dropdownOptions || null
+                        }}
+                        value={editValue}
+                        onChange={(_id, v) => setEditValue(v)}
+                    />
                 </Box>
                 <ActionIcon
                     color="green"
@@ -112,15 +99,7 @@ export function CvAttributeItem({
                 <Box
                     onClick={() => setIsEditing(true)}
                     mb="xs"
-                    style={{
-                        backgroundColor: 'var(--mantine-color-red-1)',
-                        border: '1px dashed var(--mantine-color-red-5)',
-                        color: 'var(--mantine-color-red-8)',
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        display: 'inline-block'
-                    }}
+                    className={classes.missingAttribute}
                 >
                     <Text size="sm" fw={600}>Missing: {attributeName}</Text>
                 </Box>
@@ -129,7 +108,12 @@ export function CvAttributeItem({
     }
 
     let displayValue = value;
-    if (typeName === 'Boolean') {
+    if (dropdownOptions && dropdownOptions.length > 0) {
+        const option = dropdownOptions.find(o => o.id === value);
+        if (option) {
+            displayValue = option.label;
+        }
+    } else if (typeName === 'Boolean') {
         displayValue = value ? 'Yes' : 'No';
     } else if (typeof value === 'object' && value !== null) {
         displayValue = JSON.stringify(value);
@@ -139,24 +123,16 @@ export function CvAttributeItem({
         <Group
             gap="xs"
             mb="xs"
-            style={{
-                cursor: 'pointer',
-                position: 'relative',
-                padding: '2px 4px',
-                borderRadius: '4px',
-                transition: 'background-color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--mantine-color-gray-1)'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            className={classes.attributeItem}
             onClick={() => setIsEditing(true)}
         >
             <Text fw={500} size="lg" >{attributeName} </Text>
-            <Text size="md" style={{ color: 'var(--mantine-color-dark-8)' }}>{displayValue}</Text>
+            <Text size="md" >{displayValue}</Text>
             <ActionIcon
                 variant="transparent"
                 color="gray"
                 size="sm"
-                style={{ opacity: 0.5 }}
+                className={classes.editIcon}
                 title="Edit attribute"
             >
                 <IconEdit size={14} />

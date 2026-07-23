@@ -9,6 +9,7 @@ public interface ICvService
 {
     Task<CreateCvResponseDto> CreateCvAsync(string candidateId, CreateCvDto dto);
     Task<CvDetailDto> GetCvByIdAsync(Guid cvId);
+    Task<FullCvDetailDto> GetFullCvByIdAsync(Guid cvId);
     Task<CvDetailDto> UpdateCvAsync(Guid cvId, string candidateId, UpdateCvDto dto);
     Task<PagedResponse<CvListDto>> GetCvsByCandidateIdAsync(string candidateId, int pageNumber, int pageSize);
     Task<PagedResponse<CvListDto>> GetCvsByPositionIdAsync(Guid positionId, int pageNumber, int pageSize);

@@ -24,6 +24,10 @@ namespace server.Controllers
         public async Task<IActionResult> GetCvById(Guid id)
             => Ok(await cvService.GetCvByIdAsync(id));
 
+        [HttpGet("{id:guid}/full")]
+        public async Task<IActionResult> GetFullCvById(Guid id)
+            => Ok(await cvService.GetFullCvByIdAsync(id));
+
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> UpdateCv(Guid id, [FromBody] UpdateCvDto dto)
         {

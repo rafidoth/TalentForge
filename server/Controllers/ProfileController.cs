@@ -84,6 +84,16 @@ namespace server.Controllers
             return Ok(projects);
         }
 
+        [HttpPost("projects/search")]
+        public async Task<IActionResult> SearchProjects([FromBody] ProjectSearchQueryDto dto)
+        {
+            var user = await userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+
+            var result = await projectsService.SearchProjectsAsync(user.Id, dto);
+            return Ok(result);
+        }
+
         [HttpPost("projects")]
         public async Task<IActionResult> AddProject(CreateProjectDto dto)
         {
@@ -125,7 +135,6 @@ namespace server.Controllers
 
             return Ok(result);
         }
-
     }
 
 

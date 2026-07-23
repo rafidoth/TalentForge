@@ -1,11 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchProjects, createProject, updateProject, deleteProject } from '~/api/profile';
-import type { CreateProjectDto, UpdateProjectDto } from '~/api/types';
+import { fetchProjects, searchProjects, createProject, updateProject, deleteProject } from '~/api/profile';
+import type { CreateProjectDto, UpdateProjectDto, ProjectSearchQueryDto } from '~/api/types';
 
 export function useProjects() {
     return useQuery({
         queryKey: ['profile', 'projects'],
         queryFn: fetchProjects,
+    });
+}
+
+export function useSearchProjects(dto: ProjectSearchQueryDto) {
+    return useQuery({
+        queryKey: ['profile', 'projects', 'search', dto],
+        queryFn: () => searchProjects(dto),
     });
 }
 

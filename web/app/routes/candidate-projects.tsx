@@ -10,13 +10,15 @@ import {
     Title,
     ActionIcon,
     Tooltip,
+    Pagination,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useProjects, useDeleteProject } from "~/hooks/useProjects";
+import { useSearchProjects, useDeleteProject } from "~/hooks/useProjects";
 import { ProjectTable } from "~/components/projects/ProjectTable";
 import { ProjectFormModal } from "~/components/projects/ProjectFormModal";
 import { PencilSimpleIcon, TrashIcon, PlusIcon } from "@phosphor-icons/react";
-import type { ProjectDto } from "~/api/types";
+import type { ProjectDto, TagDto } from "~/api/types";
+import { TagsInput } from "~/components/common/TagsInput";
 
 export const handle: RouteHandle = {
     allowedRoles: ["Candidate"]
@@ -25,12 +27,24 @@ export const handle: RouteHandle = {
 export default function CandidateProjectsPage() {
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [isDeletingBulk, setIsDeletingBulk] = useState(false);
+    const [page, setPage] = useState(1);
+    const [selectedTags, setSelectedTags] = useState<TagDto[]>([]);
 
-    const { data: projects, isLoading, isError } = useProjects();
+    const queryDto = {
+        tagIds: selectedTags.map(t => t.id),
+        page,
+        pageSize: 10,
+        recent: true,
+    };
+
+    const { data: searchResponse, isLoading, isError } = useSearchProjects(queryDto);
     const deleteMutation = useDeleteProject();
 
     const [formOpened, { open: openForm, close: closeForm }] = useDisclosure(false);
     const [selectedProjectForEdit, setSelectedProjectForEdit] = useState<ProjectDto | null>(null);
+
+    const projects = searchResponse?.data || [];
+    const totalPages = searchResponse?.totalPages || 1;
 
     const handleToggleSelect = (id: string) => {
         setSelectedIds(prev => {
@@ -82,6 +96,11 @@ export default function CandidateProjectsPage() {
         setSelectedProjectForEdit(null);
     };
 
+    const handleTagsChange = (newTags: TagDto[]) => {
+        setSelectedTags(newTags);
+        setPage(1); // Reset to first page when filtering
+    };
+
     return (
         <Container size="xl" py="xl">
             <Stack gap="md">
@@ -89,7 +108,15 @@ export default function CandidateProjectsPage() {
                     <Title size="h1">My Projects</Title>
                 </Group>
 
-                <Group align="flex-end" justify="flex-end">
+                <Group align="flex-end" justify="space-between">
+                    <div style={{ flex: 1, maxWidth: 400 }}>
+                        <TagsInput
+                            label="Filter by tags"
+                            placeholder="Search tags..."
+                            selectedTagsList={selectedTags}
+                            setSelectedTagsList={handleTagsChange}
+                        />
+                    </div>
                     <Group gap="xs" align="center" ml="auto">
                         <Tooltip label="New Project" withArrow>
                             <ActionIcon variant="light" size="lg" color="gray" onClick={handleCreate}>
@@ -135,10 +162,20 @@ export default function CandidateProjectsPage() {
                 ) : (
                     <Stack gap="xl">
                         <ProjectTable
-                            projects={projects || []}
+                            projects={projects}
                             selectedIds={selectedIds}
                             onToggleSelect={handleToggleSelect}
                         />
+                        {totalPages > 1 && (
+                            <Group justify="center">
+                                <Pagination
+                                    total={totalPages}
+                                    value={page}
+                                    onChange={setPage}
+                                    color="blue"
+                                />
+                            </Group>
+                        )}
                     </Stack>
                 )}
             </Stack>

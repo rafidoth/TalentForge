@@ -36,3 +36,10 @@ public record ProjectDto
     public List<TagDto> Tags { get; set; } = [];
     public uint Version { get; set; }
 }
+
+public record ProjectSearchQueryDto(
+    List<Guid>? TagIds = null,
+    bool Recent = false,
+    int Page = 1,
+    int PageSize = 20
+);

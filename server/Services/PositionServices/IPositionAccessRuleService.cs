@@ -9,5 +9,6 @@ namespace server.Services.PositionServices
         Task<PositionAccessRuleDto> UpdateRuleAsync(Guid positionId, Guid ruleId, PositionAccessRuleDto dto);
         Task<bool> DeleteRuleAsync(Guid positionId, Guid ruleId);
         Task<HashSet<Guid>> GetAccessiblePositionIdsAsync(string userId);
+        Task<bool> HasAccessToPositionAsync(string userId, Guid positionId);
     }
 }

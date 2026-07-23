@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using server.Dto;
 using server.Entities;
 using server.Utils;
+using System.Text.Json;
 
 namespace server.Services.CvServices;
 
@@ -10,9 +11,20 @@ public partial class CvService
     public async Task<CvDetailDto> GetCvByIdAsync(Guid cvId)
     {
         var cv = await FindCvOrThrowAsync(cvId);
-        var attrs = await GetCandidateProfileAttributesAsync(cv.CandidateId);
         var projects = await GetCvProjectsAsync(cv.ChosenProjectIds);
-        return MapToCvDetailDto(cv, ExtractCandidateName(attrs), MapAttributes(attrs, cv.Position), projects);
+        var names = await GetCandidateNamesAsync(new[] { cv.CandidateId });
+        var name = names.GetValueOrDefault(cv.CandidateId, "Unknown");
+        return BuildCvDetailDto(cv, name, projects);
+    }
+
+    public async Task<FullCvDetailDto> GetFullCvByIdAsync(Guid cvId)
+    {
+        var cv = await FindCvOrThrowAsync(cvId);
+        var projects = await GetCvProjectsAsync(cv.ChosenProjectIds);
+        var requiredAttributes = await FetchAllRequiredAttributesAsync(cv.PositionId);
+        var candidateAttributes = await FetchCandidateAttributesAsync(cv.CandidateId, requiredAttributes.Select(a => a.Id));
+        
+        return BuildFullCvDetailDto(cv, projects, requiredAttributes, candidateAttributes);
     }
 
     public async Task<PagedResponse<CvListDto>> GetCvsByCandidateIdAsync(string candidateId, int page, int size)
@@ -38,43 +50,6 @@ public partial class CvService
         return await MapCvListWithNamesAsync(await PagedResponse.CreateAsync(q, page, size));
     }
 
-    private async Task<List<ProjectDto>> GetCvProjectsAsync(List<Guid> pIds)
-    {
-        var p = await db.Projects.Include(p => p.ProjectTechnologyTags).ThenInclude(pt => pt.Tag).Where(x => pIds.Contains(x.Id)).ToListAsync();
-        return p.Select(MapProject).ToList();
-    }
-
-    private ProjectDto MapProject(Project p)
-        => new() { Id = p.Id, Name = p.Name, StartDate = p.StartDate, EndDate = p.EndDate, Description = p.Description, Tags = p.ProjectTechnologyTags.Select(t => new TagDto(t.TagId, t.Tag.Name)).ToList(), Version = 0 };
-
-    private async Task<PagedResponse<CvListDto>> MapCvListWithNamesAsync(PagedResponse<Cv> cvs)
-    {
-        var names = await GetCandidateNamesAsync(cvs.Data.Select(c => c.CandidateId).Distinct());
-        return MapPagedResponse(cvs, c => MapToCvListDto(c, names.GetValueOrDefault(c.CandidateId, "Unknown")));
-    }
-
-    private PagedResponse<CvListDto> MapPagedResponse(PagedResponse<Cv> page, Func<Cv, CvListDto> m)
-        => new() { Data = page.Data.Select(m).ToList(), PageNumber = page.PageNumber, PageSize = page.PageSize, TotalPages = page.TotalPages, TotalRecords = page.TotalRecords };
-
-    private async Task<Dictionary<string, string>> GetCandidateNamesAsync(IEnumerable<string> cIds)
-    {
-        var stringIds = cIds.ToList();
-        var attrs = await db.ProfileAttributes.Include(pa => pa.Attribute).Where(pa => stringIds.Contains(pa.UserId) && (pa.Attribute.Name == "First Name" || pa.Attribute.Name == "Last Name")).ToListAsync();
-        return cIds.ToDictionary(id => id, id => ExtractCandidateName(attrs.Where(a => a.UserId == id).ToList()));
-    }
-
-    private List<ProfileAttributeDto> MapAttributes(List<ProfileAttribute> attrs, Position pos)
-        => attrs.Where(a => IsRequiredOrMe(a, pos)).Select(MapProfileAttribute).ToList();
-
-    private bool IsRequiredOrMe(ProfileAttribute a, Position pos)
-        => a.Attribute.Category?.Name == "Me" || pos.PositionAttributes.Any(pa => pa.AttributeId == a.AttributeId);
-
-    private ProfileAttributeDto MapProfileAttribute(ProfileAttribute a)
-        => new() { Id = a.Id, AttributeId = a.AttributeId, AttributeName = a.Attribute.Name, TypeName = a.Attribute.Type.ToString(), CategoryName = a.Attribute.Category?.Name ?? "", Value = a.Value, Version = 0 };
-
-    private CvDetailDto MapToCvDetailDto(Cv cv, string name, List<ProfileAttributeDto> attrs, List<ProjectDto> projects)
-        => new() { Id = cv.Id, CandidateId = cv.CandidateId, PositionId = cv.PositionId, PositionTitle = cv.Position.Title, CandidateName = name, CreatedAt = cv.CreatedAt, LikeCount = cv.LikeCount, Attributes = attrs, Projects = projects };
-
     public async Task<CheckCvExistsResponseDto> CheckCvExistsAsync(string candidateId, Guid positionId)
     {
         var existingCv = await db.Cvs
@@ -87,6 +62,86 @@ public partial class CvService
         {
             Exists = existingCv != null,
             CvId = existingCv?.Id
+        };
+    }
+
+    private async Task<List<AppAttribute>> FetchAllRequiredAttributesAsync(Guid positionId)
+    {
+        var positionAttrs = await FetchPositionAttributesAsync(positionId);
+        var builtinAttrs = await FetchBuiltinPersonalAttributesAsync();
+        return positionAttrs.Concat(builtinAttrs).DistinctBy(a => a.Id).ToList();
+    }
+
+    private async Task<List<AppAttribute>> FetchPositionAttributesAsync(Guid positionId)
+    {
+        var position = await db.Positions
+            .Include(p => p.PositionAttributes).ThenInclude(pa => pa.Attribute).ThenInclude(a => a.DropdownOptions)
+            .FirstOrDefaultAsync(p => p.Id == positionId);
+        return position?.PositionAttributes.Select(pa => pa.Attribute).ToList() ?? new List<AppAttribute>();
+    }
+
+    private async Task<List<AppAttribute>> FetchBuiltinPersonalAttributesAsync()
+        => await db.Attributes
+            .Include(a => a.DropdownOptions)
+            .Where(a => a.Category!.Name == "Personal Information" && a.IsBuiltin == true)
+            .ToListAsync();
+
+    private async Task<List<ProfileAttribute>> FetchCandidateAttributesAsync(string candidateId, IEnumerable<Guid> requiredIds)
+        => await db.ProfileAttributes
+            .Include(pa => pa.Attribute).ThenInclude(a => a.DropdownOptions)
+            .Where(pa => pa.UserId == candidateId && requiredIds.Contains(pa.AttributeId))
+            .ToListAsync();
+
+    private async Task<List<ProjectDto>> GetCvProjectsAsync(List<Guid> pIds)
+    {
+        var p = await db.Projects.Include(p => p.ProjectTechnologyTags).ThenInclude(pt => pt.Tag).Where(x => pIds.Contains(x.Id)).ToListAsync();
+        return p.Select(MapProject).ToList();
+    }
+
+    private async Task<PagedResponse<CvListDto>> MapCvListWithNamesAsync(PagedResponse<Cv> cvs)
+    {
+        var names = await GetCandidateNamesAsync(cvs.Data.Select(c => c.CandidateId).Distinct());
+        return MapPagedResponse(cvs, c => MapToCvListDto(c, names.GetValueOrDefault(c.CandidateId, "Unknown")));
+    }
+
+    private async Task<Dictionary<string, string>> GetCandidateNamesAsync(IEnumerable<string> cIds)
+    {
+        var stringIds = cIds.ToList();
+        var attrs = await db.ProfileAttributes.Include(pa => pa.Attribute).Where(pa => stringIds.Contains(pa.UserId) && (pa.Attribute.Name == "First Name" || pa.Attribute.Name == "Last Name")).ToListAsync();
+        return cIds.ToDictionary(id => id, id => ExtractCandidateName(attrs.Where(a => a.UserId == id).ToList()));
+    }
+
+    private PagedResponse<CvListDto> MapPagedResponse(PagedResponse<Cv> page, Func<Cv, CvListDto> m)
+        => new() { Data = page.Data.Select(m).ToList(), PageNumber = page.PageNumber, PageSize = page.PageSize, TotalPages = page.TotalPages, TotalRecords = page.TotalRecords };
+
+    private ProjectDto MapProject(Project p)
+        => new() { Id = p.Id, Name = p.Name, StartDate = p.StartDate, EndDate = p.EndDate, Description = p.Description, Tags = p.ProjectTechnologyTags.Select(t => new TagDto(t.TagId, t.Tag.Name)).ToList(), Version = 0 };
+
+    private ProfileAttributeDto MapProfileAttribute(ProfileAttribute a)
+        => new() { Id = a.Id, AttributeId = a.AttributeId, AttributeName = a.Attribute.Name, TypeName = a.Attribute.Type.ToString(), CategoryName = a.Attribute.Category?.Name ?? "", Value = a.Value, Version = 0 };
+
+    private AttributeDto MapAttributeToDto(AppAttribute a)
+        => new() { Id = a.Id, Name = a.Name, TypeName = a.Type.ToString(), CategoryName = a.Category?.Name ?? "", IsBuiltin = a.IsBuiltin, DropdownOptions = a.DropdownOptions?.Select(d => new DropdownOptionDto(d.Id, d.Label)).ToList() };
+
+    private CvDetailDto BuildCvDetailDto(Cv cv, string name, List<ProjectDto> projects)
+        => new() { Id = cv.Id, CandidateId = cv.CandidateId, PositionId = cv.PositionId, PositionTitle = cv.Position?.Title ?? "", CandidateName = name, CreatedAt = cv.CreatedAt, LikeCount = cv.LikeCount, IsPublished = cv.IsPublished, Projects = projects };
+
+    private FullCvDetailDto BuildFullCvDetailDto(Cv cv, List<ProjectDto> projects, List<AppAttribute> requiredAttrs, List<ProfileAttribute> candidateAttrs)
+    {
+        var filledIds = candidateAttrs.Select(ca => ca.AttributeId).ToHashSet();
+        return new FullCvDetailDto 
+        {
+            Id = cv.Id,
+            CandidateId = cv.CandidateId,
+            PositionId = cv.PositionId,
+            PositionTitle = cv.Position?.Title ?? "",
+            CandidateName = ExtractCandidateName(candidateAttrs),
+            CreatedAt = cv.CreatedAt,
+            LikeCount = cv.LikeCount,
+            IsPublished = cv.IsPublished,
+            Projects = projects,
+            FilledAttributes = candidateAttrs.Select(MapProfileAttribute).ToList(),
+            MissingAttributes = requiredAttrs.Where(a => !filledIds.Contains(a.Id)).Select(MapAttributeToDto).ToList()
         };
     }
 }

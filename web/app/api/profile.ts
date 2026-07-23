@@ -1,6 +1,5 @@
 import api from "./index";
-import type { MeSectionDto, UpdateMeSectionDto, ProfileAttributeDto, AddProfileAttributeDto, UpdateProfileAttributeValueDto, ProjectDto, CreateProjectDto, UpdateProjectDto, TagDto, CandidatePositionAttributesDto } from "./types";
-
+import type { MeSectionDto, UpdateMeSectionDto, ProfileAttributeDto, AddProfileAttributeDto, UpdateProfileAttributeValueDto, ProjectDto, CreateProjectDto, UpdateProjectDto, TagDto, CandidatePositionAttributesDto, ProjectSearchQueryDto, PaginatedResponse } from "./types";
 export async function fetchMeSection(): Promise<MeSectionDto> {
     const res = await api.get<MeSectionDto>("/profile/me");
     return res.data;
@@ -29,6 +28,11 @@ export async function deleteProfileAttribute(profileAttributeId: string): Promis
 
 export async function fetchProjects(): Promise<ProjectDto[]> {
     const res = await api.get<ProjectDto[]>("/profile/projects");
+    return res.data;
+}
+
+export async function searchProjects(dto: ProjectSearchQueryDto): Promise<PaginatedResponse<ProjectDto>> {
+    const res = await api.post<PaginatedResponse<ProjectDto>>("/profile/projects/search", dto);
     return res.data;
 }
 

@@ -1,5 +1,5 @@
 import api from "./index";
-import type { PaginatedResponse } from "./types";
+import type { PaginatedResponse, ProjectDto } from "./types";
 
 export interface CreateCvDto {
     positionId: string;
@@ -39,8 +39,20 @@ export async function updateCv(id: string, dto: UpdateCvDto): Promise<void> {
     await api.put(`/cvs/${id}`, dto);
 }
 
-export async function getCvById(id: string): Promise<any> {
-    const res = await api.get(`/cvs/${id}`);
+export interface CvDetailDto {
+    id: string;
+    candidateId: string;
+    positionId: string;
+    positionTitle: string;
+    candidateName: string;
+    isPublished: boolean;
+    createdAt: string;
+    likeCount: number;
+    projects: ProjectDto[];
+}
+
+export async function getCvById(id: string): Promise<CvDetailDto> {
+    const res = await api.get<CvDetailDto>(`/cvs/${id}`);
     return res.data;
 }
 

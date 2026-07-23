@@ -14,3 +14,34 @@
 .cvWrapper button {
     font-family: "PT Serif", serif;
 }
+
+.missingAttribute {
+    background-color: light-dark(var(--mantine-color-red-1), var(--mantine-color-red-9));
+    border: 1px dashed light-dark(var(--mantine-color-red-5), var(--mantine-color-red-7));
+    color: light-dark(var(--mantine-color-red-8), var(--mantine-color-red-1));
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.attributeItem {
+    cursor: pointer;
+    position: relative;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.attributeItem:hover {
+    background-color: light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-6));
+}
+
+.editIcon {
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.attributeItem:hover .editIcon {
+    opacity: 0.5;
+}

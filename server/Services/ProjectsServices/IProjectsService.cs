@@ -1,4 +1,5 @@
 using server.Dto;
+using server.Utils;
 
 namespace server.Services.ProjectsServices
 {
@@ -8,5 +9,6 @@ namespace server.Services.ProjectsServices
         Task<List<ProjectDto>> GetAllProjectsByUserAsync(string userId);
         Task<ProjectDto> UpdateProjectAsync(string userId, Guid projectId, UpdateProjectDto dto);
         Task DeleteProjectAsync(string userId, Guid projectId);
+        Task<PagedResponse<ProjectDto>> SearchProjectsAsync(string userId, ProjectSearchQueryDto dto);
     }
 }
