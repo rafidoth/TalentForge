@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using server.Data;
 using server.Dto;
 using server.Services.CvServices;
 
@@ -64,6 +65,7 @@ namespace server.Controllers
             return NoContent();
         }
 
+        [Authorize(Roles = Roles.AdminOrRecruiter)]
         [HttpPost("{id:guid}/like")]
         public async Task<IActionResult> LikeCv(Guid id)
         {
@@ -71,6 +73,7 @@ namespace server.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = Roles.AdminOrRecruiter)]
         [HttpDelete("{id:guid}/like")]
         public async Task<IActionResult> UnlikeCv(Guid id)
         {

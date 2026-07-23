@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createCv, checkCvExists, updateCv, getCvById, getCandidateCvs, getPositionCvs, getFullCvById } from '~/api/cvs';
+import { createCv, checkCvExists, updateCv, getCvById, getCandidateCvs, getPositionCvs, getFullCvById, likeCv, unlikeCv } from '~/api/cvs';
 import type { CreateCvDto, UpdateCvDto } from '~/api/cvs';
 
 export function useCreateCv() {
@@ -54,5 +54,29 @@ export function usePositionCvs(positionId: string, pageNumber: number = 1, pageS
         queryKey: ['positionCvs', positionId, pageNumber, pageSize],
         queryFn: () => getPositionCvs(positionId, pageNumber, pageSize),
         enabled: !!positionId,
+    });
+}
+
+export function useLikeCv() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (cvId: string) => likeCv(cvId),
+        onSuccess: (_, cvId) => {
+            queryClient.invalidateQueries({ queryKey: ['fullCv', cvId] });
+            queryClient.invalidateQueries({ queryKey: ['cvs'] });
+            queryClient.invalidateQueries({ queryKey: ['positionCvs'] });
+        },
+    });
+}
+
+export function useUnlikeCv() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (cvId: string) => unlikeCv(cvId),
+        onSuccess: (_, cvId) => {
+            queryClient.invalidateQueries({ queryKey: ['fullCv', cvId] });
+            queryClient.invalidateQueries({ queryKey: ['cvs'] });
+            queryClient.invalidateQueries({ queryKey: ['positionCvs'] });
+        },
     });
 }

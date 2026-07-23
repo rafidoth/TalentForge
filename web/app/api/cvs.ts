@@ -95,3 +95,11 @@ export async function getPositionCvs(positionId: string, pageNumber: number = 1,
     const res = await api.get<PaginatedResponse<CvListDto>>(`/cvs/position/${positionId}?pageNumber=${pageNumber}&pageSize=${pageSize}`);
     return res.data;
 }
+
+export async function likeCv(id: string): Promise<void> {
+    await api.post(`/cvs/${id}/like`);
+}
+
+export async function unlikeCv(id: string): Promise<void> {
+    await api.delete(`/cvs/${id}/like`);
+}

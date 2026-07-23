@@ -1,14 +1,42 @@
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
-import { Container, Title, Text, Stack, Loader, Center, Group, ActionIcon, Divider, Button } from "@mantine/core";
+import { Container, Title, Text, Stack, Loader, Center, Group, ActionIcon, Button } from "@mantine/core";
 import { ArrowLeftIcon } from "@phosphor-icons/react";
-import { IconHeartFilled } from "@tabler/icons-react";
-import { useFullCv } from "~/hooks/useCvs";
+import { IconHeartFilled, IconHeart } from "@tabler/icons-react";
+import { useFullCv, useLikeCv, useUnlikeCv } from "~/hooks/useCvs";
 import { FullCv } from "~/components/CandidateCv/FullCv";
 
 export default function CvDetailsPage() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { data: cv, isLoading, isError } = useFullCv(id);
+    const likeMutation = useLikeCv();
+    const unlikeMutation = useUnlikeCv();
+
+    const [isLiked, setIsLiked] = useState(false);
+
+    useEffect(() => {
+        if (id) {
+            setIsLiked(localStorage.getItem(`liked_cv_${id}`) === 'true');
+        }
+    }, [id]);
+
+    const handleToggleLike = async () => {
+        if (!id) return;
+        try {
+            if (isLiked) {
+                await unlikeMutation.mutateAsync(id);
+                localStorage.setItem(`liked_cv_${id}`, 'false');
+                setIsLiked(false);
+            } else {
+                await likeMutation.mutateAsync(id);
+                localStorage.setItem(`liked_cv_${id}`, 'true');
+                setIsLiked(true);
+            }
+        } catch (e) {
+            // Ignore error (e.g. if already liked/unliked)
+        }
+    };
 
     if (isLoading) {
         return <Center p="xl" h={400}><Loader /></Center>;
@@ -36,7 +64,15 @@ export default function CvDetailsPage() {
 
                     <Group gap={4} align="center">
                         <Text fw={600} size="xl">{cv.likeCount}</Text>
-                        <IconHeartFilled size={32} color="red" />
+                        <ActionIcon 
+                            variant="subtle" 
+                            color="red" 
+                            size="xl" 
+                            onClick={handleToggleLike}
+                            loading={likeMutation.isPending || unlikeMutation.isPending}
+                        >
+                            {isLiked ? <IconHeartFilled size={32} /> : <IconHeart size={32} />}
+                        </ActionIcon>
                     </Group>
                 </Group>
 
