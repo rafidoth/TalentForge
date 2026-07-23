@@ -6,6 +6,7 @@ import { ArrowLeftIcon, GlobeHemisphereEastIcon, GlobeSimpleIcon, LockIcon, Lock
 import { OverviewTab } from "~/components/positions/positionDetails/OverviewTab";
 import { AttributesTab } from "~/components/positions/positionDetails/AttributesTab";
 import { TechnologyTagsTab } from "~/components/positions/positionDetails/TechnologyTagsTab";
+import { SubmittedCvList } from "~/components/positions/positionDetails/SubmittedCvList";
 import { PositionAccessRulesModal } from "~/components/positions/positionDetails/AccessRulesModal";
 
 export default function PositionDetails() {
@@ -59,9 +60,24 @@ export default function PositionDetails() {
           </Menu>
         </Group>
 
-        <OverviewTab positionId={id!} position={position} />
-        <TechnologyTagsTab positionId={id!} />
-        <AttributesTab positionId={id!} position={position} />
+        <Tabs defaultValue="overview" variant="outline">
+          <Tabs.List>
+            <Tabs.Tab value="overview">Overview & Settings</Tabs.Tab>
+            <Tabs.Tab value="cvs">Submitted CVs</Tabs.Tab>
+          </Tabs.List>
+
+          <Tabs.Panel value="overview" pt="xl">
+            <Stack gap="md">
+              <OverviewTab positionId={id!} position={position} />
+              <TechnologyTagsTab positionId={id!} />
+              <AttributesTab positionId={id!} position={position} />
+            </Stack>
+          </Tabs.Panel>
+
+          <Tabs.Panel value="cvs" pt="xl">
+            <SubmittedCvList positionId={id!} />
+          </Tabs.Panel>
+        </Tabs>
 
 
         <PositionAccessRulesModal

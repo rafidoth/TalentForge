@@ -1,5 +1,5 @@
 import api from "./index";
-import type { PaginatedResponse, ProjectDto } from "./types";
+import type { PaginatedResponse, ProjectDto, ProfileAttributeDto, AttributeDto } from "./types";
 
 export interface CreateCvDto {
     positionId: string;
@@ -56,6 +56,25 @@ export async function getCvById(id: string): Promise<CvDetailDto> {
     return res.data;
 }
 
+export interface FullCvDetailDto {
+    id: string;
+    candidateId: string;
+    positionId: string;
+    positionTitle: string;
+    candidateName: string;
+    isPublished: boolean;
+    createdAt: string;
+    likeCount: number;
+    projects: ProjectDto[];
+    filledAttributes: ProfileAttributeDto[];
+    missingAttributes: AttributeDto[];
+}
+
+export async function getFullCvById(id: string): Promise<FullCvDetailDto> {
+    const res = await api.get<FullCvDetailDto>(`/cvs/${id}/full`);
+    return res.data;
+}
+
 export interface CvListDto {
     id: string;
     candidateId: string;
@@ -69,5 +88,10 @@ export interface CvListDto {
 
 export async function getCandidateCvs(pageNumber: number = 1, pageSize: number = 10): Promise<PaginatedResponse<CvListDto>> {
     const res = await api.get<PaginatedResponse<CvListDto>>(`/cvs/candidate?pageNumber=${pageNumber}&pageSize=${pageSize}`);
+    return res.data;
+}
+
+export async function getPositionCvs(positionId: string, pageNumber: number = 1, pageSize: number = 10): Promise<PaginatedResponse<CvListDto>> {
+    const res = await api.get<PaginatedResponse<CvListDto>>(`/cvs/position/${positionId}?pageNumber=${pageNumber}&pageSize=${pageSize}`);
     return res.data;
 }

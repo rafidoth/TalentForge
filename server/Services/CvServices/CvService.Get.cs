@@ -23,7 +23,7 @@ public partial class CvService
         var projects = await GetCvProjectsAsync(cv.ChosenProjectIds);
         var requiredAttributes = await FetchAllRequiredAttributesAsync(cv.PositionId);
         var candidateAttributes = await FetchCandidateAttributesAsync(cv.CandidateId, requiredAttributes.Select(a => a.Id));
-        
+
         return BuildFullCvDetailDto(cv, projects, requiredAttributes, candidateAttributes);
     }
 
@@ -83,12 +83,16 @@ public partial class CvService
     private async Task<List<AppAttribute>> FetchBuiltinPersonalAttributesAsync()
         => await db.Attributes
             .Include(a => a.DropdownOptions)
+            .Include(a => a.Type)
+            .Include(a => a.Category)
             .Where(a => a.Category!.Name == "Personal Information" && a.IsBuiltin == true)
             .ToListAsync();
 
     private async Task<List<ProfileAttribute>> FetchCandidateAttributesAsync(string candidateId, IEnumerable<Guid> requiredIds)
         => await db.ProfileAttributes
             .Include(pa => pa.Attribute).ThenInclude(a => a.DropdownOptions)
+            .Include(pa => pa.Attribute).ThenInclude(a => a.Category)
+            .Include(pa => pa.Attribute).ThenInclude(a => a.Type)
             .Where(pa => pa.UserId == candidateId && requiredIds.Contains(pa.AttributeId))
             .ToListAsync();
 
@@ -118,10 +122,10 @@ public partial class CvService
         => new() { Id = p.Id, Name = p.Name, StartDate = p.StartDate, EndDate = p.EndDate, Description = p.Description, Tags = p.ProjectTechnologyTags.Select(t => new TagDto(t.TagId, t.Tag.Name)).ToList(), Version = 0 };
 
     private ProfileAttributeDto MapProfileAttribute(ProfileAttribute a)
-        => new() { Id = a.Id, AttributeId = a.AttributeId, AttributeName = a.Attribute.Name, TypeName = a.Attribute.Type.ToString(), CategoryName = a.Attribute.Category?.Name ?? "", Value = a.Value, Version = 0 };
+        => new() { Id = a.Id, AttributeId = a.AttributeId, AttributeName = a.Attribute.Name, TypeName = a.Attribute.Type?.Name ?? "", CategoryName = a.Attribute.Category?.Name ?? "", Value = a.Value, IsBuiltin = a.Attribute.IsBuiltin, DropdownOptions = a.Attribute.DropdownOptions?.Select(d => new DropdownOptionDto(d.Id, d.Label)).ToList(), Version = 0 };
 
     private AttributeDto MapAttributeToDto(AppAttribute a)
-        => new() { Id = a.Id, Name = a.Name, TypeName = a.Type.ToString(), CategoryName = a.Category?.Name ?? "", IsBuiltin = a.IsBuiltin, DropdownOptions = a.DropdownOptions?.Select(d => new DropdownOptionDto(d.Id, d.Label)).ToList() };
+        => new() { Id = a.Id, Name = a.Name, TypeName = a.Type?.Name ?? "", CategoryName = a.Category?.Name ?? "", IsBuiltin = a.IsBuiltin, DropdownOptions = a.DropdownOptions?.Select(d => new DropdownOptionDto(d.Id, d.Label)).ToList() };
 
     private CvDetailDto BuildCvDetailDto(Cv cv, string name, List<ProjectDto> projects)
         => new() { Id = cv.Id, CandidateId = cv.CandidateId, PositionId = cv.PositionId, PositionTitle = cv.Position?.Title ?? "", CandidateName = name, CreatedAt = cv.CreatedAt, LikeCount = cv.LikeCount, IsPublished = cv.IsPublished, Projects = projects };
@@ -129,7 +133,7 @@ public partial class CvService
     private FullCvDetailDto BuildFullCvDetailDto(Cv cv, List<ProjectDto> projects, List<AppAttribute> requiredAttrs, List<ProfileAttribute> candidateAttrs)
     {
         var filledIds = candidateAttrs.Select(ca => ca.AttributeId).ToHashSet();
-        return new FullCvDetailDto 
+        return new FullCvDetailDto
         {
             Id = cv.Id,
             CandidateId = cv.CandidateId,

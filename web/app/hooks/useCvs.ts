@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createCv, checkCvExists, updateCv, getCvById, getCandidateCvs } from '~/api/cvs';
+import { createCv, checkCvExists, updateCv, getCvById, getCandidateCvs, getPositionCvs, getFullCvById } from '~/api/cvs';
 import type { CreateCvDto, UpdateCvDto } from '~/api/cvs';
 
 export function useCreateCv() {
@@ -34,9 +34,25 @@ export function useCv(cvId: string | undefined) {
     });
 }
 
+export function useFullCv(cvId: string | undefined) {
+    return useQuery({
+        queryKey: ['fullCv', cvId],
+        queryFn: () => getFullCvById(cvId!),
+        enabled: !!cvId,
+    });
+}
+
 export function useCandidateCvs(pageNumber: number = 1, pageSize: number = 10) {
     return useQuery({
         queryKey: ['candidateCvs', pageNumber, pageSize],
         queryFn: () => getCandidateCvs(pageNumber, pageSize),
+    });
+}
+
+export function usePositionCvs(positionId: string, pageNumber: number = 1, pageSize: number = 10) {
+    return useQuery({
+        queryKey: ['positionCvs', positionId, pageNumber, pageSize],
+        queryFn: () => getPositionCvs(positionId, pageNumber, pageSize),
+        enabled: !!positionId,
     });
 }

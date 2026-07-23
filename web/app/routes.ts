@@ -12,6 +12,7 @@ export default [
         route("positions", "routes/positions.tsx"),
         route("attributes", "routes/attribute-library.tsx"),
         route("cvs", "routes/cvs.tsx"),
+        route("cv/:id", "routes/cv.tsx"),
         route("position/:id", "routes/position-details.tsx"),
         route("c/positions", "routes/candidate-positions.tsx"),
         route("c/projects", "routes/candidate-projects.tsx"),
