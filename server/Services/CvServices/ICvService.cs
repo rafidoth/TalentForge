@@ -11,7 +11,8 @@ public interface ICvService
     Task<CvDetailDto> GetCvByIdAsync(Guid cvId);
     Task<FullCvDetailDto> GetFullCvByIdAsync(Guid cvId);
     Task<CvDetailDto> UpdateCvAsync(Guid cvId, string candidateId, UpdateCvDto dto);
-    Task<PagedResponse<CvListDto>> GetCvsByCandidateIdAsync(string candidateId, int pageNumber, int pageSize);
+    Task<List<CvListDto>> GetAllCvsByCandidateIdAsync(string candidateId);
+    Task<PagedResponse<CvListDto>> GetCvsWithPositionByCandidateIdAsync(string candidateId, int pageNumber, int pageSize);
     Task<PagedResponse<CvListDto>> GetCvsByPositionIdAsync(Guid positionId, int pageNumber, int pageSize);
     Task<PagedResponse<CvListDto>> SearchCvsAsync(string query, int pageNumber, int pageSize);
     Task DeleteCvAsync(Guid cvId);

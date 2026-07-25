@@ -1,4 +1,4 @@
-import { Card, Stack, TextInput, NumberInput, Group, Button } from "@mantine/core";
+import { Card, Stack, TextInput, Textarea, NumberInput, Group, Button } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useEffect } from "react";
 import { useUpdatePosition } from "~/hooks/usePositions";
@@ -41,7 +41,7 @@ export function OverviewTab({ positionId, position }: OverviewTabProps) {
       <form onSubmit={form.onSubmit(handleSave)}>
         <Stack gap="md">
           <TextInput label="Title" {...form.getInputProps("title")} required />
-          <TextInput label="Short Description" {...form.getInputProps("shortDescription")} />
+          <Textarea label="Short Description" radius="sm" {...form.getInputProps("shortDescription")} />
           <NumberInput label="Max Projects" {...form.getInputProps("maxProjects")} />
           <Group justify="flex-end">
             {form.isDirty() && (

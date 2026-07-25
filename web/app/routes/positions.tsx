@@ -24,7 +24,7 @@ export const handle: RouteHandle = {
 };
 
 export default function PositionsPage() {
-  const pageSize = 10;
+  const pageSize = 20;
   const { page, setPage, selectedIds, toggleSelection, resetStore } =
     usePositionStore();
 
@@ -72,7 +72,6 @@ export default function PositionsPage() {
                   value={page}
                   onChange={setPage}
                   color="blue"
-                  radius="md"
                   withEdges
                 />
               </Flex>

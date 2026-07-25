@@ -46,7 +46,7 @@ namespace server.Controllers
         [HttpGet("candidate")]
         public async Task<IActionResult> GetCvsByCandidateId([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await cvService.GetCvsByCandidateIdAsync(GetUserIdString(), pageNumber, pageSize);
+            var result = await cvService.GetCvsWithPositionByCandidateIdAsync(GetUserIdString(), pageNumber, pageSize);
             return Ok(result);
         }
 

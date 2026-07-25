@@ -31,7 +31,7 @@ namespace server.Services.PositionServices
         }
 
         public async Task<PagedResponse<PositionDto>> GetAllPositionsAsync(int pageNumber = 1, int pageSize = 10)
-            => await PagedResponse.CreateAsync(db.Positions.AsNoTracking().Select(MapToDtoExpr()), pageNumber, pageSize, 10);
+            => await PagedResponse.CreateAsync(db.Positions.AsNoTracking().Select(MapToDtoExpr()), pageNumber, pageSize, 20);
 
         public async Task<PagedResponse<PositionDto>> GetCandidatePositionsAsync(string userId, int pageNumber = 1, int pageSize = 10)
         {
@@ -40,7 +40,7 @@ namespace server.Services.PositionServices
                           .AsNoTracking()
                           .Where(p => p.IsPublic || accessibleIds.Contains(p.Id));
 
-            return await PagedResponse.CreateAsync(query.Select(MapToDtoExpr()), pageNumber, pageSize, 10);
+            return await PagedResponse.CreateAsync(query.Select(MapToDtoExpr()), pageNumber, pageSize, 20);
         }
 
         public async Task<PositionDto> GetPositionByIdAsync(Guid id)

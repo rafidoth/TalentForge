@@ -27,7 +27,18 @@ public partial class CvService
         return BuildFullCvDetailDto(cv, projects, requiredAttributes, candidateAttributes);
     }
 
-    public async Task<PagedResponse<CvListDto>> GetCvsByCandidateIdAsync(string candidateId, int page, int size)
+    public async Task<List<CvListDto>> GetAllCvsByCandidateIdAsync(string candidateId)
+    {
+        var cvs = await db.Cvs.Include(c => c.Position)
+                              .Where(c => c.CandidateId == candidateId)
+                              .OrderByDescending(c => c.CreatedAt)
+                              .ToListAsync();
+
+        var name = ExtractCandidateName(await GetCandidateProfileAttributesAsync(candidateId));
+        return cvs.Select(c => MapToCvListDto(c, name)).ToList();
+    }
+
+    public async Task<PagedResponse<CvListDto>> GetCvsWithPositionByCandidateIdAsync(string candidateId, int page, int size)
     {
         var q = db.Cvs
                   .Include(c => c.Position)

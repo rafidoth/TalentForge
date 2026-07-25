@@ -16,7 +16,7 @@ export function PositionTable({
   onRowClick,
 }: PositionTableProps) {
   return (
-    <Table.ScrollContainer minWidth={600}>
+    <Table.ScrollContainer minWidth={600} maxHeight={600}>
       <Table highlightOnHover withRowBorders withColumnBorders={false}>
         <Table.Thead>
           <Table.Tr>

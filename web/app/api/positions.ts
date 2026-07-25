@@ -37,7 +37,7 @@ export const updatePosition = async (id: string, dto: UpdatePositionDto) => {
 
 export const fetchPositions = async (
   pageNumber: number = 1,
-  pageSize: number = 10,
+  pageSize: number = 20,
 ): Promise<PaginatedResponse<PositionDto>> => {
   const fetchPositionsUrl = `/positions?pageNumber=${pageNumber}&pageSize=${pageSize}`;
   const { data } = await api.get<PaginatedResponse<PositionDto>>(fetchPositionsUrl)
