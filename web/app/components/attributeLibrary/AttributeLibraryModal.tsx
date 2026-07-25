@@ -16,7 +16,7 @@ function PositionAttributeList({ positionId }: { positionId: string }) {
     ? parseInt(activeTab, 10)
     : null;
   const recent = activeTab === "recent";
-  const { data: attributesData, isLoading: attributesLoading } = useAttributes(search, categoryId, recent, page, 10);
+  const { data: attributesData, isLoading: attributesLoading } = useAttributes(search, categoryId, recent, page, 20);
 
   return (
     <BaseAttributeList

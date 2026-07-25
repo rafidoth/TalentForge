@@ -91,7 +91,7 @@ export const usePositionAttributes = (positionId: string | undefined) => {
   return useInfiniteQuery({
     queryKey: ["positionAttributes", positionId],
     queryFn: ({ pageParam }) =>
-      fetchPositionAttributes(positionId!, pageParam as number, 10),
+      fetchPositionAttributes(positionId!, pageParam as number, 20),
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
       lastPage.hasNextPage ? lastPage.pageNumber + 1 : undefined,

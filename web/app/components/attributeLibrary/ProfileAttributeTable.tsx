@@ -10,7 +10,7 @@ export interface ProfileAttributeTableProps {
 
 export function ProfileAttributeTable({ attributes, profileAttributeMap, onRowClick }: ProfileAttributeTableProps) {
   return (
-    <Table.ScrollContainer minWidth={500}>
+    <Table.ScrollContainer minWidth={500} maxHeight={600}>
       <Table highlightOnHover withRowBorders withColumnBorders={false}>
         <Table.Thead>
           <Table.Tr>
