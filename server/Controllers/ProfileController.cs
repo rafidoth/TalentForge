@@ -15,7 +15,8 @@ namespace server.Controllers
     public class ProfileController(
         IProfileService profileService,
         IProjectsService projectsService,
-        UserManager<ApplicationUser> userManager
+        UserManager<ApplicationUser> userManager,
+        ICandidateProfileService candidateProfileService
     ) : ControllerBase
     {
 
@@ -135,6 +136,10 @@ namespace server.Controllers
 
             return Ok(result);
         }
+
+        [HttpGet("candidate/{candidateId}/full")]
+        public async Task<IActionResult> GetCandidateFullProfile(string candidateId)
+            => Ok(await candidateProfileService.GetCandidateFullProfileAsync(candidateId));
     }
 
 
