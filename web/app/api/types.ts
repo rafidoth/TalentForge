@@ -124,7 +124,11 @@ export interface PositionAttributeDto {
 }
 
 export interface CreatePositionAttributeDto {
-  attributeId: string;
+  attributeIds: string[];
+}
+
+export interface DeletePositionAttributeDto {
+  attributeIds: string[];
 }
 
 export interface AddProfileAttributeDto {

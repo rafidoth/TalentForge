@@ -13,27 +13,60 @@ namespace server.Services.PositionServices
         IAttributeService attributeService
     ) : IPositionAttributeService
     {
-        public async Task<PositionAttributeDto> CreateAsync(Guid positionId, CreatePositionAttributeDto dto)
+        public async Task CreateBulkAsync(Guid positionId, CreatePositionAttributeDto dto)
         {
             await positionService.ExistsAsync(positionId);
-            await attributeService.AttributeExists(dto.AttributeId);
+            if (dto.AttributeIds == null || dto.AttributeIds.Length == 0)
+            {
+                throw new BadRequestException("At least one attribute ID must be provided.");
+            }
+            await attributeService.AllAttributesExistOrThrowAsync(dto.AttributeIds);
+            var existingAttributeIds = await GetAttributeIdsOfPositionAsync(positionId, dto.AttributeIds);
+            var attributesToAdd = GetAttributeIdsExcludingDuplicatesAndAlreadyAssociated(dto.AttributeIds, existingAttributeIds);
 
+            if (attributesToAdd.Count == 0) return;
+
+            var maxOrder = await GetMaxOrderAsync(positionId);
+            var newPositionAttributes = new List<PositionAttribute>();
+            foreach (var attributeId in attributesToAdd)
+            {
+                newPositionAttributes.Add(new PositionAttribute
+                {
+                    PositionId = positionId,
+                    AttributeId = attributeId,
+                    Order = maxOrder + 1
+                });
+                maxOrder++;
+            }
+
+            db.PositionAttributes.AddRange(newPositionAttributes);
+            await db.SaveChangesAsync();
+        }
+
+        private List<Guid> GetAttributeIdsExcludingDuplicatesAndAlreadyAssociated(IEnumerable<Guid> attributeIds, List<Guid> existingAttributeIds)
+        {
+            return attributeIds
+                .Distinct()
+                .Except(existingAttributeIds)
+                .ToList();
+        }
+
+        private async Task<List<Guid>> GetAttributeIdsOfPositionAsync(Guid positionId, IEnumerable<Guid> attributeIds)
+        {
+            var existingAttributeIds = await db.PositionAttributes
+                .Where(pa => pa.PositionId == positionId && attributeIds.Contains(pa.AttributeId))
+                .Select(pa => pa.AttributeId)
+                .ToListAsync();
+
+            return existingAttributeIds;
+        }
+
+        private async Task<int> GetMaxOrderAsync(Guid positionId)
+        {
             var maxOrder = await db.PositionAttributes
                 .Where(pa => pa.PositionId == positionId)
                 .MaxAsync(pa => (int?)pa.Order) ?? 0;
-            var nextOrder = maxOrder + 1;
-
-            var positionAttribute = new PositionAttribute
-            {
-                PositionId = positionId,
-                AttributeId = dto.AttributeId,
-                Order = nextOrder
-            };
-
-            await db.PositionAttributes.AddAsync(positionAttribute);
-            await db.SaveChangesAsync();
-            await db.Entry(positionAttribute).Reference(pa => pa.Attribute).LoadAsync();
-            return MapToDto(positionAttribute, db);
+            return maxOrder;
         }
 
         public async Task<PagedResponse<PositionAttributeDto>> GetAllAsync(Guid positionId, int pageNumber = 1, int pageSize = 10)
@@ -44,7 +77,7 @@ namespace server.Services.PositionServices
                 query,
                 pageNumber,
                 pageSize,
-                maxPageSize: 10
+                maxPageSize: 50
             );
         }
 
@@ -62,30 +95,24 @@ namespace server.Services.PositionServices
             return query;
         }
 
-        private async Task PositionAttributeExistsAsync(Guid positionId, Guid attributeId)
-        {
-            var exists = await db.PositionAttributes
-                .AnyAsync(pa => pa.PositionId == positionId && pa.AttributeId == attributeId);
-            if (!exists)
-            {
-                throw new NotFoundException("PositionAttribute", $"{positionId}-{attributeId}");
-            }
-        }
-
-        private async Task CheckExistanceOfAttributeInPosition(Guid positionId, Guid attributeId)
+        public async Task DeleteBulkAsync(Guid positionId, DeletePositionAttributeDto dto)
         {
             await positionService.ExistsAsync(positionId);
-            await attributeService.AttributeExists(attributeId);
-            await PositionAttributeExistsAsync(positionId, attributeId);
-        }
+            if (dto.AttributeIds == null || dto.AttributeIds.Length == 0)
+            {
+                throw new BadRequestException("At least one attribute ID must be provided.");
+            }
+            await attributeService.AllAttributesExistOrThrowAsync(dto.AttributeIds);
 
-        public async Task DeleteAsync(Guid positionId, Guid attributeId)
-        {
-            await CheckExistanceOfAttributeInPosition(positionId, attributeId);
-            var positionAttribute = await db.PositionAttributes
-                .FirstOrDefaultAsync(pa => pa.PositionId == positionId && pa.AttributeId == attributeId);
-            db.PositionAttributes.Remove(positionAttribute!);
-            await db.SaveChangesAsync();
+            var positionAttributes = await db.PositionAttributes
+                .Where(pa => pa.PositionId == positionId && dto.AttributeIds.Contains(pa.AttributeId))
+                .ToListAsync();
+
+            if (positionAttributes.Count > 0)
+            {
+                db.PositionAttributes.RemoveRange(positionAttributes);
+                await db.SaveChangesAsync();
+            }
         }
 
         private static PositionAttributeDto MapToDto(

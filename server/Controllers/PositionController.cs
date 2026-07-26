@@ -96,17 +96,17 @@ namespace server.Controllers
 
         [Authorize(Roles = Roles.AdminOrRecruiter)]
         [HttpPost("{id:guid}/attributes")]
-        public async Task<IActionResult> AddAttribute(Guid id, [FromBody] CreatePositionAttributeDto dto)
+        public async Task<IActionResult> AddAttributes(Guid id, [FromBody] CreatePositionAttributeDto dto)
         {
-            var result = await positionAttributeService.CreateAsync(id, dto);
-            return Ok(result);
+            await positionAttributeService.CreateBulkAsync(id, dto);
+            return Ok();
         }
 
         [Authorize(Roles = Roles.AdminOrRecruiter)]
-        [HttpDelete("{id:guid}/attributes/{attributeId:guid}")]
-        public async Task<IActionResult> RemoveAttribute(Guid id, Guid attributeId)
+        [HttpDelete("{id:guid}/attributes")]
+        public async Task<IActionResult> RemoveAttributes(Guid id, [FromBody] DeletePositionAttributeDto dto)
         {
-            await positionAttributeService.DeleteAsync(id, attributeId);
+            await positionAttributeService.DeleteBulkAsync(id, dto);
             return NoContent();
         }
 

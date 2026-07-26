@@ -26,12 +26,20 @@ public record PositionAttributeDto
 public record CreatePositionAttributeDto
 {
     [Required(ErrorMessage = PositionConstraints.AttributeIdRequiredErrorMessage)]
-    public Guid AttributeId { get; init; }
+    [MinLength(1, ErrorMessage = PositionConstraints.AttributeIdRequiredErrorMessage)]
+    public Guid[] AttributeIds { get; init; } = Array.Empty<Guid>();
 }
 
 public record CreatePositionAttributeResponseDto : CreatePositionAttributeDto
 {
     public Guid Id { get; init; }
+}
+
+public record DeletePositionAttributeDto
+{
+    [Required(ErrorMessage = PositionConstraints.AttributeIdRequiredErrorMessage)]
+    [MinLength(1, ErrorMessage = PositionConstraints.AttributeIdRequiredErrorMessage)]
+    public Guid[] AttributeIds { get; init; } = Array.Empty<Guid>();
 }
 
 public record PositionAccessRuleDto

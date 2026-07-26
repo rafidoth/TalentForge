@@ -9,8 +9,8 @@ namespace server.Services.PositionServices
 {
     public interface IPositionAttributeService
     {
-        Task<PositionAttributeDto> CreateAsync(Guid positionId, CreatePositionAttributeDto dto);
+        Task CreateBulkAsync(Guid positionId, CreatePositionAttributeDto dto);
         Task<PagedResponse<PositionAttributeDto>> GetAllAsync(Guid positionId, int pageNumber = 1, int pageSize = 10);
-        Task DeleteAsync(Guid positionId, Guid attributeId);
+        Task DeleteBulkAsync(Guid positionId, DeletePositionAttributeDto dto);
     }
 }

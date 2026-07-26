@@ -1,5 +1,5 @@
 import api from "./index";
-import type { PaginatedResponse, PositionAttributeDto, CreatePositionAttributeDto, CreatePositionTagDto, TagDto, PopularPositionDto } from "./types";
+import type { PaginatedResponse, PositionAttributeDto, CreatePositionAttributeDto, DeletePositionAttributeDto, CreatePositionTagDto, TagDto, PopularPositionDto } from "./types";
 
 export interface PositionDto {
   id: string;
@@ -88,17 +88,35 @@ export const fetchPositionAttributes = async (
 
 export const addPositionAttribute = async (
   id: string,
-  dto: CreatePositionAttributeDto
+  dto: CreatePositionAttributeDto | { attributeIds: string[] } | { attributeId: string } | string[]
 ) => {
-  const { data } = await api.post(`/positions/${id}/attributes`, dto);
+  let ids: string[] = [];
+  if (Array.isArray(dto)) {
+    ids = dto;
+  } else if ("attributeIds" in dto && Array.isArray(dto.attributeIds)) {
+    ids = dto.attributeIds;
+  } else if ("attributeId" in (dto as any)) {
+    ids = [(dto as any).attributeId];
+  }
+  const { data } = await api.post(`/positions/${id}/attributes`, { attributeIds: ids });
   return data;
 };
 
 export const removePositionAttribute = async (
   positionId: string,
-  attributeId: string
+  dto: DeletePositionAttributeDto | { attributeIds: string[] } | { attributeId: string } | string | string[]
 ) => {
-  await api.delete(`/positions/${positionId}/attributes/${attributeId}`);
+  let ids: string[] = [];
+  if (typeof dto === "string") {
+    ids = [dto];
+  } else if (Array.isArray(dto)) {
+    ids = dto;
+  } else if ("attributeIds" in dto && Array.isArray(dto.attributeIds)) {
+    ids = dto.attributeIds;
+  } else if ("attributeId" in (dto as any)) {
+    ids = [(dto as any).attributeId];
+  }
+  await api.delete(`/positions/${positionId}/attributes`, { data: { attributeIds: ids } });
 };
 
 export const getPositionTags = async (positionId: string) => {

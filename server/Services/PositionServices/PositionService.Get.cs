@@ -51,5 +51,6 @@ namespace server.Services.PositionServices
             if (!await db.Positions.AnyAsync(p => p.Id == positionId))
                 throw new NotFoundException("Position", positionId);
         }
+
     }
 }
