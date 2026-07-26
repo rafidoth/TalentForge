@@ -240,7 +240,12 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
     private IQueryable<AppAttribute> ApplySorting(IQueryable<AppAttribute> query, bool recent)
     {
         if (recent)
-            return query.OrderByDescending(a => a.CreatedAt).ThenByDescending(a => a.Id);
+        {
+            return query.Where(a => a.ProfileAttributes.Any())
+                        .OrderByDescending(
+                            a => a.ProfileAttributes.Max(pa => pa.UpdatedAt));
+        }
+
         return query;
     }
 
