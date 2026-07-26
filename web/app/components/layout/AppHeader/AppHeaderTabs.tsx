@@ -37,8 +37,8 @@ export function AppHeaderTabs({ tabs, activeTab }: AppHeaderTabsProps) {
           <Tabs.Tab 
             value={tab.path} 
             key={tab.path} 
-            component={Link} 
-            to={tab.path}
+            component={Link as any} 
+            {...({ to: tab.path } as any)}
             prefetch="intent"
             onClick={() => setLocalTab(tab.path)}
           >
