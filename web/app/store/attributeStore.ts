@@ -20,6 +20,8 @@ interface AttributeState {
   setPage: (page: number) => void;
   setActiveTab: (tab: string | null) => void;
   toggleSelection: (id: string) => void;
+  selectMultiple: (ids: string[]) => void;
+  deselectMultiple: (ids: string[]) => void;
   clearSelection: () => void;
 }
 
@@ -58,6 +60,16 @@ export const useAttributeStore = create<AttributeState>()(
         const newSet = new Set(state.selectedIds);
         if (newSet.has(id)) newSet.delete(id);
         else newSet.add(id);
+        return { selectedIds: newSet };
+      }),
+      selectMultiple: (ids) => set((state) => {
+        const newSet = new Set(state.selectedIds);
+        ids.forEach(id => newSet.add(id));
+        return { selectedIds: newSet };
+      }),
+      deselectMultiple: (ids) => set((state) => {
+        const newSet = new Set(state.selectedIds);
+        ids.forEach(id => newSet.delete(id));
         return { selectedIds: newSet };
       }),
       clearSelection: () => set({ selectedIds: new Set() })

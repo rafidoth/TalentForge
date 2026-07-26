@@ -4,6 +4,7 @@ import type { ProfileAttributeDto, AttributeDto } from '~/api/types';
 import { getAttributeDictionary } from './CandidateCvHeader';
 import classes from './CandidateCv.module.css';
 import { MarkdownRenderer } from '~/components/common/MarkdownRenderer';
+import { FullCvAttributeDisplay } from './FullCvAttributeDisplay';
 
 interface FullCvProps {
     cv: FullCvDetailDto;
@@ -24,7 +25,7 @@ export function FullCv({ cv }: FullCvProps) {
     });
 
     missingAttributes.forEach(attr => {
-        if (attr.isBuiltin) return; // Skip builtin missing attributes from groups
+        if (attr.isBuiltin) return;
         const cat = attr.categoryName || 'Other';
         if (!groupedAttributes[cat]) groupedAttributes[cat] = { filled: [], missing: [] };
         groupedAttributes[cat].missing.push(attr);
@@ -54,7 +55,6 @@ export function FullCv({ cv }: FullCvProps) {
                 </Group>
             </Stack>
 
-            {/* Attributes */}
             <Stack gap="sm">
                 {Object.entries(groupedAttributes).map(([category, { filled, missing }]) => (
                     <div key={category}>
@@ -69,36 +69,12 @@ export function FullCv({ cv }: FullCvProps) {
                             {category}
                         </Title>
                         <Stack gap={0} >
-                            {filled.map(attr => {
-                                let displayValue = attr.value;
-                                if (attr.dropdownOptions && attr.dropdownOptions.length > 0) {
-                                    if (Array.isArray(attr.value)) {
-                                        displayValue = attr.value.map((v: any) => {
-                                            const option = attr.dropdownOptions!.find(o => o.id === v);
-                                            return option ? option.label : v;
-                                        }).join(', ');
-                                    } else {
-                                        const option = attr.dropdownOptions.find(o => o.id === attr.value);
-                                        if (option) displayValue = option.label;
-                                    }
-                                } else if (attr.typeName === 'Boolean') {
-                                    displayValue = attr.value ? 'Yes' : 'No';
-                                } else if (typeof attr.value === 'object' && attr.value !== null) {
-                                    displayValue = JSON.stringify(attr.value);
-                                }
-
-                                return (
-                                    <Group
-                                        key={`filled-${attr.id}`}
-                                        gap="xs"
-                                        mb="xs"
-                                        style={{ padding: '2px 4px' }}
-                                    >
-                                        <Text fw={500} size="lg">{attr.attributeName} </Text>
-                                        <Text size="md">{displayValue as string}</Text>
-                                    </Group>
-                                );
-                            })}
+                            {filled.map(attr => (
+                                <FullCvAttributeDisplay
+                                    key={`filled-${attr.id}`}
+                                    attribute={attr}
+                                />
+                            ))}
                             {missing.map(attr => (
                                 <Box
                                     key={`missing-${attr.id}`}
