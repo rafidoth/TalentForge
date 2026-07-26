@@ -1,5 +1,6 @@
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
+using server.Dto;
 
 namespace server.Services.CloudinaryServices
 {
@@ -58,7 +59,6 @@ namespace server.Services.CloudinaryServices
             }
             catch
             {
-                // Fail-safe: deletion errors should not block attribute updates
                 return false;
             }
         }
