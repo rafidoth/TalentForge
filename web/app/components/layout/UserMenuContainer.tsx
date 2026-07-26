@@ -11,6 +11,8 @@ export function UserMenuContainer() {
     const { data: meSection, isLoading } = useMeSection();
     const queryClient = useQueryClient();
     const email = useAuthStore((state) => state.email) || '';
+    const currentTheme = useAuthStore((state) => state.theme);
+    const setTheme = useAuthStore((state) => state.setTheme);
 
     const displayName = meSection?.meAttributes
         ? getDisplayName(meSection.meAttributes)
@@ -26,12 +28,19 @@ export function UserMenuContainer() {
         navigate('/login');
     };
 
+    const handleToggleTheme = () => {
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        setTheme(newTheme);
+    };
+
     return (
         <UserMenu
             avatarUrl={avatarUrl}
             displayName={displayName}
             email={email}
             isLoading={isLoading}
+            currentTheme={currentTheme}
+            onToggleTheme={handleToggleTheme}
             onLogout={handleLogout}
         />
     );

@@ -22,3 +22,7 @@ export async function fetchMe(): Promise<AuthInfo> {
 export async function logout(): Promise<void> {
     await api.post("/auth/logout");
 }
+
+export async function updateTheme(theme: "light" | "dark"): Promise<void> {
+    await api.put(`/preferences/theme?theme=${theme}`);
+}

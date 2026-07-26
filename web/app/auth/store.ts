@@ -1,15 +1,19 @@
 import { create } from 'zustand';
 import type { UserRole } from '~/auth/types';
-import { fetchMe, logout as apiLogout } from '~/api/auth';
+import { fetchMe, logout as apiLogout, updateTheme as apiUpdateTheme } from '~/api/auth';
+
+type Theme = "light" | "dark";
 
 interface AuthState {
   isAuthenticated: boolean;
   userId: string | null;
   email: string | null;
   role: UserRole | null;
+  theme: Theme;
   isLoading: boolean;
   checkAuth: () => Promise<void>;
   logout: () => Promise<void>;
+  setTheme: (theme: Theme) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()((set) => ({
@@ -17,6 +21,7 @@ export const useAuthStore = create<AuthState>()((set) => ({
   userId: null,
   email: null,
   role: null,
+  theme: "light",
   isLoading: true,
   checkAuth: async () => {
     try {
@@ -26,6 +31,7 @@ export const useAuthStore = create<AuthState>()((set) => ({
         userId: data.userId,
         email: data.email,
         role: data.role as UserRole,
+        theme: data.preference?.theme ?? "light",
         isLoading: false,
       });
     } catch {
@@ -34,6 +40,7 @@ export const useAuthStore = create<AuthState>()((set) => ({
         userId: null,
         email: null,
         role: null,
+        theme: "light",
         isLoading: false,
       });
     }
@@ -45,8 +52,17 @@ export const useAuthStore = create<AuthState>()((set) => ({
       userId: null,
       email: null,
       role: null,
+      theme: "light",
       isLoading: false,
     });
+  },
+  setTheme: async (theme: Theme) => {
+    set({ theme });
+    try {
+      await apiUpdateTheme(theme);
+    } catch (error) {
+      console.error("Failed to update theme preference", error);
+    }
   },
 }));
 
@@ -54,6 +70,8 @@ export const useIsAuthenticated = () => useAuthStore((state) => state.isAuthenti
 export const useUserId = () => useAuthStore((state) => state.userId);
 export const useUserRole = () => useAuthStore((state) => state.role);
 export const useUserEmail = () => useAuthStore((state) => state.email);
+export const useUserTheme = () => useAuthStore((state) => state.theme);
 export const useAuthLoading = () => useAuthStore((state) => state.isLoading);
 export const useCheckAuth = () => useAuthStore((state) => state.checkAuth);
 export const useLogout = () => useAuthStore((state) => state.logout);
+export const useSetTheme = () => useAuthStore((state) => state.setTheme);

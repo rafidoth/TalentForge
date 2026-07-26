@@ -11,10 +11,16 @@ export type RegisterRequest = {
   location: string;
 };
 
+export type UserPreference = {
+  theme: "light" | "dark";
+  language: string;
+};
+
 export type AuthInfo = {
   userId: string;
   email: string;
   role: string;
+  preference: UserPreference;
 };
 
 // Profile DTOs
