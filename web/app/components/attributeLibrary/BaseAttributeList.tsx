@@ -21,7 +21,7 @@ export function BaseAttributeList({ attributesData, attributesLoading, mode, pos
     search, setSearch,
     page, setPage,
     activeTab, setActiveTab,
-    selectedIds, toggleSelection, clearSelection,
+    selectedIds, toggleSelection, clearSelection, selectMultiple, deselectMultiple,
     categories, fetchLookups
   } = useAttributeStore();
 
@@ -79,6 +79,16 @@ export function BaseAttributeList({ attributesData, attributesLoading, mode, pos
     toggleSelection(attributeId);
   };
 
+  const allCurrentSelected = filteredAttributes.length > 0 && filteredAttributes.every(a => selectedIds.has(a.id));
+
+  const handleToggleSelectAll = () => {
+    if (allCurrentSelected) {
+      deselectMultiple(filteredAttributes.map(a => a.id));
+    } else {
+      selectMultiple(filteredAttributes.map(a => a.id));
+    }
+  };
+
   const selectedNotAdded = useMemo(() => {
     return Array.from(selectedIds).filter(id => !addedAttributeIds.has(id));
   }, [selectedIds, addedAttributeIds]);
@@ -91,13 +101,10 @@ export function BaseAttributeList({ attributesData, attributesLoading, mode, pos
     if (mode !== "position" || !positionId || selectedNotAdded.length === 0) return;
     setIsAddingBulk(true);
     try {
-      const promises = selectedNotAdded.map(attrId =>
-        addPositionAttributeMutation.mutateAsync({
-          positionId,
-          dto: { attributeId: attrId }
-        })
-      );
-      await Promise.all(promises);
+      await addPositionAttributeMutation.mutateAsync({
+        positionId,
+        dto: { attributeIds: selectedNotAdded },
+      });
       clearSelection();
     } catch (error) {
       console.error("Failed to add some attributes.", error);
@@ -110,13 +117,10 @@ export function BaseAttributeList({ attributesData, attributesLoading, mode, pos
     if (mode !== "position" || !positionId || selectedAdded.length === 0) return;
     setIsRemovingBulk(true);
     try {
-      const promises = selectedAdded.map(attrId =>
-        removePositionAttributeMutation.mutateAsync({
-          positionId,
-          attributeId: attrId
-        })
-      );
-      await Promise.all(promises);
+      await removePositionAttributeMutation.mutateAsync({
+        positionId,
+        attributeIds: selectedAdded,
+      });
       clearSelection();
     } catch (error) {
       console.error("Failed to remove some attributes.", error);
@@ -179,6 +183,7 @@ export function BaseAttributeList({ attributesData, attributesLoading, mode, pos
           addedAttributeIds={mode === "position" ? addedAttributeIds : undefined}
           selectedIds={selectedIds}
           onToggleSelect={handleToggleSelect}
+          onToggleSelectAll={handleToggleSelectAll}
           hideStatus={mode === "global"}
         />
 
@@ -248,7 +253,7 @@ export function BaseAttributeList({ attributesData, attributesLoading, mode, pos
                   </ActionIcon>
                 </Tooltip>
 
-                <Tooltip label="Delete Attribute" withArrow>
+                <Tooltip label={`Delete ${selectedIds.size} attribute(s)`} withArrow>
                   <ActionIcon
                     variant="light"
                     size="lg"
@@ -265,7 +270,7 @@ export function BaseAttributeList({ attributesData, attributesLoading, mode, pos
 
             {mode === "position" && (
               <>
-                <Tooltip label="Add to Position" withArrow>
+                <Tooltip label={`Add ${selectedNotAdded.length} attribute(s) to Position`} withArrow>
                   <ActionIcon
                     variant="light"
                     size="lg"
@@ -278,7 +283,7 @@ export function BaseAttributeList({ attributesData, attributesLoading, mode, pos
                   </ActionIcon>
                 </Tooltip>
 
-                <Tooltip label="Remove from Position" withArrow>
+                <Tooltip label={`Remove ${selectedAdded.length} attribute(s) from Position`} withArrow>
                   <ActionIcon
                     variant="light"
                     size="lg"

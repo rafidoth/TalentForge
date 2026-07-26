@@ -19,4 +19,5 @@ public interface IAttributeService
     Task<List<AppAttribute>> GetBuiltInAttributesAsync();
     Task<AppAttribute> GetAttributeByNameAsync(string name);
     Task AttributeExists(Guid attributeId);
+    Task AllAttributesExistOrThrowAsync(IEnumerable<Guid> attributeIds);
 }

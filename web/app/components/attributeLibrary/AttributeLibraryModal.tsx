@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Modal, Text } from "@mantine/core";
 import { BaseAttributeList } from "./BaseAttributeList";
 import { ProfileAttributeList } from "./ProfileAttributeList";
@@ -33,6 +34,13 @@ export function AttributeLibraryModal({
   onClose,
   positionId,
 }: AttributeLibraryModalProps) {
+  const { clearSelection } = useAttributeStore();
+
+  useEffect(() => {
+    if (opened) {
+      clearSelection();
+    }
+  }, [opened, clearSelection]);
 
   const handleClose = () => {
     onClose();

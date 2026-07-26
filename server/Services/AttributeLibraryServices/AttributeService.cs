@@ -16,6 +16,22 @@ public class AttributeService(ApplicationDbContext db) : IAttributeService
             throw new NotFoundException("Attribute", attributeId);
         }
     }
+
+    public async Task AllAttributesExistOrThrowAsync(IEnumerable<Guid> attributeIds)
+    {
+        var existingAttributeIds = await db.Attributes
+            .Where(a => attributeIds.Contains(a.Id))
+            .Select(a => a.Id)
+            .ToListAsync();
+
+        var missingAttributeIds = attributeIds.Except(existingAttributeIds).ToList();
+
+        if (missingAttributeIds.Any())
+        {
+            throw new NotFoundException("Attributes", string.Join(", ", missingAttributeIds));
+        }
+    }
+
     public async Task<AttributeDto> CreateAsync(CreateAttributeDto dto)
     {
         var newAttribute = await GetNewAttribute(dto);

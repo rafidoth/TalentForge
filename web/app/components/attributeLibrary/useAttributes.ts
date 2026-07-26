@@ -22,6 +22,7 @@ import type {
   CreateAttributeDto,
   UpdateAttributeDto,
   CreatePositionAttributeDto,
+  DeletePositionAttributeDto,
   AttributeDto,
 } from "../../api/types";
 
@@ -107,11 +108,26 @@ export const useAddPositionAttribute = () => {
       dto,
     }: {
       positionId: string;
-      dto: CreatePositionAttributeDto;
+      dto: CreatePositionAttributeDto | { attributeIds: string[] } | { attributeId: string } | string[];
     }) => addPositionAttribute(positionId, dto),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["positionAttributes", variables.positionId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["profile", "attributes", "position", variables.positionId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["positions"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["position", variables.positionId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["cv"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["fullCv"],
       });
     },
   });
@@ -123,13 +139,35 @@ export const useRemovePositionAttribute = () => {
     mutationFn: ({
       positionId,
       attributeId,
+      attributeIds,
+      dto,
     }: {
       positionId: string;
-      attributeId: string;
-    }) => removePositionAttribute(positionId, attributeId),
+      attributeId?: string;
+      attributeIds?: string[];
+      dto?: DeletePositionAttributeDto | { attributeIds: string[] } | { attributeId: string } | string | string[];
+    }) => {
+      const payload = dto || attributeIds || (attributeId ? [attributeId] : []);
+      return removePositionAttribute(positionId, payload);
+    },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["positionAttributes", variables.positionId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["profile", "attributes", "position", variables.positionId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["positions"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["position", variables.positionId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["cv"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["fullCv"],
       });
     },
   });

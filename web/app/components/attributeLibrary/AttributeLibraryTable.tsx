@@ -7,6 +7,7 @@ export interface AttributeLibraryTableProps {
   addedAttributeIds?: Set<string>;
   selectedIds: Set<string>;
   onToggleSelect: (attributeId: string) => void;
+  onToggleSelectAll?: () => void;
   hideStatus?: boolean;
 }
 
@@ -15,6 +16,7 @@ export function AttributeLibraryTable({
   addedAttributeIds,
   selectedIds,
   onToggleSelect,
+  onToggleSelectAll,
   hideStatus = false
 }: AttributeLibraryTableProps) {
   return (
@@ -22,7 +24,16 @@ export function AttributeLibraryTable({
       <Table highlightOnHover withRowBorders withColumnBorders={false} verticalSpacing="sm">
         <Table.Thead>
           <Table.Tr>
-            <Table.Th w={40}></Table.Th>
+            <Table.Th w={40}>
+              {onToggleSelectAll && (
+                <Checkbox
+                  checked={attributes.length > 0 && attributes.every((attr) => selectedIds.has(attr.id))}
+                  indeterminate={attributes.some((attr) => selectedIds.has(attr.id)) && !attributes.every((attr) => selectedIds.has(attr.id))}
+                  onChange={onToggleSelectAll}
+                  aria-label="Select all attributes on this page"
+                />
+              )}
+            </Table.Th>
             <Table.Th>Name</Table.Th>
             <Table.Th>Category</Table.Th>
             <Table.Th>Type</Table.Th>
@@ -37,8 +48,10 @@ export function AttributeLibraryTable({
               <Table.Tr
                 key={attr.id}
                 bg={isSelected ? "var(--mantine-color-blue-light)" : undefined}
+                onClick={() => onToggleSelect(attr.id)}
+                style={{ cursor: "pointer" }}
               >
-                <Table.Td>
+                <Table.Td onClick={(e) => e.stopPropagation()}>
                   <Checkbox
                     checked={isSelected}
                     onChange={() => onToggleSelect(attr.id)}
