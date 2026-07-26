@@ -8,7 +8,10 @@ namespace server.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-public class AuthController(IAuthService authService) : ControllerBase
+public class AuthController(
+    IAuthService authService,
+    IUserPreferenceService userPreferenceService
+) : ControllerBase
 {
     [Authorize]
     [HttpGet("me")]
@@ -21,13 +24,16 @@ public class AuthController(IAuthService authService) : ControllerBase
         }
 
         var role = await authService.GetUserRoleAsync(user);
+        var pref = await userPreferenceService.GetPreferenceAsync(user.Id);
         return Ok(new
         {
             userId = user.Id,
             email = user.Email,
-            role = role ?? "Candidate"
+            role = role ?? "Candidate",
+            preference = pref
         });
     }
+
 
     [Authorize]
     [HttpPost("logout")]

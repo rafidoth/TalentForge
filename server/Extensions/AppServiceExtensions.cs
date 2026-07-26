@@ -30,6 +30,7 @@ namespace server.Extensions
             services.AddScoped<ITagsService, TagsService>();
             services.AddScoped<ICvService, CvService>();
             services.AddScoped<ICloudinaryService, CloudinaryService>();
+            services.AddScoped<IUserPreferenceService, UserPreferenceService>();
             return services;
         }
     }

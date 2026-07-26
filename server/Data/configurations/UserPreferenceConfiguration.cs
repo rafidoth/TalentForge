@@ -4,11 +4,10 @@ using server.Entities;
 
 namespace server.Data.configurations
 {
-    public class UserPreferenceConfiguration : IEntityTypeConfiguration<AppAttribute>
+    public class UserPreferenceConfiguration : IEntityTypeConfiguration<UserPreference>
     {
-        public void Configure(EntityTypeBuilder<AppAttribute> builder)
+        public void Configure(EntityTypeBuilder<UserPreference> builder)
         {
-
             builder.Property(a => a.CreatedAt).HasDefaultValueSql("now()").ValueGeneratedOnAdd();
         }
     }
