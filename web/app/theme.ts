@@ -192,7 +192,7 @@ const theme: MantineThemeOverride = {
     black: 'rgba(20, 19, 19, 1)',
     autoContrast: true,
     luminanceThreshold: 0.3,
-    fontFamily: 'Raleway, sans-serif',
+    fontFamily: 'Archivo, sans-serif',
     fontFamilyMonospace: 'Roboto Mono',
     scale: 1,
     radius: {
