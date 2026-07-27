@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
@@ -33,6 +35,10 @@ namespace server.Extensions
                         "Google ClientSecret is not configured."
                     );
                     options.SignInScheme = IdentityConstants.ExternalScheme;
+                    options.Scope.Add("profile");
+                    options.ClaimActions.MapJsonKey("urn:google:picture", "picture", "url");
+                    options.ClaimActions.MapJsonKey(ClaimTypes.GivenName, "given_name");
+                    options.ClaimActions.MapJsonKey(ClaimTypes.Surname, "family_name");
                 });
 
             services.ConfigureApplicationCookie(options =>

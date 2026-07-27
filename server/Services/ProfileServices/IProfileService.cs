@@ -13,7 +13,7 @@ namespace server.Services.ProfileServices
         Task AddAttributeToProfileAsync(string userId, AddProfileAttributeDto dto);
         Task<bool> DeleteAttributeFromProfileAsync(string userId, Guid profileAttributeId);
         Task UpdateAttributeValueInProfileAsync(string userId, UpdateProfileAttributeValueDto dto);
-        Task<bool> CreateMeSectionAsync(JsonElement FName, JsonElement LName, JsonElement Location, string userId);
+        Task<bool> CreateMeSectionAsync(string userId, JsonElement FName, JsonElement LName, JsonElement Location, JsonElement? imageUrl);
         Task<CandidatePositionAttributesDto?> GetCandidateAttributesForPositionAsync(string userId, Guid positionId);
     }
 }

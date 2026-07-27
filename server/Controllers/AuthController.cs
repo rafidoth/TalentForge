@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using server.Dto;
 using server.Services.UserServices;
@@ -47,17 +46,8 @@ public class AuthController(
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDto loginDto)
     {
-        var result = await authService.LoginAsync(loginDto);
-        if (result.IsSuccess)
-        {
-            return Ok(new { success = true });
-        }
-
-        if (result.ErrorCode == "InvalidCredentials")
-        {
-            return Unauthorized(result.Message);
-        }
-        return Unauthorized();
+        await authService.LoginAsync(loginDto);
+        return Ok(new { success = true });
     }
 
     [AllowAnonymous]
@@ -89,31 +79,30 @@ public class AuthController(
             return Redirect($"{returnUrl}login?error=GoogleAuthFailed");
         }
 
-        var result = await authService.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false);
-        if (result.IsSuccess)
+        try
         {
+            await authService.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false);
             return Redirect($"{returnUrl}login/success");
         }
-
-        var createResult = await authService.CreateExternalUserAsync(info);
-        if (createResult.IsSuccess)
+        catch
         {
-            return Redirect($"{returnUrl}login/success");
+            try
+            {
+                await authService.CreateExternalUserAsync(info);
+                return Redirect($"{returnUrl}login/success");
+            }
+            catch
+            {
+                return Redirect($"{returnUrl}login?error=GoogleAuthFailed");
+            }
         }
-
-        return Redirect($"{returnUrl}login?error=GoogleAuthFailed");
     }
 
     [AllowAnonymous]
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto request)
     {
-        var result = await authService.RegisterAsync(request);
-        if (result.IsSuccess)
-        {
-            return Ok(new { success = true });
-        }
-
-        return BadRequest(new { message = result.Message });
+        await authService.RegisterAsync(request);
+        return Ok(new { success = true });
     }
 }

@@ -8,10 +8,11 @@ namespace server.Services.ProfileServices
     {
 
         public async Task<bool> CreateMeSectionAsync(
+            string userId,
             JsonElement FName,
             JsonElement LName,
             JsonElement Location,
-            string userId
+            JsonElement? imageUrl
         )
         {
             var dicebear_url = cfg.GetValue<string>("DiceBear:profile_image");
@@ -19,8 +20,10 @@ namespace server.Services.ProfileServices
             {
                 throw new Exception("DiceBear profile image URL is not configured.");
             }
+
+            var imgUrl = imageUrl ?? JsonDocument.Parse($"\"{dicebear_url}{userId.Substring(0, 4)}\"").RootElement;
             var profileAttributes = await BuildMeProfileAttributesAsync(
-                userId, FName, LName, Location, dicebear_url
+                userId, FName, LName, Location, imgUrl
             );
 
             await db.ProfileAttributes.AddRangeAsync(profileAttributes);
@@ -33,7 +36,7 @@ namespace server.Services.ProfileServices
             JsonElement FName,
             JsonElement LName,
             JsonElement Location,
-            string dicebear_url
+            JsonElement imgUrl
         )
         {
             var fna = await attrs.GetAttributeByNameAsync(BuiltInAttributes.FirstName);
@@ -46,14 +49,13 @@ namespace server.Services.ProfileServices
                 throw new Exception("One or more required attributes are missing.");
             }
 
-            var defaultImageUrlJson = JsonDocument.Parse($"\"{dicebear_url}{userId.Substring(0, 4)}\"").RootElement;
 
             return
             [
                 BuildProfileAttribute(FName, userId, fna),
                 BuildProfileAttribute(LName, userId, lna),
                 BuildProfileAttribute(Location, userId, loc),
-                BuildProfileAttribute(defaultImageUrlJson, userId, pia)
+                BuildProfileAttribute(imgUrl, userId, pia)
             ];
         }
     }

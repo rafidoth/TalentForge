@@ -3,7 +3,7 @@ import type { AuthInfo, LoginRequest, RegisterRequest } from "./types";
 
 export function loginWithGoogle() {
     const returnUrl = encodeURIComponent(window.location.origin + "/");
-    window.location.href = `${import.meta.env.VITE_API_URL}/users/login/google?provider=Google&returnUrl=${returnUrl}`;
+    window.location.href = `${import.meta.env.VITE_API_URL}/auth/login/google?provider=Google&returnUrl=${returnUrl}`;
 }
 
 export async function login(data: LoginRequest): Promise<void> {
