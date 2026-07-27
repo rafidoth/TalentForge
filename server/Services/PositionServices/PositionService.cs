@@ -16,9 +16,9 @@ namespace server.Services.PositionServices
                 .FirstOrDefaultAsync(p => p.Id == id) ?? throw new NotFoundException(nameof(Position), id);
 
         private static PositionDto MapToDto(Position position) 
-            => new() { Id = position.Id, Title = position.Title, ShortDescription = position.ShortDescription, IsPublic = position.IsPublic, MaxProjects = position.MaxProjects, CreatedAt = position.CreatedAt, UpdatedAt = position.UpdatedAt };
+            => new() { Id = position.Id, Title = position.Title, ShortDescription = position.ShortDescription, IsPublic = position.IsPublic, MaxProjects = position.MaxProjects, SubmittedCvCount = position.Cvs.Count(c => c.IsPublished), CreatedAt = position.CreatedAt, UpdatedAt = position.UpdatedAt };
 
         private static Expression<Func<Position, PositionDto>> MapToDtoExpr() 
-            => p => new PositionDto { Id = p.Id, Title = p.Title, ShortDescription = p.ShortDescription, IsPublic = p.IsPublic, MaxProjects = p.MaxProjects, CreatedAt = p.CreatedAt, UpdatedAt = p.UpdatedAt };
+            => p => new PositionDto { Id = p.Id, Title = p.Title, ShortDescription = p.ShortDescription, IsPublic = p.IsPublic, MaxProjects = p.MaxProjects, SubmittedCvCount = p.Cvs.Count(c => c.IsPublished), CreatedAt = p.CreatedAt, UpdatedAt = p.UpdatedAt };
     }
 }

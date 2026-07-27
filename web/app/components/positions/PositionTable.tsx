@@ -15,6 +15,10 @@ export function PositionTable({
   onToggleSelect,
   onRowClick,
 }: PositionTableProps) {
+  const sortedPositions = [...positions].sort(
+    (a, b) => (b.submittedCvCount ?? 0) - (a.submittedCvCount ?? 0)
+  );
+
   return (
     <Table.ScrollContainer minWidth={600} maxHeight={600}>
       <Table highlightOnHover withRowBorders withColumnBorders={false}>
@@ -23,12 +27,13 @@ export function PositionTable({
             <Table.Th w={40}></Table.Th>
             <Table.Th>Title</Table.Th>
             <Table.Th>Last Updated At</Table.Th>
+            <Table.Th>Submitted CVs</Table.Th>
             <Table.Th>Max Projects</Table.Th>
             <Table.Th>Visibility</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {positions.map((position) => {
+          {sortedPositions.map((position) => {
             const isSelected = selectedIds.has(position.id);
             return (
               <Table.Tr
@@ -53,6 +58,9 @@ export function PositionTable({
                   </Text>
                 </Table.Td>
                 <Table.Td>
+                  <Text size="sm">{position.submittedCvCount ?? 0}</Text>
+                </Table.Td>
+                <Table.Td>
                   <Text size="sm">{position.maxProjects}</Text>
                 </Table.Td>
                 <Table.Td>
@@ -71,7 +79,7 @@ export function PositionTable({
           })}
           {positions.length === 0 && (
             <Table.Tr>
-              <Table.Td colSpan={5}>
+              <Table.Td colSpan={6}>
                 <Text ta="center" c="dimmed" py="xl">
                   No positions found. Create one to get started!
                 </Text>

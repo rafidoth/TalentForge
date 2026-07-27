@@ -7,6 +7,7 @@ export interface PositionDto {
   shortDescription?: string;
   isPublic: boolean;
   maxProjects: number;
+  submittedCvCount?: number;
   createdAt: string;
   updatedAt: string;
   accessRules?: any[];
