@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using server.Data;
 using server.Dto;
 using server.Entities;
 using server.Services.ProfileServices;
 using server.Services.ProjectsServices;
+using server.Services.UserServices;
 
 namespace server.Controllers
 {
@@ -15,8 +17,8 @@ namespace server.Controllers
     public class ProfileController(
         IProfileService profileService,
         IProjectsService projectsService,
-        UserManager<ApplicationUser> userManager,
-        ICandidateProfileService candidateProfileService
+        IAuthService authService,
+        UserManager<ApplicationUser> userManager
     ) : ControllerBase
     {
 
@@ -137,10 +139,20 @@ namespace server.Controllers
             return Ok(result);
         }
 
+
+        [Authorize(Roles = Roles.AdminOrRecruiter)]
         [HttpGet("candidate/{candidateId}/full")]
         public async Task<IActionResult> GetCandidateFullProfile(string candidateId)
-            => Ok(await candidateProfileService.GetCandidateFullProfileAsync(candidateId));
+        {
+            var user = await authService.GetUserByIdAsync(candidateId);
+            if (user == null) return Unauthorized();
+            var result = await profileService.GetCandidateFullProfileAsync(user);
+            return Ok(result);
+        }
+
     }
 
-
+    internal class IauthService
+    {
+    }
 }

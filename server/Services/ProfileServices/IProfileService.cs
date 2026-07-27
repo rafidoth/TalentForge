@@ -6,6 +6,7 @@ namespace server.Services.ProfileServices
 {
     public interface IProfileService
     {
+        Task<CandidateFullProfileDto> GetCandidateFullProfileAsync(ApplicationUser user);
         Task<MeSectionDto> GetMeSectionAsync(string userId);
         Task<MeSectionDto> UpdateMeSectionAsync(ApplicationUser user, UpdateMeSectionDto dto);
         Task<List<ProfileAttributeDto>> GetNonBuiltInAttributesAsync(string userId);

@@ -64,3 +64,36 @@ export async function fetchCandidatePositionAttributes(positionId: string): Prom
     const res = await api.get<CandidatePositionAttributesDto>(`/profile/attributes/position/${positionId}`);
     return res.data;
 }
+
+// Candidate Full Profile (for recruiters/admins viewing a candidate)
+
+export interface CandidateInfoSectionDto {
+    email: string;
+    status: string;
+    joinedAt: string;
+}
+
+export interface CandidateCvSummaryDto {
+    id: string;
+    candidateId: string;
+    positionId: string;
+    positionTitle: string;
+    candidateName: string;
+    isPublished: boolean;
+    createdAt: string;
+    likeCount: number;
+}
+
+export interface CandidateFullProfileDto {
+    candidateId: string;
+    infoSection: CandidateInfoSectionDto;
+    meSection: MeSectionDto;
+    attributes: ProfileAttributeDto[];
+    projects: ProjectDto[];
+    cvs: CandidateCvSummaryDto[];
+}
+
+export async function fetchCandidateFullProfile(candidateId: string): Promise<CandidateFullProfileDto> {
+    const res = await api.get<CandidateFullProfileDto>(`/profile/candidate/${candidateId}/full`);
+    return res.data;
+}

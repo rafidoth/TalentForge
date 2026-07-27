@@ -19,7 +19,6 @@ namespace server.Extensions
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IAttributeService, AttributeService>();
             services.AddScoped<IProfileService, ProfileService>();
-            services.AddScoped<ICandidateProfileService, CandidateProfileService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserConfirmation<ApplicationUser>, UserConfirmation>();
             services.AddScoped<IPositionService, PositionService>();

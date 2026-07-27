@@ -161,6 +161,12 @@ public class AuthService(SignInManager<ApplicationUser> signInManager, IProfileS
         return user;
     }
 
+    public async Task<ApplicationUser?> GetUserByIdAsync(string userId)
+    {
+        var user = await signInManager.UserManager.FindByIdAsync(userId);
+        return user;
+    }
+
     public async Task<ApplicationUser?> GetUserByClaimsPrincipalAsync(ClaimsPrincipal User)
     {
         var user = await signInManager.UserManager.GetUserAsync(User);

@@ -1,4 +1,5 @@
-import { Table, Text, Badge, Checkbox } from '@mantine/core';
+import { useNavigate } from 'react-router';
+import { Table, Text, Badge, Checkbox, Anchor } from '@mantine/core';
 import type { UserListDto } from '~/api/types';
 
 const formatDate = (isoString: string) => {
@@ -20,6 +21,7 @@ interface UserTableRowProps {
 }
 
 export function UserTableRow({ user, selected, onSelect, index }: UserTableRowProps) {
+  const navigate = useNavigate();
   return (
     <Table.Tr bg={selected ? 'var(--mantine-color-blue-light)' : undefined}>
       <Table.Td>
@@ -29,7 +31,19 @@ export function UserTableRow({ user, selected, onSelect, index }: UserTableRowPr
         <Text size="sm">{index}</Text>
       </Table.Td>
       <Table.Td>
-        <Text size="sm" fw={500}>{user.email}</Text>
+        {user.role === 'Candidate' ? (
+          <Anchor
+            component="button"
+            type="button"
+            size="sm"
+            fw={500}
+            onClick={() => navigate(`/app/candidate/${user.id}`)}
+          >
+            {user.email}
+          </Anchor>
+        ) : (
+          <Text size="sm" fw={500}>{user.email}</Text>
+        )}
       </Table.Td>
       <Table.Td>
         <Badge color={user.method === 'Email' ? 'blue' : 'red'} variant="light">

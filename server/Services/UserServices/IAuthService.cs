@@ -21,6 +21,7 @@ public interface IAuthService
     Task<ApplicationUser?> GetUserByClaimsPrincipalAsync(ClaimsPrincipal User);
     Task<string> GetUserRoleAsync(ApplicationUser user);
     Task<ApplicationUser?> GetUserByEmailAsync(string email);
+    Task<ApplicationUser?> GetUserByIdAsync(string userId);
     Task<IdentityResult> CreateNewUserAsync(ApplicationUser user, string password);
     Task<IdentityResult> AssignRoleAsync(ApplicationUser user, string role);
     Task<SignInResult> SignInUserAsync(ApplicationUser user, string password, bool isPersistent);

@@ -14,6 +14,7 @@ export default [
         route("cvs", "routes/cvs.tsx"),
         route("cv/:id", "routes/cv.tsx"),
         route("position/:id", "routes/position-details.tsx"),
+        route("candidate/:id", "routes/candidate-details.tsx"),
         route("c/positions", "routes/candidate-positions.tsx"),
         route("c/projects", "routes/candidate-projects.tsx"),
         route("c/cvs", "routes/candidate-cvs.tsx"),
