@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
-import { Container, Title, Text, Stack, Loader, Center, Group, ActionIcon, Button } from "@mantine/core";
+import { Container, Title, Text, Stack, Loader, Center, Group, ActionIcon, Button, Anchor } from "@mantine/core";
 import { ArrowLeftIcon } from "@phosphor-icons/react";
 import { IconHeartFilled, IconHeart } from "@tabler/icons-react";
 import { useFullCv, useLikeCv, useUnlikeCv } from "~/hooks/useCvs";
@@ -59,7 +59,16 @@ export default function CvDetailsPage() {
                 <Group justify="space-between" align="flex-start">
                     <Stack gap="xs">
                         <Title order={3} c="dimmed">{cv.positionTitle}</Title>
-                        <Title order={1}>{cv.candidateName}</Title>
+                        <Title order={1}>
+                            <Anchor
+                                component="button"
+                                type="button"
+                                onClick={() => navigate(`/app/candidate/${cv.candidateId}`)}
+                                style={{ fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit', textDecoration: 'underline' }}
+                            >
+                                {cv.candidateName}
+                            </Anchor>
+                        </Title>
                     </Stack>
 
                     <Group gap={4} align="center">

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Card, Text, Center, Loader, Table, Pagination, Flex, Stack, Badge } from "@mantine/core";
+import { Card, Text, Center, Loader, Table, Pagination, Flex, Stack, Badge, Anchor } from "@mantine/core";
 import { usePositionCvs } from "~/hooks/useCvs";
 import { formatDate, formatDateTime } from "~/utils/date";
 import { useNavigate } from "react-router";
@@ -61,7 +61,17 @@ export function SubmittedCvList({ positionId }: SubmittedCvListProps) {
                                             onClick={() => navigate(`/app/cv/${cv.id}`)}
                                         >
                                             <Table.Td>
-                                                <Text fw={500}>{cv.candidateName}</Text>
+                                                <Anchor
+                                                    component="button"
+                                                    type="button"
+                                                    fw={500}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        navigate(`/app/candidate/${cv.candidateId}`);
+                                                    }}
+                                                >
+                                                    {cv.candidateName}
+                                                </Anchor>
                                             </Table.Td>
                                             <Table.Td>
                                                 <Text size="sm" c="dimmed">

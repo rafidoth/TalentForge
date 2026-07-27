@@ -38,7 +38,15 @@ public partial class CvService
         return cvs.Select(c => MapToCvListDto(c, name)).ToList();
     }
 
-    public async Task<PagedResponse<CvListDto>> GetCvsWithPositionByCandidateIdAsync(string candidateId, int page, int size)
+    public async Task<PagedResponse<CvListDto>> GetPublishedCvsWithPositionByCandidateId(Guid positionId, int page, int size)
+    {
+        var q = db.Cvs.Include(c => c.Position)
+                      .Where(c => c.PositionId == positionId && c.IsPublished)
+                      .OrderByDescending(c => c.CreatedAt);
+        return await MapCvListWithNamesAsync(await PagedResponse.CreateAsync(q, page, size));
+    }
+
+    public async Task<PagedResponse<CvListDto>> GetCvsWithPosition(string candidateId, int page, int size)
     {
         var q = db.Cvs
                   .Include(c => c.Position)

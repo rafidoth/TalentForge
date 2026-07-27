@@ -43,10 +43,19 @@ namespace server.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = Roles.AdminOrCandidate)]
         [HttpGet("candidate")]
-        public async Task<IActionResult> GetCvsByCandidateId([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetCvs([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await cvService.GetCvsWithPositionByCandidateIdAsync(GetUserIdString(), pageNumber, pageSize);
+            var result = await cvService.GetCvsWithPosition(GetUserIdString(), pageNumber, pageSize);
+            return Ok(result);
+        }
+
+        [Authorize(Roles = Roles.AdminOrRecruiter)]
+        [HttpGet("candidate/{candidateId}")]
+        public async Task<IActionResult> GetCvsByCandidateId(string candidateId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await cvService.GetCvsWithPosition(candidateId, pageNumber, pageSize);
             return Ok(result);
         }
 
