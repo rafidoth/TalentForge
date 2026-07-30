@@ -12,6 +12,7 @@ import type { ProfileAttributeDto } from '~/api/types';
 import { getDisplayName, getProfileImageUrl, getAttributeValue } from './profileUtils';
 import RoleBadge from '../common/RoleBadge';
 import type { UserRole } from '~/auth/types';
+import { SalesforceSyncModal } from './SalesforceSyncModal';
 
 interface ProfileHeroProps {
     attributes: ProfileAttributeDto[];
@@ -54,6 +55,7 @@ export function ProfileHero({ attributes, email, role }: ProfileHeroProps) {
                             RoleBadge({ role: role as UserRole })
                         )}
                     </Group>
+                    <SalesforceSyncModal />
                 </Stack>
             </Group>
         </Paper>

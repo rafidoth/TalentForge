@@ -8,6 +8,7 @@ using server.Services.TagsServices;
 using server.Services.UserServices;
 using server.Services.CvServices;
 using server.Services.CloudinaryServices;
+using server.Services.SalesforceServices;
 using server.Utils;
 
 namespace server.Extensions
@@ -30,6 +31,7 @@ namespace server.Extensions
             services.AddScoped<ICvService, CvService>();
             services.AddScoped<ICloudinaryService, CloudinaryService>();
             services.AddScoped<IUserPreferenceService, UserPreferenceService>();
+            services.AddScoped<ISalesforceService, SalesforceService>();
             return services;
         }
     }

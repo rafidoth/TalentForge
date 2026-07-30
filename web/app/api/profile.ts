@@ -1,5 +1,6 @@
 import api from "./index";
-import type { MeSectionDto, UpdateMeSectionDto, ProfileAttributeDto, AddProfileAttributeDto, UpdateProfileAttributeValueDto, ProjectDto, CreateProjectDto, UpdateProjectDto, TagDto, CandidatePositionAttributesDto, ProjectSearchQueryDto, PaginatedResponse } from "./types";
+import type { MeSectionDto, UpdateMeSectionDto, ProfileAttributeDto, AddProfileAttributeDto, UpdateProfileAttributeValueDto, ProjectDto, CreateProjectDto, UpdateProjectDto, TagDto, CandidatePositionAttributesDto, ProjectSearchQueryDto, PaginatedResponse, SyncSalesforceProfileDto, SalesforceStatusResponse } from "./types";
+
 export async function fetchMeSection(): Promise<MeSectionDto> {
     const res = await api.get<MeSectionDto>("/profile/me");
     return res.data;
@@ -96,4 +97,13 @@ export interface CandidateFullProfileDto {
 export async function fetchCandidateFullProfile(candidateId: string): Promise<CandidateFullProfileDto> {
     const res = await api.get<CandidateFullProfileDto>(`/profile/candidate/${candidateId}/full`);
     return res.data;
+}
+
+export async function fetchSalesforceStatus(): Promise<SalesforceStatusResponse> {
+    const res = await api.get<SalesforceStatusResponse>("/profile/sf/status");
+    return res.data;
+}
+
+export async function syncSalesforceProfile(dto: SyncSalesforceProfileDto): Promise<void> {
+    await api.post("/profile/sf", dto);
 }

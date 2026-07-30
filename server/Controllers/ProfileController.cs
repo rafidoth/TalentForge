@@ -7,6 +7,7 @@ using server.Entities;
 using server.Services.ProfileServices;
 using server.Services.ProjectsServices;
 using server.Services.UserServices;
+using server.Services.SalesforceServices;
 
 namespace server.Controllers
 {
@@ -18,6 +19,7 @@ namespace server.Controllers
         IProfileService profileService,
         IProjectsService projectsService,
         IAuthService authService,
+        ISalesforceService salesforceService,
         UserManager<ApplicationUser> userManager
     ) : ControllerBase
     {
@@ -150,9 +152,34 @@ namespace server.Controllers
             return Ok(result);
         }
 
-    }
+        [Authorize]
+        [HttpPost("sf")]
+        public async Task<IActionResult> CreateSalesforceLink([FromBody] SyncSalesforceProfileDto dto)
+        {
+            var user = await userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
 
-    internal class IauthService
-    {
+            var success = await salesforceService.SyncUserToSalesforceAsync(user, dto);
+            
+            if (success) 
+            {
+                return Ok(new { message = "Successfully synced to Salesforce." });
+            }
+            
+            return BadRequest(new { message = "Failed to sync to Salesforce." });
+        }
+
+        [Authorize]
+        [HttpGet("sf/status")]
+        public async Task<IActionResult> GetSalesforceSyncStatus()
+        {
+            var user = await userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+
+            var isSynced = salesforceService.IsUserSyncedToSalesforce(user);
+            
+            return Ok(new { isSynced });
+        }
+
     }
 }

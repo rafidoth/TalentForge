@@ -11,6 +11,7 @@ builder.Services.AddDatabase(builder.Configuration)
                 .AddCorsPolicy(builder.Configuration)
                 .AddApiDoc();
 
+builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();

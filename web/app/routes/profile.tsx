@@ -2,10 +2,7 @@ import { Navigate, useNavigate } from 'react-router';
 import {
     Container,
     Stack,
-    Group,
-    Button,
 } from '@mantine/core';
-import { ArrowLeftIcon } from '@phosphor-icons/react';
 import { useIsAuthenticated, useAuthLoading, useAuthStore } from '~/auth/store';
 import { useMeSection } from '~/hooks/useProfileData';
 import {
@@ -15,6 +12,7 @@ import {
     MeSectionEditor,
     ProjectsSection,
     ProfileInfoSection,
+    SalesforceSyncModal,
 } from '~/components/profile';
 
 export default function Profile() {

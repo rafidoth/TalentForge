@@ -8,3 +8,4 @@ export { ProfileAttributeInput } from './ProfileAttributeInput';
 export { getAttributeValue, getProfileImageUrl, getDisplayName } from './profileUtils';
 export { ProjectsSection } from './ProjectsSection';
 export { ProfileInfoSection } from './ProfileInfoSection';
+export { SalesforceSyncModal } from './SalesforceSyncModal';

@@ -221,3 +221,14 @@ export interface PopularPositionDto {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface SyncSalesforceProfileDto {
+  companyName: string;
+  jobTitle: string;
+  phoneNumber: string;
+  industry: string;
+}
+
+export interface SalesforceStatusResponse {
+  isSynced: boolean;
+}
