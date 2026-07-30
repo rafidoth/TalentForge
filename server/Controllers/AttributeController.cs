@@ -13,7 +13,7 @@ namespace server.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/attributes")]
-public class AttributeController(IAttributeService attributeService) : ControllerBase
+public class AttributeController(IAttributeService attributeService, ILogger logger) : ControllerBase
 {
 
     [HttpGet("types-and-categories")]
@@ -21,6 +21,7 @@ public class AttributeController(IAttributeService attributeService) : Controlle
     {
         var categories = await attributeService.GetCategoriesAsync();
         var types = await attributeService.GetAttributeTypesAsync();
+        logger.LogInformation("Retrieved attribute types and categories.");
 
         return Ok(new
         {
