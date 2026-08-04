@@ -37,7 +37,6 @@ export function AttributeLibraryTable({
             <Table.Th>Name</Table.Th>
             <Table.Th>Category</Table.Th>
             <Table.Th>Type</Table.Th>
-            <Table.Th> Description</Table.Th>
             {!hideStatus && <Table.Th>Status</Table.Th>}
           </Table.Tr>
         </Table.Thead>
@@ -77,9 +76,6 @@ export function AttributeLibraryTable({
                   <Badge variant="light" color="blue">
                     {attr.typeName}
                   </Badge>
-                </Table.Td>
-                <Table.Td>
-                  {attr.description}
                 </Table.Td>
                 {!hideStatus && (
                   <Table.Td>
