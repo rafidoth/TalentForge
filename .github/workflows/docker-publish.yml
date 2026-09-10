@@ -34,3 +34,26 @@ jobs:
 
       - name: Push image
         run: docker push rafidoth/talent_forge:${{ steps.vars.outputs.TAG }}
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+
+            # Stop and remove all running containers
+            docker ps -q | xargs -r docker stop
+            docker ps -aq | xargs -r docker rm
+
+            # Pull the newly built image
+            docker pull rafidoth/talent_forge:1.0${{ github.run_number }}
+
+            # Run the new container
+            docker run -d \
+              --name talent_forge \
+              --restart unless-stopped \
+              -p 8080:8080 \
+              rafidoth/talent_forge:1.0${{ github.run_number }}
