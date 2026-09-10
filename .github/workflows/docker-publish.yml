@@ -53,7 +53,7 @@ jobs:
 
             # Run the new container
             docker run -d \
-              --env-file .env 
+              --env-file .env \
               --name talent_forge \
               --restart unless-stopped \
               -p 8080:8080 \
