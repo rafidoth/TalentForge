@@ -21,7 +21,7 @@ public class HealthController(ApplicationDbContext dbContext) : Controller
                 return StatusCode(503, "Database unreachable");
             }
 
-            return Ok("Ok");
+            return Ok("ok");
         }
         catch (Exception ex)
         {
