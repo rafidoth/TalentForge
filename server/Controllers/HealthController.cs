@@ -9,7 +9,6 @@ namespace server.Controllers;
 public class HealthController : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> HealthCheck(Guid id)
-            => Ok("Healthy");
+    public IActionResult HealthCheck(Guid id)=> Ok("Healthy");
 
 }
