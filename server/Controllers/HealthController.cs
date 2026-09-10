@@ -9,6 +9,10 @@ namespace server.Controllers;
 public class HealthController : Controller
 {
     [HttpGet]
-    public IActionResult HealthCheck(Guid id)=> Ok("Healthy");
+    public IActionResult HealthCheck(Guid id)
+    {
+        
+        return Ok("Ok");
+    }
 
 }
