@@ -1,6 +1,5 @@
 <div align="center">
   <!-- You can replace this with your actual logo -->
-  <img src="https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/React-Dark.svg" width="80" alt="TalentForge Logo" />
   
   <h1 align="center">Talent Forge</h1>
   
@@ -27,6 +26,23 @@
 ## 🌟 Overview
 
 **Talent Forge** is a comprehensive recruitment and profiling platform designed to bridge the gap between candidates and recruiters. It features a robust attribute engine, dynamic CV generation tailored to specific positions, real-time collaboration, and an intuitive, table-driven user interface.
+
+## 💻 Tech Stack
+
+### Frontend
+- **Framework:** React 19 & React Router 8
+- **UI Library:** Mantine & TailwindCSS
+- **State Management:** Zustand & React Query
+- **Editor:** TipTap (Markdown)
+- **Language:** TypeScript
+- **Build Tool:** Vite
+
+### Backend
+- **Framework:** ASP.NET Core (C#), EF Core, Redis 
+- **Architecture:** Standard N-Tier (Controllers, Services, Repositories)
+
+### Infrastructure
+- **Containerization:** Docker & Docker Compose
 
 ## ✨ Key Features
 
@@ -99,19 +115,25 @@ The application will now be running and accessible via your local browser.
 
 Use these default credentials to test the different roles in the system:
 
-| Role | Email | Password |
-| :--- | :--- | :--- |
-| **Admin** | `admin@talentforge.local` | `admin123` |
-| **Recruiter** | `recruiter@talentforge.local` | `recruiter123` |
-| **Candidate** | `candidate@talentforge.local` | `candidate123` |
+| Role          | Email              | Password       |
+|:--------------|:-------------------|:---------------|
+| **Admin**     | `admin@tf.com`     | `root_1Admin`  |
+| **Recruiter** | `rezia@gmail.com`  | `hello_1World` |
+| **Candidate** | `rafiul@gmail.com` | `hello_1World` |
 
-*(Note: Please ensure you change these in a production environment).*
 
 ## 🏗️ Architecture & Deployment
 
-<!-- DEPLOYMENT DIAGRAM PLACEHOLDER -->
+The application is deployed using a robust, highly available cloud architecture:
+
+### Frontend
+- **Hosting:** [Vercel](https://vercel.com/)
+- **Delivery:** Global Edge CDN provided by Vercel ensures fast, low-latency access to the React frontend application.
+
+### Backend
+- **API Management:** AWS API Gateway routing requests securely to the internal network.
+- **Load Balancing:** AWS Network Load Balancer (NLB) for high-performance TCP routing.
+- **Compute:** Amazon EC2 instances hosting the containerized .NET backend services.
 
 ---
-<div align="center">
-  <i>Built with passion to forge the best talents.</i>
-</div>
+
